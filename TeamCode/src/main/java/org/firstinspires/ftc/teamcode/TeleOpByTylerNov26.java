@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
 
-@TeleOp(name = "TeleOp", group = "$")
+@TeleOp(name = "TeleOpByTyler", group = "$")
 public class TeleOpByTylerNov26 extends OpMode {
 
     private MecanumDriveBase mecanumDrive;

@@ -172,7 +172,7 @@ public class StarterBotTeleop extends OpMode {
      */
     @Override
     public void loop() {
-        forward = gamepad1.left_stick_y;
+        forward = -gamepad1.left_stick_y;
         strafe = gamepad1.left_stick_x;
         rotate = gamepad1.right_stick_x;
         /*
@@ -186,10 +186,10 @@ public class StarterBotTeleop extends OpMode {
          */
         // left stick forward/back and right stick left/right
 
-        drive.driveFieldRelative(forward, strafe, rotate);
+        //drive.driveFieldRelative(forward, strafe, rotate);
 
         // for robot centric drive, comment out the drive.driveFieldRelative, and uncomment the drive.drive
-        //drive.drive(forward, strafe, rotate);
+        drive.drive(forward, strafe, rotate);
 
         // left stick forward/back and left stick left/right
         //arcadeDrive(-gamepad2.left_stick_y,gamepad2.left_stick_x);

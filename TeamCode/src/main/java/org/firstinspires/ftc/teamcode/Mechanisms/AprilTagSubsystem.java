@@ -25,6 +25,15 @@ public class AprilTagSubsystem {
     private static final KalmanFilterParameters KALMAN_FILTER_PARAMETERS = new KalmanFilterParameters(0.05, 0.1);
     private static final Size CAMERA_RESOLUTION = new Size(640, 480);
 
+    private static final boolean DRAW_TAG_ID = true;
+    private static final boolean DRAW_TAG_OUTLINE = true;
+    private static final boolean DRAW_AXES = true;
+    private static final boolean DRAW_CUBE_PROJECTION = true;
+    private static final DistanceUnit OUTPUT_DISTANCE_UNIT = DistanceUnit.CM;
+    private static final AngleUnit OUTPUT_ANGLE_UNIT = AngleUnit.DEGREES;
+
+    private static final String WEBCAM_NAME = "Webcam 1";
+
     private final AprilTagProcessor aprilTagProcessor;
     private final VisionPortal visionPortal;
 
@@ -36,15 +45,15 @@ public class AprilTagSubsystem {
 
     public AprilTagSubsystem(@NotNull HardwareMap hardwareMap) {
         aprilTagProcessor = new AprilTagProcessor.Builder()
-                .setDrawTagID(true)
-                .setDrawTagOutline(true)
-                .setDrawAxes(true)
-                .setDrawCubeProjection(true)
-                .setOutputUnits(DistanceUnit.CM, AngleUnit.DEGREES)
+                .setDrawTagID(DRAW_TAG_ID)
+                .setDrawTagOutline(DRAW_TAG_OUTLINE)
+                .setDrawAxes(DRAW_AXES)
+                .setDrawCubeProjection(DRAW_CUBE_PROJECTION)
+                .setOutputUnits(OUTPUT_DISTANCE_UNIT, OUTPUT_ANGLE_UNIT)
                 .build();
 
         visionPortal = new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCamera(hardwareMap.get(WebcamName.class, WEBCAM_NAME))
                 .setCameraResolution(CAMERA_RESOLUTION)
                 .addProcessor(aprilTagProcessor)
                 .build();
@@ -133,6 +142,10 @@ public class AprilTagSubsystem {
 
     public void debug(Telemetry telemetry, int id) {
         if (tagDetectedWithId(id)) {
+            /*
+             * Safety: Because tagDetectedWithId is called by this point, tagWidthRawId and
+             * tagWithId cannot be null
+             */
             final AprilTagDetection raw = tagWithIdRaw(id);
             final AprilTagDetection filtered = tagWithId(id);
 

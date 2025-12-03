@@ -3,12 +3,15 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
 
 @TeleOp(name = "TeleOpByTyler", group = "$")
 public class TeleOpByTylerNov26 extends OpMode {
+
+    private AprilTagSubsystem aprilTagSubsystem;
 
     private MecanumDriveBase mecanumDrive;
     private Intake intake;
@@ -18,6 +21,8 @@ public class TeleOpByTylerNov26 extends OpMode {
         mecanumDrive = new MecanumDriveBase(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
+
+        aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
     }
 
     @Override public void loop() {
@@ -43,6 +48,10 @@ public class TeleOpByTylerNov26 extends OpMode {
         } else {
             shooter.spin(0.0);
         }
-    }
+
+        aprilTagSubsystem.update();
+
+        aprilTagSubsystem.debug(telemetry,20);
+    } // end loop
 }
 

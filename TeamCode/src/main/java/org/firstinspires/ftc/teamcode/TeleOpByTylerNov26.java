@@ -43,6 +43,7 @@ public class TeleOpByTylerNov26 extends OpMode {
         } else {
             shooter.spin(0.0);
         }
+
     }
 }
 

@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 public class AutoByExampleDec extends  OpMode{
 
     private Intake intake;
+    private Shooter shooter;
 
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
@@ -94,6 +95,7 @@ public class AutoByExampleDec extends  OpMode{
             case 0:
                 follower.followPath(scorePreload);
                 setPathState(1);
+                shooter.score(3);
                 break;
             case 1:
 
@@ -104,7 +106,7 @@ public class AutoByExampleDec extends  OpMode{
             */
 
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if(!follower.isBusy()) {
+                if(!follower.isBusy() && shooter.score(3)) {
                     /* Score Preload */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
@@ -211,6 +213,7 @@ public class AutoByExampleDec extends  OpMode{
         follower.setStartingPose(startPose);
 
         intake = new Intake(hardwareMap);
+        shooter = new Shooter(hardwareMap);
 
     } // end init
 

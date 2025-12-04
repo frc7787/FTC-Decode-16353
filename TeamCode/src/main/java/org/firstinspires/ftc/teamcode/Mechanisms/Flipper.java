@@ -8,9 +8,15 @@ public class Flipper {
 
     public Flipper(HardwareMap hardwareMap) {
         servoFlipper = hardwareMap.get(Servo.class, "servoFlipper");
+        servoFlipper.setPosition(0.05);
     }
 
+    public void up() {
+        servoFlipper.setPosition(0.3);
+    }
 
-
+    public void down() {
+        servoFlipper.setPosition(0.05);
+    }
 
 }

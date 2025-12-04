@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.teamcode.Mechanisms.Flipper;
+import org.firstinspires.ftc.teamcode.Mechanisms.IndicatorLights;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
@@ -20,7 +21,15 @@ public class TeleOpByTylerNov26 extends OpMode {
 
     private Flipper flipper;
 
+    private IndicatorLights indicatorLights;
+
     private boolean DEBUG = true;
+
+    private double[] results;
+    private double distanceAprilTag = 9999;
+    private double angleAprilTag = 9999;
+    private double shooterVelocity = 0;
+    private double shooterTargetVelocity;
 
     @Override public void init() {
         mecanumDrive = new MecanumDriveBase(hardwareMap);
@@ -29,6 +38,9 @@ public class TeleOpByTylerNov26 extends OpMode {
         flipper = new Flipper(hardwareMap);
 
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
+        indicatorLights = new IndicatorLights(hardwareMap);
+
+        shooterTargetVelocity = 2000;
     }
 
     @Override public void start() {
@@ -50,11 +62,12 @@ public class TeleOpByTylerNov26 extends OpMode {
         }
 
         intake.spin(gamepad2.left_trigger - gamepad2.right_trigger);
+        shooterVelocity = shooter.velocity();
 
         if (gamepad2.rightBumperWasPressed()) {
-            shooter.spin(2000);
+            shooter.spin(shooterTargetVelocity);
         } else if (gamepad2.left_bumper) {
-            if (shooter.velocity() > 1000) {
+            if (shooterVelocity > 1000) {
                 shooter.spin(0.0);
             } else {
                 shooter.spin(-500);
@@ -70,13 +83,34 @@ public class TeleOpByTylerNov26 extends OpMode {
         }
 
         aprilTagSubsystem.update();
+        results = aprilTagSubsystem.angleANDdistance(20);
+        distanceAprilTag = results[0];
+        angleAprilTag = results[1];
+        indicatorLights.display(distanceAprilTag,150.0, angleAprilTag, 0.0); // should be actual ideal distance for shooting
+
+        if (gamepad1.leftBumperWasPressed()) {
+            shooterTargetVelocity = shooterTargetVelocity - 5;
+        } else if (gamepad1.rightBumperWasPressed()) {
+            shooterTargetVelocity = shooterTargetVelocity + 5;
+        }
 
         if (DEBUG) {
-            telemetry.addData("SHOOTER VELOCITY",shooter.velocity());
-            telemetry.update();
+            telemetry.addData("SHOOTER VELOCITY",shooterVelocity);
+            telemetry.addData("SHOOTER TARGET VELOCITY",shooterTargetVelocity);
+            telemetry.addData("RANGE",distanceAprilTag);
+            telemetry.addData("ANGLE",angleAprilTag);
         }
 
         aprilTagSubsystem.debug(telemetry,20);
+        telemetry.update();
     } // end loop
-}
+
+    public boolean checkRange() {
+
+        double distance;
+        distance = 0;
+
+        return false;
+    }
+} // end class TeleOpByTylerNov26
 

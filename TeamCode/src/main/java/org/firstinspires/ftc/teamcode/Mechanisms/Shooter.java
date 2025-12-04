@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class Shooter {
 
     private final DcMotorEx motor;
+    private final DcMotorEx motor2;
 
     private Timer scoreTimer;
 
@@ -19,15 +20,22 @@ public class Shooter {
         motor = hardwareMap.get(DcMotorEx.class, "shooterMotor");
         motor.setDirection(DcMotorEx.Direction.REVERSE);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        motor2 = hardwareMap.get(DcMotorEx.class, "shooterTwo");
+        motor2.setDirection(DcMotorEx.Direction.FORWARD);
+        motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         scoreTimer = new Timer();
     }
 
     public void spin(double velocity) {
+
         motor.setVelocity(velocity);
+        motor2.setVelocity(velocity);
     }
 
     public double velocity() {
-        return motor.getVelocity();
+        return motor2.getVelocity();
     }
 
 

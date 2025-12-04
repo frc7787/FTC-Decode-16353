@@ -50,6 +50,7 @@ public class AprilTagSubsystem {
                 .setDrawAxes(DRAW_AXES)
                 .setDrawCubeProjection(DRAW_CUBE_PROJECTION)
                 .setOutputUnits(OUTPUT_DISTANCE_UNIT, OUTPUT_ANGLE_UNIT)
+                .setLensIntrinsics(622.001f, 622.001, 319.803f, 241.251f) // from teamwebcamcalibrations
                 .build();
 
         visionPortal = new VisionPortal.Builder()
@@ -162,5 +163,35 @@ public class AprilTagSubsystem {
         } else {
             telemetry.addLine("No tag detected with id: " + id);
         }
+    } // end debug
+
+    public double[] angleANDdistance(int id) {
+        double distanceToAprilTag = 9999;
+        double angleToAprilTag = 9999;
+        final AprilTagDetection filtered;
+        double[] results = new double[2];
+
+        if (tagDetectedWithId(id)) {
+            filtered = tagWithId(id);
+            distanceToAprilTag = Math.hypot(filtered.ftcPose.x, filtered.ftcPose.y); // actually use the Kalman Filtered RANGE!!!
+            distanceToAprilTag = Math.hypot(distanceToAprilTag, filtered.ftcPose.z);
+            angleToAprilTag = filtered.ftcPose.bearing;
+            results[0] = distanceToAprilTag;
+            results[1] = angleToAprilTag;
+        }
+
+        return results;
+    }
+
+    public double angle(int id) {
+        double angleToAprilTag = 9999;
+        final AprilTagDetection filtered;
+
+        if (tagDetectedWithId(id)) {
+            filtered = tagWithId(id);
+            angleToAprilTag = filtered.ftcPose.bearing;
+        }
+
+        return angleToAprilTag;
     }
 }

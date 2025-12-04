@@ -16,6 +16,8 @@ public class AutoByExampleDec extends  OpMode{
     private Intake intake;
     private Shooter shooter;
 
+    private AprilTagSubsystem aprilTagSubsystem;
+
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
@@ -214,6 +216,7 @@ public class AutoByExampleDec extends  OpMode{
 
         intake = new Intake(hardwareMap);
         shooter = new Shooter(hardwareMap);
+        aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
     } // end init
 

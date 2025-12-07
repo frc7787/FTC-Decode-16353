@@ -58,11 +58,14 @@ public class Shooter {
         switch (shooterState) {
             case START:
                 if(gamepad2.cross){
+                    motor2.setVelocity(MOTORVELOCITY);
+                    motor.setVelocity(MOTORVELOCITY);
+
+                    shooterTimer.resetTimer();
                     shooterState = shootingState.INTAKE;
                 }
 
             case INTAKE:
-                shooterTimer.resetTimer();
                 intake.spin(0.5);
                 if (shooterTimer.getElapsedTimeSeconds() > 3) {
                     shooterState = shootingState.MOTORSPINUP;
@@ -70,9 +73,9 @@ public class Shooter {
 
                 }
             case MOTORSPINUP:
-                motor2.setVelocity(MOTORVELOCITY);
-                motor.setVelocity(MOTORVELOCITY);
-                if(motor.getVelocity()>=MOTORVELOCITY &&motor2.getVelocity()>=MOTORVELOCITY) {
+
+                if(motor.getVelocity()>MOTORVELOCITY- 100 &&motor2.getVelocity()>MOTORVELOCITY- 100) {
+                    shooterTimer.resetTimer();
                     shooterState = shootingState.FLINGER;
 
                 }
@@ -80,7 +83,6 @@ public class Shooter {
             case FLINGER:
 
                 flipper.up();
-                shooterTimer.resetTimer();
                 if(shooterTimer.getElapsedTimeSeconds()>2){
                     flipper.down();
 
@@ -89,8 +91,6 @@ public class Shooter {
                 }
             case END:
                 break;
-
-
         }
     }
 

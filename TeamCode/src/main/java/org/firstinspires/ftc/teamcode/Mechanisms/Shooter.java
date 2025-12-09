@@ -23,10 +23,10 @@ public class Shooter {
     private Timer shooterTimer;
 
     private int motorvelocity = 2050;
-    private int NEARVELOCITY = 1725;
+    private int NEARVELOCITY = 1710;
     private int MEDIUMVELOCITY = 1800;
-    private int FARVELOCITY = 2050;
-    private int REALLYFARVELOCITY = 2150;
+    private int FARVELOCITY = 2015;
+    private int REALLYFARVELOCITY = 2110;
     private enum shootingState{
         IDLE, START,INTAKE,MOTORSPINUP,FLINGER,END
     }
@@ -103,7 +103,7 @@ public class Shooter {
                 }
                 case INTAKE: {
                     intake.spin(0.5);
-                    if (shooterTimer.getElapsedTimeSeconds() > 1) {
+                    if (shooterTimer.getElapsedTimeSeconds() > 0.5) {
                         shooterState = shootingState.MOTORSPINUP;
                     }
                     telemetry.addData("SHOOTER UPDATE","INTAKE");
@@ -119,9 +119,9 @@ public class Shooter {
                     break;
                 }
                 case FLINGER: {
-                    if (shooterTimer.getElapsedTimeSeconds() > 3) {
+                    if (shooterTimer.getElapsedTimeSeconds() > 1.5) {
                         shooterState = shootingState.END;
-                    } else if (shooterTimer.getElapsedTimeSeconds() > 2) {
+                    } else if (shooterTimer.getElapsedTimeSeconds() > 1) {
                         flipper.down();
                     }
                     telemetry.addData("SHOOTER UPDATE","FLINGER");

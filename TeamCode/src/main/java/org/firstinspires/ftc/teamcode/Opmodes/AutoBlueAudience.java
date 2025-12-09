@@ -40,8 +40,8 @@ public class AutoBlueAudience extends  OpMode{
 
     private final Pose pickup2EndPose = new Pose(24,59,Math.toRadians(180));
 
-    private final Pose pickup3StartPose = new Pose(48, 35, Math.toRadians(180));
-    private final Pose pickup3EndPose = new Pose(24,35, Math.toRadians(180));
+    private final Pose pickup3StartPose = new Pose(48, 34, Math.toRadians(180));
+    private final Pose pickup3EndPose = new Pose(23,34, Math.toRadians(180));
     private final Pose scorePose = new Pose(60, 85, Math.toRadians(135)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
     private final Pose scorePoseAudience = new Pose(56,16, Math.toRadians(110)); // Scoring Pose from the Audience launch zone.
     private final Pose pickup1Pose = new Pose(37, 121, Math.toRadians(0)); // Highest (First Set) of Artifacts from the Spike Mark.

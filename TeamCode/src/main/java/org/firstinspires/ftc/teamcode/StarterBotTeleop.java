@@ -50,6 +50,7 @@ public class StarterBotTeleop extends OpMode {
     private DcMotorEx launcher = null;
     private CRServo leftFeeder = null;
     private CRServo rightFeeder = null;
+    private DcMotorEx intake = null;
 
     ElapsedTime feederTimer = new ElapsedTime();
 
@@ -105,6 +106,8 @@ public class StarterBotTeleop extends OpMode {
         launcher = hardwareMap.get(DcMotorEx.class, "launcher");
         leftFeeder = hardwareMap.get(CRServo.class, "left_feeder");
         rightFeeder = hardwareMap.get(CRServo.class, "right_feeder");
+
+        intake = hardwareMap.get(DcMotorEx.class, "intake");
 
         /*
          * To drive forward, most robots need the motor on one side to be reversed,
@@ -204,10 +207,19 @@ public class StarterBotTeleop extends OpMode {
             launcher.setVelocity(STOP_SPEED);
         }
 
+        if (gamepad1.rightBumperWasPressed()) {
+            intake.setPower(0.9);
+        } else if (gamepad1.leftBumperWasPressed()) {
+            intake.setPower(0.0);
+        }
+
         /*
          * Now we call our "Launch" function.
          */
-        launch(gamepad1.rightBumperWasPressed());
+        if (gamepad1.aWasPressed()) {
+            launch(true);
+        }
+
 
 
         /*
@@ -227,7 +239,7 @@ public class StarterBotTeleop extends OpMode {
     public void stop() {
     }
 
-        void launch(boolean shotRequested) {
+    void launch(boolean shotRequested) {
         switch (launchState) {
             case IDLE:
                 leftFeeder.setPower(-0.2);

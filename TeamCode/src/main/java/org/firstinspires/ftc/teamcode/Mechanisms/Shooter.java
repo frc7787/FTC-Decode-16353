@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 
 public class Shooter {
 
@@ -20,11 +22,17 @@ public class Shooter {
     private  boolean started = false;
     private Timer shooterTimer;
 
-    private int MOTORVELOCITY = 2000;
+    private int motorvelocity = 2050;
+    private int NEARVELOCITY = 1725;
+    private int MEDIUMVELOCITY = 1800;
+    private int FARVELOCITY = 2050;
+    private int REALLYFARVELOCITY = 2150;
     private enum shootingState{
-        START,INTAKE,MOTORSPINUP,FLINGER,END
+        IDLE, START,INTAKE,MOTORSPINUP,FLINGER,END
     }
     private shootingState shooterState = shootingState.START;
+    private boolean startScoring = true;
+    private double totalBalls = 3;
 
     public Shooter(HardwareMap hardwareMap) {
 
@@ -40,6 +48,20 @@ public class Shooter {
 
         scoreTimer = new Timer();
         shooterTimer = new Timer();
+
+        shooterState = shootingState.IDLE;
+    }
+
+    public void setShooterVelocity(int velocity) {
+        if (velocity == 0) {
+            motorvelocity= NEARVELOCITY;
+        } else if (velocity == 1) {
+            motorvelocity = MEDIUMVELOCITY;
+        } else if (velocity == 2) {
+            motorvelocity = FARVELOCITY;
+        } else if (velocity == 3) {
+            motorvelocity = REALLYFARVELOCITY;
+        }
     }
 
 
@@ -54,59 +76,87 @@ public class Shooter {
         return motor2.getVelocity();
     }
 
-    public void update() {
-        switch (shooterState) {
-            case START:
-                if(gamepad2.cross){
-                    motor2.setVelocity(MOTORVELOCITY);
-                    motor.setVelocity(MOTORVELOCITY);
+    public boolean update(boolean startShootingProcess, boolean cancelShootingProcess, Telemetry telemetry) {
+        if (cancelShootingProcess) {
+            intake.spin(0);
+            flipper.down();
+            startScoring =true;
+            shooterState = shootingState.IDLE;
+            return false;
+        } else {
+            switch (shooterState) {
+                case IDLE: {
+                    if (startShootingProcess) {
+                        shooterState = shootingState.START;
+                    }
+                    telemetry.addData("SHOOTER UPDATE","IDLE");
+                    break;
+                }
+                case START: {
+                    motor2.setVelocity(motorvelocity);
+                    motor.setVelocity(motorvelocity);
 
                     shooterTimer.resetTimer();
                     shooterState = shootingState.INTAKE;
+                    telemetry.addData("SHOOTER UPDATE","START");
+                    break;
                 }
-
-            case INTAKE:
-                intake.spin(0.5);
-                if (shooterTimer.getElapsedTimeSeconds() > 3) {
-                    shooterState = shootingState.MOTORSPINUP;
-
-
+                case INTAKE: {
+                    intake.spin(0.5);
+                    if (shooterTimer.getElapsedTimeSeconds() > 1) {
+                        shooterState = shootingState.MOTORSPINUP;
+                    }
+                    telemetry.addData("SHOOTER UPDATE","INTAKE");
+                    break;
                 }
-            case MOTORSPINUP:
-
-                if(motor.getVelocity()>MOTORVELOCITY- 100 &&motor2.getVelocity()>MOTORVELOCITY- 100) {
-                    shooterTimer.resetTimer();
-                    shooterState = shootingState.FLINGER;
-
+                case MOTORSPINUP: {
+                    if (motor.getVelocity() > motorvelocity - 50) {
+                        shooterTimer.resetTimer();
+                        shooterState = shootingState.FLINGER;
+                        flipper.up();
+                    }
+                    telemetry.addData("SHOOTER UPDATE","MOTORSPINUP");
+                    break;
                 }
-
-            case FLINGER:
-
-                flipper.up();
-                if(shooterTimer.getElapsedTimeSeconds()>2){
-                    flipper.down();
-
-                } else if (shooterTimer.getElapsedTimeSeconds()>4) {
-                    shooterState = shootingState.END;
+                case FLINGER: {
+                    if (shooterTimer.getElapsedTimeSeconds() > 3) {
+                        shooterState = shootingState.END;
+                    } else if (shooterTimer.getElapsedTimeSeconds() > 2) {
+                        flipper.down();
+                    }
+                    telemetry.addData("SHOOTER UPDATE","FLINGER");
+                    break;
                 }
-            case END:
-                break;
-        }
-    }
+                case END: {
+                    telemetry.addData("SHOOTER UPDATE","END");
+                    shooterState = shootingState.IDLE;
+                    return true; // update returns true only when the cycle has finally reached "END"
+                }
+            } // end switch
+            return false; // update returns false if the cycle has not JUST finished "scoring"
+        } // end else, for switch
 
+    } // end update
 
+    public boolean score(boolean placeHolder, double numberBalls, Telemetry telemetry) {
 
-                public boolean score(double numberBalls) {
-        if (!started) {
-            scoreTimer.resetTimer();
-            started = true;
-            this.spin(2000);
-        } else if (scoreTimer.getElapsedTimeSeconds() > 2* numberBalls) {
-            started = false;
-            this.spin(0);
-            return true; // finished scoring, so score is true
+        if (startScoring) {
+            telemetry.addData("SHOOTER SCORE","startScoring");
+            totalBalls = numberBalls;
+            startScoring = false;
+            this.update(true,false, telemetry); // start the shooting update process, with "true" for shootingstate START
+        } else if (this.update(false,false, telemetry)) {
+            telemetry.addData("SHOOTER SCORE", "update true, so minus one ball");
+            totalBalls = totalBalls - 1;
+            if (totalBalls == 0) {
+                telemetry.addData("SHOOTER SCORE", "total balls equals ZERO");
+                startScoring = true;
+                return true; // finished firing all balls, return true for "score"
+            } else {
+                this.update(true, false, telemetry); // start the shooting update process, with "true" for shootingstate START
+                return false; // if not finished firing all balls, return false for "score"
+            }
         }
         return false;
-
     } // end score
 }

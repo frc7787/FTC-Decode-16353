@@ -30,6 +30,7 @@ public class TeleOpByTylerNov26 extends OpMode {
     private double angleAprilTag = 9999;
     private double shooterVelocity = 0;
     private double shooterTargetVelocity;
+    private String shooterDistance = "Default";
 
     @Override public void init() {
         mecanumDrive = new MecanumDriveBase(hardwareMap);
@@ -64,6 +65,8 @@ public class TeleOpByTylerNov26 extends OpMode {
         intake.spin(gamepad2.left_trigger - gamepad2.right_trigger);
         shooterVelocity = shooter.velocity();
 
+
+
         if (gamepad2.rightBumperWasPressed()) {
             shooter.spin(shooterTargetVelocity);
         } else if (gamepad2.left_bumper) {
@@ -82,6 +85,8 @@ public class TeleOpByTylerNov26 extends OpMode {
             flipper.down();
         }
 
+
+
         aprilTagSubsystem.update();
         results = aprilTagSubsystem.angleANDdistance(20);
         distanceAprilTag = results[0];
@@ -94,7 +99,26 @@ public class TeleOpByTylerNov26 extends OpMode {
             shooterTargetVelocity = shooterTargetVelocity + 5;
         }
 
+        if (gamepad1.triangleWasPressed()) {
+            // near
+            shooter.setShooterVelocity(0);
+            shooterDistance = "Near";
+        } else if (gamepad1.squareWasPressed()) {
+            // medium
+            shooter.setShooterVelocity(1);
+            shooterDistance = "Medium";
+        } else if (gamepad1.circleWasPressed()) {
+            // far
+            shooter.setShooterVelocity(2);
+            shooterDistance = "Far";
+        } else if (gamepad1.xWasPressed()) {
+            // really far
+            shooter.setShooterVelocity(3);
+            shooterDistance = "Really Far";
+        }
+
         if (DEBUG) {
+            telemetry.addData("SHOOTER DISTANCE", shooterDistance);
             telemetry.addData("SHOOTER VELOCITY",shooterVelocity);
             telemetry.addData("SHOOTER TARGET VELOCITY",shooterTargetVelocity);
             telemetry.addData("RANGE",distanceAprilTag);

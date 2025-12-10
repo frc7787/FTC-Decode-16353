@@ -12,18 +12,23 @@ import java.util.List;
 public class AprilTagWebCamOpModeSahaj extends OpMode {
 
      AprilTagWebCamMechanismsSahaj aprilTagWebCam = new AprilTagWebCamMechanismsSahaj();
+     private boolean exposureSet = false;
 
 
     @Override
     public void init() {
         aprilTagWebCam.init(hardwareMap, telemetry);
-        aprilTagWebCam.setManualExposure(10, 6);
 
 
     }
 
     @Override
     public void loop() {
+
+        if (!exposureSet) {
+            aprilTagWebCam.setManualExposure(10, 6);
+            exposureSet = true;
+        }
         // update the vision portal
         aprilTagWebCam.update();
         List<AprilTagDetection> detectedTags = aprilTagWebCam.getDetectedTags();

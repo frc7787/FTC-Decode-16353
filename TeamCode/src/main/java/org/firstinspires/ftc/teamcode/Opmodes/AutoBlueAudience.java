@@ -30,6 +30,8 @@ public class AutoBlueAudience extends  OpMode{
     // INITIALIZING POSES
 
     private final Pose startPose = new Pose(28, 127, Math.toRadians(180)); // Start Pose of our robot.
+    private final Pose leavePoseGoal = new Pose(60, 65, Math.toRadians(135)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+
     private final Pose startPoseAudience = new Pose(56, 8, Math.toRadians(90)); // Start Pose of our robot.
     private final Pose leavePoseAudience = new Pose(56,20, Math.toRadians(90)); //
 
@@ -104,6 +106,11 @@ public class AutoBlueAudience extends  OpMode{
                 .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
                 .build();
 
+        leaveGoal = follower.pathBuilder()
+                .addPath(new BezierLine(scorePose,leavePoseGoal))
+                .setLinearHeadingInterpolation(scorePose.getHeading(),leavePoseGoal.getHeading())
+                .build();
+
         // AUDIENCE SIDE PATHS
 
         scorePreloadAudience = new Path(new BezierLine(startPoseAudience, scorePoseAudience));
@@ -114,7 +121,9 @@ public class AutoBlueAudience extends  OpMode{
                 .setLinearHeadingInterpolation(scorePoseAudience.getHeading(), pickup3StartPose.getHeading())
                 .addPath(new BezierLine(pickup3StartPose, pickup3EndPose))
                 .setLinearHeadingInterpolation(pickup3StartPose.getHeading(), pickup3EndPose.getHeading())
-                .setGlobalDeceleration(3)
+                .setGlobalDeceleration(4)
+                .setBrakingStrength(4)
+                .setBrakingStart(4)
                 .setVelocityConstraint(10)
                 .build();
 
@@ -185,7 +194,7 @@ public class AutoBlueAudience extends  OpMode{
                 if (!follower.isBusy()) {
                     /* Grab Sample */
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
-                    intake.spin(0.0);
+                    intake.spin(0.8);
                     follower.followPath(scorePickup3Audience, true);
                     setPathState(4);
                 }
@@ -195,6 +204,7 @@ public class AutoBlueAudience extends  OpMode{
                 if (!follower.isBusy()) {
                     setPathState(5);
                 }
+                break;
             }
             case 5: { // JUST SCORING - pickup 3
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
@@ -214,7 +224,7 @@ public class AutoBlueAudience extends  OpMode{
                     /* Grab Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
-                    intake.spin(0);
+                    intake.spin(0.8);
                     follower.followPath(scorePickup2Audience, true);
                     setPathState(7);
                 }
@@ -224,6 +234,7 @@ public class AutoBlueAudience extends  OpMode{
                 if (!follower.isBusy()) {
                     setPathState(8);
                 }
+                break;
             }
             case 8: { // JUST SCORING - pickup 2
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
@@ -233,7 +244,7 @@ public class AutoBlueAudience extends  OpMode{
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     //follower.followPath(grabPickup3,true);
                     follower.followPath(leaveAudience, true);
-                    intake.spin(0);  // POWER DOWN FOR END OF AUTO
+                    intake.spin(0.0);  // POWER DOWN FOR END OF AUTO
                     shooter.spin(0);
                     setPathState(9);
                 }
@@ -243,6 +254,7 @@ public class AutoBlueAudience extends  OpMode{
                 if (!follower.isBusy()) {
                     setPathState(-1);
                 }
+                break;
             }
             case 66:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup3Pose's position */

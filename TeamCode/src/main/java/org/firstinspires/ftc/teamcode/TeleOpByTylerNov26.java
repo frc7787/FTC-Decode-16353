@@ -31,6 +31,11 @@ public class TeleOpByTylerNov26 extends OpMode {
     private double shooterVelocity = 0;
     private double shooterTargetVelocity;
     private String shooterDistance = "Default";
+    private enum AutomaticShooting {MANUAL, AUTO1,AUTO3};
+    private AutomaticShooting automaticShooting = AutomaticShooting.MANUAL;
+
+    private double[] idealRanges = {170,190,200,210};
+    private double currentRange = 170;
 
     @Override public void init() {
         mecanumDrive = new MecanumDriveBase(hardwareMap);
@@ -42,6 +47,7 @@ public class TeleOpByTylerNov26 extends OpMode {
         indicatorLights = new IndicatorLights(hardwareMap);
 
         shooterTargetVelocity = 2000;
+
     }
 
     @Override public void start() {
@@ -56,15 +62,17 @@ public class TeleOpByTylerNov26 extends OpMode {
         double turn = gamepad1.right_stick_x;
         turn *= Math.abs(turn);
 
-        mecanumDrive.driveRobotCentric(drive, strafe, turn);
+        //mecanumDrive.driveRobotCentric(drive, strafe, turn);
+        mecanumDrive.driveFieldCentric(drive,strafe,turn);
 
         if (gamepad1.options) {
             mecanumDrive.resetImu();
         }
 
+        // GAMEPAD2 manual controls
+
         intake.spin(gamepad2.left_trigger - gamepad2.right_trigger);
         shooterVelocity = shooter.velocity();
-
 
 
         if (gamepad2.rightBumperWasPressed()) {
@@ -85,13 +93,30 @@ public class TeleOpByTylerNov26 extends OpMode {
             flipper.down();
         }
 
+        // Gamepad2 automatic scoring controls
+
+        if (gamepad2.yWasPressed()) {
+            automaticShooting = AutomaticShooting.AUTO1;
+            shooter.score(true,1,telemetry);
+        } else if (gamepad2.aWasPressed()) {
+            automaticShooting = AutomaticShooting.AUTO3;
+            shooter.score(true, 3,telemetry);
+        }
+
+        if ((automaticShooting == AutomaticShooting.AUTO1) || (automaticShooting == AutomaticShooting.AUTO3)) {
+            if (shooter.score(false,3,telemetry)) {
+                automaticShooting = AutomaticShooting.MANUAL;
+            }
+        }
 
 
         aprilTagSubsystem.update();
         results = aprilTagSubsystem.angleANDdistance(20);
         distanceAprilTag = results[0];
         angleAprilTag = results[1];
-        indicatorLights.display(distanceAprilTag,150.0, angleAprilTag, 0.0); // should be actual ideal distance for shooting
+        indicatorLights.display(distanceAprilTag, currentRange, angleAprilTag, 0.0); // should be actual ideal distance for shooting
+
+        // GAMEPAD1 controls
 
         if (gamepad1.leftBumperWasPressed()) {
             shooterTargetVelocity = shooterTargetVelocity - 5;
@@ -101,19 +126,27 @@ public class TeleOpByTylerNov26 extends OpMode {
 
         if (gamepad1.triangleWasPressed()) {
             // near
-            shooter.setShooterVelocity(0);
+            shooterTargetVelocity = shooter.NEARVELOCITY;
+            currentRange = idealRanges[0];
+            //shooter.setShooterVelocity(0);
             shooterDistance = "Near";
         } else if (gamepad1.squareWasPressed()) {
             // medium
-            shooter.setShooterVelocity(1);
+            shooterTargetVelocity = shooter.MEDIUMVELOCITY;
+            currentRange = idealRanges[1];
+            //shooter.setShooterVelocity(1);
             shooterDistance = "Medium";
         } else if (gamepad1.circleWasPressed()) {
             // far
-            shooter.setShooterVelocity(2);
+            //shooter.setShooterVelocity(2);
+            shooterTargetVelocity = shooter.FARVELOCITY;
+            currentRange = idealRanges[2];
             shooterDistance = "Far";
         } else if (gamepad1.xWasPressed()) {
             // really far
-            shooter.setShooterVelocity(3);
+            //shooter.setShooterVelocity(3);
+            shooterTargetVelocity = shooter.REALLYFARVELOCITY;
+            currentRange = idealRanges[3];
             shooterDistance = "Really Far";
         }
 

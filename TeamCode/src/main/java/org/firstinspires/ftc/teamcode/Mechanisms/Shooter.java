@@ -22,15 +22,15 @@ public class Shooter {
     private  boolean started = false;
     private Timer shooterTimer;
 
-    private int motorvelocity = 2050;
-    private int NEARVELOCITY = 1710;
-    private int MEDIUMVELOCITY = 1800;
-    private int FARVELOCITY = 2015;
-    private int REALLYFARVELOCITY = 2110;
+    public int motorvelocity = 2000;
+    public int NEARVELOCITY = 1710;
+    public int MEDIUMVELOCITY = 1800;
+    public int FARVELOCITY = 2015;
+    public int REALLYFARVELOCITY = 2110;
     private enum shootingState{
         IDLE, START,INTAKE,MOTORSPINUP,FLINGER,END
     }
-    private shootingState shooterState = shootingState.START;
+    private shootingState shooterState;
     private boolean startScoring = true;
     private double totalBalls = 3;
 
@@ -102,7 +102,7 @@ public class Shooter {
                     break;
                 }
                 case INTAKE: {
-                    intake.spin(0.5);
+                    intake.spin(0.8);
                     if (shooterTimer.getElapsedTimeSeconds() > 0.5) {
                         shooterState = shootingState.MOTORSPINUP;
                     }

@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 
 
-@Autonomous(name="StarterBotAuto", group="StarterBot")
+@Autonomous(name="StarterBotAutoPerimeter", group="StarterBot")
 public class AutoPerimeterNov26Esquimalt extends OpMode
 {
 

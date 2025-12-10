@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
@@ -26,6 +27,8 @@ public class AutoEsquimaltNov26 extends OpMode
     private MecanumDriveBase mecanumDrive;
     private Intake intake;
     private Shooter shooter;
+
+    private AprilTagSubsystem aprilTagSubsystem;
 
     final double FEED_TIME = 0.20; //The feeder servos run this long when a shot is requested.
 
@@ -155,6 +158,7 @@ public class AutoEsquimaltNov26 extends OpMode
         mecanumDrive = new MecanumDriveBase(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
+        aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
 
         // Tell the driver that initialization is complete.

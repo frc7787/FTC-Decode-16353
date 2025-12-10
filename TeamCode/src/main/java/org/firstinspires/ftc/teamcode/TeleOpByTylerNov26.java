@@ -152,8 +152,9 @@ public class TeleOpByTylerNov26 extends OpMode {
 
         if (DEBUG) {
             telemetry.addData("SHOOTER DISTANCE", shooterDistance);
-            telemetry.addData("SHOOTER VELOCITY",shooterVelocity);
             telemetry.addData("SHOOTER TARGET VELOCITY",shooterTargetVelocity);
+            telemetry.addData("SHOOTER ACTUAL VELOCITY",shooterVelocity);
+
             telemetry.addData("RANGE",distanceAprilTag);
             telemetry.addData("ANGLE",angleAprilTag);
         }

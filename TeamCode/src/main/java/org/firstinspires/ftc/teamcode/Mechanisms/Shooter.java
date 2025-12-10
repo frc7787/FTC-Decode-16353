@@ -98,6 +98,7 @@ public class Shooter {
 
                     shooterTimer.resetTimer();
                     shooterState = shootingState.INTAKE;
+                    intake.spin(0.8);
                     telemetry.addData("SHOOTER UPDATE","START");
                     break;
                 }
@@ -119,9 +120,9 @@ public class Shooter {
                     break;
                 }
                 case FLINGER: {
-                    if (shooterTimer.getElapsedTimeSeconds() > 1.5) {
+                    if (shooterTimer.getElapsedTimeSeconds() > 1.0) { // was 1.5
                         shooterState = shootingState.END;
-                    } else if (shooterTimer.getElapsedTimeSeconds() > 1) {
+                    } else if (shooterTimer.getElapsedTimeSeconds() > 0.5) {  // was 1
                         flipper.down();
                     }
                     telemetry.addData("SHOOTER UPDATE","FLINGER");

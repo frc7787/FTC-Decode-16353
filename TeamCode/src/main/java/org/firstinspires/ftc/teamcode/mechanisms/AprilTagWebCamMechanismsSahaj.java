@@ -34,6 +34,7 @@ public class AprilTagWebCamMechanismsSahaj {
     private Telemetry telemetry;
 
     private KalmanFilter xfilter, yfilter, zfilter;
+    private KalmanFilter rangeFilter, bearingFilter, elevationFilter;
     private KalmanFilterParameters kalmanParams;
 
     public void init(HardwareMap hwMap, Telemetry telemetry)  {
@@ -58,6 +59,11 @@ public class AprilTagWebCamMechanismsSahaj {
         xfilter = new KalmanFilter(kalmanParams);
         yfilter = new KalmanFilter(kalmanParams);
         zfilter = new KalmanFilter(kalmanParams);
+
+        rangeFilter = new KalmanFilter(kalmanParams);
+        bearingFilter = new KalmanFilter(kalmanParams);
+        elevationFilter = new KalmanFilter(kalmanParams);
+
 
 
 
@@ -109,10 +115,6 @@ public class AprilTagWebCamMechanismsSahaj {
     public void setManualExposure(int exposureMS, int gain) {
         try {
 
-            //while (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
-                //sleep(20);
-
-            //}
 
             ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
             if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
@@ -136,15 +138,45 @@ public class AprilTagWebCamMechanismsSahaj {
             xfilter.update(realTag.ftcPose.x, 0);
             yfilter.update(realTag.ftcPose.y, 0);
             zfilter.update(realTag.ftcPose.z, 0);
+            rangeFilter.update(realTag.ftcPose.range, 0);
+            bearingFilter.update(realTag.ftcPose.bearing, 0);
+            elevationFilter.update(realTag.ftcPose.elevation, 0);
+
+            telemetry.addLine("=== SMOOTHED KALMAN DATA ===");
+            telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f (cm, deg, deg)",
+                    rangeFilter.getState(), bearingFilter.getState(), elevationFilter.getState()));
             telemetry.addLine("=== SMOOTHED KALMAN DATA ===");
             telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f (cm)",
                     xfilter.getState(), yfilter.getState(), zfilter.getState()));
-            //telemetry.addLine(String.format("RAW XYZ %6.1f %6.1f %6.1f (cm) RAW",
-                   // realTag.ftcPose.x, realTag.ftcPose.y, realTag.ftcPose.z));
 
             return realTag;
         }
         return null;
+    }
+
+
+    public double getSmoothedX() {
+        return xfilter.getState();
+    }
+
+    public double getSmoothedY() {
+        return yfilter.getState();
+    }
+
+    public double getSmoothedZ() {
+        return zfilter.getState();
+    }
+
+    public double getSmoothedRange() {
+        return rangeFilter.getState();
+    }
+
+    public double getSmoothedBearing() {
+        return bearingFilter.getState();
+    }
+
+    public double getSmoothedElevation() {
+        return elevationFilter.getState();
     }
 
 }

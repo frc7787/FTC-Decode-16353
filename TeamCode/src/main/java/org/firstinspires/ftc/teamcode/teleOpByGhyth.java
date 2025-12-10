@@ -41,6 +41,7 @@ public class  teleOpByGhyth extends OpMode {
 
     private boolean lastOptions = false;
     private AprilTagSubsystem aprilTagSubsystem;
+    private String shooterDistance;
 
     private MecanumDriveBase mecanumDrive;
     private Intake intake;
@@ -58,35 +59,14 @@ public class  teleOpByGhyth extends OpMode {
         intake = new Intake(hardwareMap);
         flipper = new Flipper(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
+        mecanumDrive = new MecanumDriveBase(hardwareMap);
+
 
 
 
         // drive motor init
-        backRightDrive = hardwareMap.get(DcMotor.class, "backRightDrive");
-        backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDrive");
-        frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDrive");
-        frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDrive");
-
-        frontLeftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        frontRightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        backLeftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        backRightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-
-        frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotorEx.Direction.FORWARD);
-        backLeftDrive.setDirection(DcMotorEx.Direction.REVERSE);
 
 
-        imu = hardwareMap.get(IMU.class, "imu");
-        final IMU.Parameters IMU_PARAMETERS = new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                        RevHubOrientationOnRobot.UsbFacingDirection.UP
-                )
-        );
-
-        imu.initialize(IMU_PARAMETERS);
 
 
 
@@ -102,40 +82,51 @@ public class  teleOpByGhyth extends OpMode {
     @Override
     public void loop() {
         //Drive code
-        double drive = -gamepad1.left_stick_y; // forward/backwards
-        double strafe = gamepad1.left_stick_x; // left/right
-        double turn = gamepad1.right_stick_x; // rotation
-        double heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
-        // Robot heading
-        double adjustedStrafe = strafe * Math.cos(heading) + drive * Math.sin(heading);
-        double adjustedDrive = strafe * Math.sin(heading) + drive * Math.cos(heading);
+        double drive = -gamepad1.left_stick_y;
+        drive *= Math.abs(drive);
+        double strafe = gamepad1.left_stick_x;
+        strafe *= Math.abs(strafe);
+        double turn = gamepad1.right_stick_x;
+        turn *= Math.abs(turn);
 
-        double fl = adjustedDrive + adjustedStrafe + turn;
-        double fr = adjustedDrive - adjustedStrafe - turn;
-        double bl = adjustedDrive - adjustedStrafe + turn;
-        double br = adjustedDrive + adjustedStrafe - turn;
-
+        mecanumDrive.driveFieldCentric(drive, strafe, turn);
+        
+       // Robot heading
+    
         // Normalize
-        double max = Math.max(1.0,
-                Math.max(Math.abs(fl),
-                        Math.max(Math.abs(fr),
-                                Math.max(Math.abs(bl), Math.abs(br)))));
+        if (gamepad1.triangleWasPressed()) {
+            // near
+            shooter.setShooterVelocity(0);
+            shooterDistance = "Near";
+        } else if (gamepad1.squareWasPressed()) {
+            // medium
+            shooter.setShooterVelocity(1);
+            shooterDistance = "Medium";
+        } else if (gamepad1.circleWasPressed()) {
+            // far
+            shooter.setShooterVelocity(2);
+            shooterDistance = "Far";
+        } else if (gamepad1.crossWasPressed()) {
+            // really far
+            shooter.setShooterVelocity(3);
+            shooterDistance = "Really Far";
+        }
+        boolean startShoot = gamepad2.right_bumper;
 
-        // Set powers using your motor names
-        frontLeftDrive.setPower(fl / max);
-        frontRightDrive.setPower(fr / max);
-        backLeftDrive.setPower(bl / max);
-        backRightDrive.setPower(br / max);
-
-        // Reset IMU with OPTIONS button
-        boolean optionsPressed = gamepad1.options && !lastOptions;
-        if (optionsPressed) imu.resetYaw();
-        lastOptions = gamepad1.options;
-
-        telemetry.addData("Heading (deg)", Math.toDegrees(heading));
+        boolean cancelShoot = gamepad2.crossWasPressed();
 
 
+        boolean finishedOneShot = shooter.update(startShoot, cancelShoot, telemetry);
+
+        if (finishedOneShot) {
+            telemetry.addLine("Shooter Cycle Complete!");
+        }
+
+        // ---------------- AUTO MULTI-SHOT ----------------
+        if (gamepad2.left_bumper) {
+            shooter.score(true, 3, telemetry);   // shoot 3 rings automatically
+        }
 
 
 
@@ -143,36 +134,9 @@ public class  teleOpByGhyth extends OpMode {
         if (gamepad1.options) {
             mecanumDrive.resetImu();
         }
+        
 
-        intake.spin(gamepad2.left_trigger - gamepad2.right_trigger);
-
-        if (gamepad2.rightBumperWasPressed()) {
-            shooter.spin(2000);
-        } else if (gamepad2.left_bumper) {
-            if (shooter.velocity() > 1000) {
-                shooter.spin(0.0);
-            } else {
-                shooter.spin(-500);
-            }
-        } else if (gamepad2.leftBumperWasReleased()) {
-            shooter.spin(0.0);
-        }
-
-        if (gamepad2.dpad_up) {
-            flipper.up();
-        } else if (gamepad2.dpad_down) {
-            flipper.down();
-        }
-
-        aprilTagSubsystem.update();
-
-        if (DEBUG) {
-            telemetry.addData("SHOOTER VELOCITY",shooter.velocity());
-            telemetry.update();
-        }
-
-        aprilTagSubsystem.debug(telemetry,20);
-
+        
 
     }
 }

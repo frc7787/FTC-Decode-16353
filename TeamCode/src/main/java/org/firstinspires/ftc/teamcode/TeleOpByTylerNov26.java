@@ -87,7 +87,7 @@ public class TeleOpByTylerNov26 extends OpMode {
             shooter.spin(0.0);
         }
 
-        if (gamepad2.dpad_up) {
+        if (gamepad2.dpad_up && (shooterVelocity>(shooterTargetVelocity-50))) {
             flipper.up();
         } else if (gamepad2.dpad_down) {
             flipper.down();
@@ -97,6 +97,7 @@ public class TeleOpByTylerNov26 extends OpMode {
 
         if (gamepad2.yWasPressed()) {
             automaticShooting = AutomaticShooting.AUTO1;
+            shooter.motorvelocity = (int) shooterTargetVelocity;
             shooter.score(true,1,telemetry);
         } else if (gamepad2.aWasPressed()) {
             automaticShooting = AutomaticShooting.AUTO3;
@@ -124,28 +125,32 @@ public class TeleOpByTylerNov26 extends OpMode {
             shooterTargetVelocity = shooterTargetVelocity + 5;
         }
 
-        if (gamepad1.triangleWasPressed()) {
+        if (gamepad1.yWasPressed()) {
             // near
             shooterTargetVelocity = shooter.NEARVELOCITY;
+            shooter.spin(shooterTargetVelocity);
             currentRange = idealRanges[0];
             //shooter.setShooterVelocity(0);
             shooterDistance = "Near";
-        } else if (gamepad1.squareWasPressed()) {
+        } else if (gamepad1.xWasPressed()) {
             // medium
             shooterTargetVelocity = shooter.MEDIUMVELOCITY;
+            shooter.spin(shooterTargetVelocity);
             currentRange = idealRanges[1];
             //shooter.setShooterVelocity(1);
             shooterDistance = "Medium";
-        } else if (gamepad1.circleWasPressed()) {
+        } else if (gamepad1.bWasPressed()) {
             // far
             //shooter.setShooterVelocity(2);
             shooterTargetVelocity = shooter.FARVELOCITY;
+            shooter.spin(shooterTargetVelocity);
             currentRange = idealRanges[2];
             shooterDistance = "Far";
-        } else if (gamepad1.xWasPressed()) {
+        } else if (gamepad1.aWasPressed()) {
             // really far
             //shooter.setShooterVelocity(3);
             shooterTargetVelocity = shooter.REALLYFARVELOCITY;
+            shooter.spin(shooterTargetVelocity);
             currentRange = idealRanges[3];
             shooterDistance = "Really Far";
         }

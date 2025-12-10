@@ -32,20 +32,22 @@ public class AutoBlueAudience extends  OpMode{
     private final Pose startPose = new Pose(28, 127, Math.toRadians(180)); // Start Pose of our robot.
     private final Pose leavePoseGoal = new Pose(60, 65, Math.toRadians(135)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
 
-    private final Pose startPoseAudience = new Pose(56, 8, Math.toRadians(90)); // Start Pose of our robot.
-    private final Pose leavePoseAudience = new Pose(56,20, Math.toRadians(90)); //
+    private final Pose startPoseAudience = new Pose(56, 9, Math.toRadians(90)); // Start Pose of our robot.
+    private final Pose leavePoseAudience = new Pose(50,26, Math.toRadians(114)); //
 
     private final Pose pickup1StartPose = new Pose(48, 83, Math.toRadians(180));
     private final Pose pickup1EndPose = new Pose(24,83, Math.toRadians(180));
 
-    private final Pose pickup2StartPose = new Pose(48,59, Math.toRadians(180));
 
-    private final Pose pickup2EndPose = new Pose(24,59,Math.toRadians(180));
+    private final Pose pickup2StartPrePose = new Pose(52,58, Math.toRadians(180));
+    private final Pose pickup2StartPose = new Pose(48,58, Math.toRadians(180));
+
+    private final Pose pickup2EndPose = new Pose(21,58,Math.toRadians(180));
 
     private final Pose pickup3StartPose = new Pose(48, 34, Math.toRadians(180));
-    private final Pose pickup3EndPose = new Pose(23,34, Math.toRadians(180));
+    private final Pose pickup3EndPose = new Pose(21,34, Math.toRadians(180));
     private final Pose scorePose = new Pose(60, 85, Math.toRadians(135)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    private final Pose scorePoseAudience = new Pose(56,16, Math.toRadians(110)); // Scoring Pose from the Audience launch zone.
+    private final Pose scorePoseAudience = new Pose(55,21, Math.toRadians(113)); // Scoring Pose from the Audience launch zone.
     private final Pose pickup1Pose = new Pose(37, 121, Math.toRadians(0)); // Highest (First Set) of Artifacts from the Spike Mark.
     private final Pose pickup2Pose = new Pose(43, 130, Math.toRadians(0)); // Middle (Second Set) of Artifacts from the Spike Mark.
     private final Pose pickup3Pose = new Pose(49, 135, Math.toRadians(0)); // Lowest (Third Set) of Artifacts from the Spike Mark.
@@ -53,7 +55,7 @@ public class AutoBlueAudience extends  OpMode{
     // INITIALIZING PATHS
     private Path scorePreload, scorePreloadAudience;
     private PathChain grabPickup1, scorePickup1, grabPickup2, scorePickup2, grabPickup3, scorePickup3;
-    private PathChain grabPickup3Audience, scorePickup3Audience, grabPickup2Audience, scorePickup2Audience;
+    private PathChain grabPickup3Audience, scorePickup3Audience, grabPickup2PreAudience, grabPickup2Audience, scorePickup2Audience;
     private PathChain leaveGoal, leaveAudience;
 
     public void buildPaths() {
@@ -124,27 +126,38 @@ public class AutoBlueAudience extends  OpMode{
                 .setGlobalDeceleration(4)
                 .setBrakingStrength(4)
                 .setBrakingStart(4)
-                .setVelocityConstraint(10)
                 .build();
 
         /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup3Audience= follower.pathBuilder()
                 .addPath(new BezierLine(pickup3EndPose, scorePoseAudience))
                 .setLinearHeadingInterpolation(pickup3EndPose.getHeading(), scorePoseAudience.getHeading())
+                .setGlobalDeceleration(4)
+                .setBrakingStrength(4)
+                .setBrakingStart(4)
+                .build();
+
+        grabPickup2PreAudience = follower.pathBuilder()
+                .addPath(new BezierLine(scorePoseAudience, pickup2StartPrePose))
+                .setLinearHeadingInterpolation(scorePoseAudience.getHeading(), pickup2StartPrePose.getHeading())
+                .addPath(new BezierLine(pickup2StartPrePose, pickup2StartPose))
+                .setLinearHeadingInterpolation(pickup2StartPrePose.getHeading(), pickup2StartPose.getHeading())
                 .build();
 
         grabPickup2Audience = follower.pathBuilder()
-                .addPath(new BezierLine(scorePoseAudience, pickup2StartPose))
-                .setLinearHeadingInterpolation(scorePoseAudience.getHeading(), pickup2StartPose.getHeading())
                 .addPath(new BezierLine(pickup2StartPose, pickup2EndPose))
                 .setLinearHeadingInterpolation(pickup2StartPose.getHeading(), pickup2EndPose.getHeading())
                 .setGlobalDeceleration(3)
-                .setVelocityConstraint(10)
+                .setBrakingStrength(4)
+                .setBrakingStart(4)
                 .build();
 
         scorePickup2Audience= follower.pathBuilder()
                 .addPath(new BezierLine(pickup2EndPose, scorePoseAudience))
                 .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), scorePoseAudience.getHeading())
+                .setGlobalDeceleration(4)
+                .setBrakingStrength(4)
+                .setBrakingStart(4)
                 .build();
 
         leaveAudience = follower.pathBuilder()
@@ -161,7 +174,7 @@ public class AutoBlueAudience extends  OpMode{
             case 0: {  // FOLLOW PATH TO SCORING - preloaded
                 follower.followPath(scorePreloadAudience);
                 setPathState(1);
-                shooter.spin(2000);
+                //shooter.spin(2000);
                 break;
             }
             case 1: { // DONE PATH
@@ -182,9 +195,9 @@ public class AutoBlueAudience extends  OpMode{
             case 2: { // JUST SCORING - preloaded
                 if (shooter.score(false, 3, telemetry)) {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup3Audience, true);
+                    follower.followPath(grabPickup3Audience, 0.5, true);
                     // setPathState(2); OK, let's just test the first two paths.
-                    intake.spin(0.8);
+                    intake.spin(1.0);
                     setPathState(3);
                 }
                 break;
@@ -194,7 +207,7 @@ public class AutoBlueAudience extends  OpMode{
                 if (!follower.isBusy()) {
                     /* Grab Sample */
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
-                    intake.spin(0.8);
+                    intake.spin(1.0);
                     follower.followPath(scorePickup3Audience, true);
                     setPathState(4);
                 }
@@ -212,13 +225,22 @@ public class AutoBlueAudience extends  OpMode{
                     /* Score Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup2Audience, true);
+                    follower.followPath(grabPickup2PreAudience, true);
                     intake.spin(0.8);
                     setPathState(6);
                 }
                 break;
             }
-            case 6: { // FOLLOW GRAB PATH - pickup 2
+            case 6: {
+                if (!follower.isBusy()) {
+                    follower.followPath(grabPickup2Audience,0.5,true);
+                    setPathState(61);
+                }
+                break;
+            }
+
+
+            case 61: { // FOLLOW GRAB PATH - pickup 2
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup2Pose's position */
                 if (!follower.isBusy()) {
                     /* Grab Sample */

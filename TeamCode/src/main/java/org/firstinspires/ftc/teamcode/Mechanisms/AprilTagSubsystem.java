@@ -39,7 +39,10 @@ public class AprilTagSubsystem {
 
     private final KalmanFilter xFilter,
                                yFilter,
-                               zFilter;
+                               zFilter,
+                               rangeFilter,
+                               bearingFilter,
+                               elevationFilter;
 
     private List<AprilTagDetection> detections;
 
@@ -62,6 +65,10 @@ public class AprilTagSubsystem {
         xFilter = new KalmanFilter(KALMAN_FILTER_PARAMETERS);
         yFilter = new KalmanFilter(KALMAN_FILTER_PARAMETERS);
         zFilter = new KalmanFilter(KALMAN_FILTER_PARAMETERS);
+
+        rangeFilter = new KalmanFilter(KALMAN_FILTER_PARAMETERS);
+        bearingFilter = new KalmanFilter(KALMAN_FILTER_PARAMETERS);
+        elevationFilter = new KalmanFilter(KALMAN_FILTER_PARAMETERS);
 
         visionPortal.resumeStreaming();
     }
@@ -112,6 +119,10 @@ public class AprilTagSubsystem {
         xFilter.update(detection.ftcPose.x, 0);
         yFilter.update(detection.ftcPose.y, 0);
         zFilter.update(detection.ftcPose.z, 0);
+
+        rangeFilter.update(detection.ftcPose.range, 0);
+        bearingFilter.update(detection.ftcPose.bearing, 0);
+        elevationFilter.update(detection.ftcPose.elevation, 0);
         return new AprilTagDetection(
                 detection.id,
                 detection.hamming,
@@ -126,9 +137,11 @@ public class AprilTagSubsystem {
                         detection.ftcPose.yaw,
                         detection.ftcPose.pitch,
                         detection.ftcPose.roll,
-                        detection.ftcPose.range,
-                        detection.ftcPose.bearing,
-                        detection.ftcPose.elevation
+                        rangeFilter.getState(),
+                        bearingFilter.getState(),
+                        elevationFilter.getState()
+
+
                 ),
                 detection.rawPose,
                 detection.robotPose,
@@ -160,6 +173,19 @@ public class AprilTagSubsystem {
             telemetry.addData("Raw", "%.2f", raw.ftcPose.z);
             telemetry.addData("Filtered", "%.2f", filtered.ftcPose.z);
 
+            //new added kalman telemetry
+            telemetry.addLine("Range");
+            telemetry.addData("Raw", "%.2f", raw.ftcPose.range);
+            telemetry.addData("Filtered", "%.2f", filtered.ftcPose.range);
+
+            telemetry.addLine("Bearing");
+            telemetry.addData("Raw", "%.2f", raw.ftcPose.bearing);
+            telemetry.addData("Filtered", "%.2f", filtered.ftcPose.bearing);
+
+            telemetry.addLine("Elevation");
+            telemetry.addData("Raw", "%.2f", raw.ftcPose.elevation);
+            telemetry.addData("Filtered", "%.2f", filtered.ftcPose.elevation);
+
         } else {
             telemetry.addLine("No tag detected with id: " + id);
         }
@@ -173,8 +199,9 @@ public class AprilTagSubsystem {
 
         if (tagDetectedWithId(id)) {
             filtered = tagWithId(id);
-            distanceToAprilTag = Math.hypot(filtered.ftcPose.x, filtered.ftcPose.y); // actually use the Kalman Filtered RANGE!!!
-            distanceToAprilTag = Math.hypot(distanceToAprilTag, filtered.ftcPose.z);
+            //distanceToAprilTag = Math.hypot(filtered.ftcPose.x, filtered.ftcPose.y); // actually use the Kalman Filtered RANGE!!!
+           // distanceToAprilTag = Math.hypot(distanceToAprilTag, filtered.ftcPose.z);
+            distanceToAprilTag = filtered.ftcPose.range;
             angleToAprilTag = filtered.ftcPose.bearing;
             results[0] = distanceToAprilTag;
             results[1] = angleToAprilTag;

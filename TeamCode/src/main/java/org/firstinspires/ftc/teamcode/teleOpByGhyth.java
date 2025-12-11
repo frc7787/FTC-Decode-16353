@@ -21,6 +21,7 @@ import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.teamcode.Mechanisms.Flipper;
+import org.firstinspires.ftc.teamcode.Mechanisms.IndicatorLights;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
@@ -39,16 +40,29 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class  teleOpByGhyth extends OpMode {
     private DcMotor backRightDrive, frontRightDrive, backLeftDrive, frontLeftDrive;
 
+    private double shooterTargetVelocity;
+    private boolean scoringThree = false;
+    private boolean scoringOne = false;
+
+
+    private double[] results;
+
+    private double shooterVelocity = 0;
+
     private boolean lastOptions = false;
     private AprilTagSubsystem aprilTagSubsystem;
     private String shooterDistance;
 
+    private double distanceAprilTag = 9999;
+    private double angleAprilTag = 9999;
+
     private MecanumDriveBase mecanumDrive;
     private Intake intake;
     private Shooter shooter;
-
+    private boolean AUTOSCORE = false;
     private Flipper flipper;
     private boolean DEBUG = true;
+    private IndicatorLights indicatorLights;
 
 
     private IMU imu;
@@ -93,50 +107,88 @@ public class  teleOpByGhyth extends OpMode {
         mecanumDrive.driveFieldCentric(drive, strafe, turn);
         
        // Robot heading
-    
-        // Normalize
-        if (gamepad1.triangleWasPressed()) {
-            // near
-            shooter.setShooterVelocity(0);
-            shooterDistance = "Near";
-        } else if (gamepad1.squareWasPressed()) {
-            // medium
-            shooter.setShooterVelocity(1);
-            shooterDistance = "Medium";
-        } else if (gamepad1.circleWasPressed()) {
-            // far
-            shooter.setShooterVelocity(2);
-            shooterDistance = "Far";
-        } else if (gamepad1.crossWasPressed()) {
-            // really far
-            shooter.setShooterVelocity(3);
-            shooterDistance = "Really Far";
-        }
-        boolean startShoot = gamepad2.right_bumper;
 
-        boolean cancelShoot = gamepad2.crossWasPressed();
-
-
-        boolean finishedOneShot = shooter.update(startShoot, cancelShoot, telemetry);
-
-        if (finishedOneShot) {
-            telemetry.addLine("Shooter Cycle Complete!");
-        }
-
-        // ---------------- AUTO MULTI-SHOT ----------------
-        if (gamepad2.left_bumper) {
-            shooter.score(true, 3, telemetry);   // shoot 3 rings automatically
-        }
-
-
-
-        // end of drive code
+        intake.spin(gamepad2.left_trigger - gamepad2.right_trigger);
+        shooterVelocity = shooter.velocity();
         if (gamepad1.options) {
             mecanumDrive.resetImu();
         }
-        
+        if (gamepad1.triangleWasPressed()) {
+            // near
+            shooter.spin(shooter.NEARVELOCITY);
 
-        
+            shooterDistance = "Near";
+        } else if (gamepad1.squareWasPressed()) {
+            shooter.spin(shooter.MEDIUMVELOCITY);
+            // medi
+            shooterDistance = "Medium";
+        } else if (gamepad1.circleWasPressed()) {
+            // far
+            shooter.spin(shooter.FARVELOCITY);
+            shooterDistance = "Far";
+        } else if (gamepad1.crossWasPressed()) {
+            // really fa
+            shooter.spin(shooter.REALLYFARVELOCITY);
+
+            shooterDistance = "Really Far";
+        }
+
+        if (gamepad2.rightBumperWasPressed()) {
+            shooter.spin(shooterTargetVelocity);
+        } else if (gamepad2.left_bumper) {
+            if (shooterVelocity > 1000) {
+                shooter.spin(0.0);
+            } else {
+                shooter.spin(-500);
+            }
+        } else if (gamepad2.leftBumperWasReleased()) {
+            shooter.spin(0.0);
+        }
+
+        if (gamepad2.dpad_up) {
+            flipper.up();
+        } else if (gamepad2.dpad_down) {
+            flipper.down();
+        }
+        if (gamepad1.leftBumperWasPressed()) {
+            shooterTargetVelocity = shooterTargetVelocity - 5;
+        } else if (gamepad1.rightBumperWasPressed()) {
+            shooterTargetVelocity = shooterTargetVelocity + 5;
+        }
+
+
+
+
+
+        if (gamepad2.a && !scoringThree) {
+            scoringThree = true;
+            shooter.startScoring = true;    // reset shooter
+        }
+
+        if (scoringThree) {
+            if (shooter.score(true, 3, telemetry)) {
+                scoringThree = false;       // finished scoring all 3 balls
+            }
+        }
+
+        if (gamepad2.x && !scoringOne) {
+            scoringOne = true;
+            shooter.startScoring = true;
+        }
+
+        if (scoringOne) {
+            if (shooter.score(true, 1, telemetry)) {
+                scoringOne = false;         // finished firing 1 ball
+            }
+        }
+
+
+
+
+
+
+
+
 
     }
 }

@@ -88,6 +88,9 @@ public class AutoBlueGoal extends  OpMode{
         scorePickup1 = follower.pathBuilder()
                 .addPath(new BezierLine(pickup1EndPose, scorePose))
                 .setLinearHeadingInterpolation(pickup1EndPose.getHeading(), scorePose.getHeading())
+                .setGlobalDeceleration(4)
+                .setBrakingStrength(4)
+                .setBrakingStart(4)
                 .build();
 
         grabPickup2Pre = follower.pathBuilder()

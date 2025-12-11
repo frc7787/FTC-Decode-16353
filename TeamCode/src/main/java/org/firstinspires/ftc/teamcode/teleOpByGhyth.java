@@ -45,6 +45,8 @@ public class  teleOpByGhyth extends OpMode {
     private boolean scoringOne = false;
 
 
+    private boolean DEBUG = true;
+
     private double[] results;
 
     private double shooterVelocity = 0;
@@ -61,8 +63,7 @@ public class  teleOpByGhyth extends OpMode {
     private Shooter shooter;
     private boolean AUTOSCORE = false;
     private Flipper flipper;
-    private boolean DEBUG = true;
-    private IndicatorLights indicatorLights;
+     private IndicatorLights indicatorLights;
 
 
     private IMU imu;
@@ -108,27 +109,32 @@ public class  teleOpByGhyth extends OpMode {
         
        // Robot heading
 
-        intake.spin(gamepad2.left_trigger - gamepad2.right_trigger);
+        intake.spin(gamepad2.left_trigger - gamepad2.right_trigger) ;
         shooterVelocity = shooter.velocity();
         if (gamepad1.options) {
             mecanumDrive.resetImu();
         }
         if (gamepad1.triangleWasPressed()) {
             // near
+            shooter.setShooterVelocity(0);
             shooter.spin(shooter.NEARVELOCITY);
-
             shooterDistance = "Near";
         } else if (gamepad1.squareWasPressed()) {
             shooter.spin(shooter.MEDIUMVELOCITY);
             // medi
+            shooter.setShooterVelocity(1);
+
             shooterDistance = "Medium";
         } else if (gamepad1.circleWasPressed()) {
             // far
+            shooter.setShooterVelocity(2);
+
             shooter.spin(shooter.FARVELOCITY);
             shooterDistance = "Far";
         } else if (gamepad1.crossWasPressed()) {
             // really fa
             shooter.spin(shooter.REALLYFARVELOCITY);
+            shooter.setShooterVelocity(3);
 
             shooterDistance = "Really Far";
         }
@@ -180,6 +186,14 @@ public class  teleOpByGhyth extends OpMode {
             if (shooter.score(true, 1, telemetry)) {
                 scoringOne = false;         // finished firing 1 ball
             }
+        }
+        if (DEBUG) {
+            telemetry.addData("SHOOTER DISTANCE", shooterDistance);
+            telemetry.addData("SHOOTER TARGET VELOCITY",shooterTargetVelocity);
+            telemetry.addData("SHOOTER ACTUAL VELOCITY",shooterVelocity);
+
+            telemetry.addData("RANGE",distanceAprilTag);
+            telemetry.addData("ANGLE",angleAprilTag);
         }
 
 

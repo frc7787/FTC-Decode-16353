@@ -4,13 +4,13 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 
-public class AutoConstants {
+public class AutoConstantsRed {
     // INITIALIZING POSES
 
     public static Pose startPose = new Pose(28, 127, Math.toRadians(180)); // Start Pose of our robot.
     public static Pose leavePoseGoal = new Pose(60, 65, Math.toRadians(135)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
 
-    public static Pose startPoseAudience = new Pose(56, 9, Math.toRadians(90)); // Start Pose of our robot.
+    public static Pose startPoseAudience = new Pose(88, 9, Math.toRadians(90)); // Start Pose of our robot.
     public static Pose leavePoseAudience = new Pose(50,26, Math.toRadians(114)); //
 
     public static Pose pickup1StartPose = new Pose(48, 83, Math.toRadians(180));

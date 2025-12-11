@@ -31,7 +31,7 @@ public class Shooter {
         IDLE, START,INTAKE,MOTORSPINUP,FLINGER,END
     }
     private shootingState shooterState;
-    private boolean startScoring = true;
+    public boolean startScoring = true;
     private double totalBalls = 3;
 
     public Shooter(HardwareMap hardwareMap) {

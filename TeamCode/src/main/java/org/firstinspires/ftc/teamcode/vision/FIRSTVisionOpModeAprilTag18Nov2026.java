@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.vision;
 import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -32,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 // https://www.reddit.com/r/LogitechG/comments/lmlfal/how_to_add_un_supported_webcam_to_logitech_capture/
 // webcam lens intrinsics tutorial: https://youtu.be/bTcCY3DZM0k?si=EerbST3UnBUprVwY
 
+@Disabled
 @TeleOp(name="FIRSTVisionOpModeAprilTag18Nov2026", group = "Utility")
 public class FIRSTVisionOpModeAprilTag18Nov2026 extends OpMode {
 
@@ -67,6 +69,7 @@ public class FIRSTVisionOpModeAprilTag18Nov2026 extends OpMode {
     boolean lastGainDn = false;
     boolean lastWhiteBalanceUp = false;
     boolean lastWhiteBalanceDn = false;
+
 
 
     @Override

@@ -107,7 +107,7 @@ public class StarterBotTeleop extends OpMode {
         leftFeeder = hardwareMap.get(CRServo.class, "left_feeder");
         rightFeeder = hardwareMap.get(CRServo.class, "right_feeder");
 
-        intake = hardwareMap.get(DcMotorEx.class, "intake");
+        //intake = hardwareMap.get(DcMotorEx.class, "intake");
 
         /*
          * To drive forward, most robots need the motor on one side to be reversed,
@@ -148,7 +148,7 @@ public class StarterBotTeleop extends OpMode {
          * Much like our drivetrain motors, we set the left feeder servo to reverse so that they
          * both work to feed the ball into the robot.
          */
-        leftFeeder.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFeeder.setDirection(DcMotorSimple.Direction.REVERSE);
 
         /*
          * Tell the driver that initialization is complete.
@@ -168,6 +168,8 @@ public class StarterBotTeleop extends OpMode {
      */
     @Override
     public void start() {
+        leftFeeder.setPower(-0.2);
+        rightFeeder.setPower(-0.2);
     }
 
     /*
@@ -207,18 +209,12 @@ public class StarterBotTeleop extends OpMode {
             launcher.setVelocity(STOP_SPEED);
         }
 
-        if (gamepad1.rightBumperWasPressed()) {
-            intake.setPower(0.9);
-        } else if (gamepad1.leftBumperWasPressed()) {
-            intake.setPower(0.0);
-        }
 
         /*
          * Now we call our "Launch" function.
          */
-        if (gamepad1.aWasPressed()) {
-            launch(true);
-        }
+
+        launch(gamepad1.rightBumperWasPressed());
 
 
 

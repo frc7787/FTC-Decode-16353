@@ -22,15 +22,15 @@ public class Shooter {
     private  boolean started = false;
     private Timer shooterTimer;
 
-    private int motorvelocity = 2050;
-    private int NEARVELOCITY = 1710;
-    private int MEDIUMVELOCITY = 1800;
-    private int FARVELOCITY = 2015;
-    private int REALLYFARVELOCITY = 2110;
+    public int motorvelocity = 2000;
+    public int NEARVELOCITY = 1710;
+    public int MEDIUMVELOCITY = 1800;
+    public int FARVELOCITY = 2015;
+    public int REALLYFARVELOCITY = 2110;
     private enum shootingState{
         IDLE, START,INTAKE,MOTORSPINUP,FLINGER,END
     }
-    private shootingState shooterState = shootingState.START;
+    private shootingState shooterState;
     private boolean startScoring = true;
     private double totalBalls = 3;
 
@@ -98,20 +98,21 @@ public class Shooter {
 
                     shooterTimer.resetTimer();
                     shooterState = shootingState.INTAKE;
-                    intake.spin(0.8);
+                    intake.spin(1.0);
                     telemetry.addData("SHOOTER UPDATE","START");
                     break;
                 }
                 case INTAKE: {
-                    intake.spin(0.8);
-                    if (shooterTimer.getElapsedTimeSeconds() > 0.5) {
+                    intake.spin(1.0);
+                    if (shooterTimer.getElapsedTimeSeconds() > 0.6) {
                         shooterState = shootingState.MOTORSPINUP;
                     }
                     telemetry.addData("SHOOTER UPDATE","INTAKE");
                     break;
                 }
                 case MOTORSPINUP: {
-                    if (motor.getVelocity() > motorvelocity - 50) {
+                    if ((motor.getVelocity() > motorvelocity - 50) &&
+                            (motor.getVelocity() < motorvelocity +50)) {
                         shooterTimer.resetTimer();
                         shooterState = shootingState.FLINGER;
                         flipper.up();
@@ -120,7 +121,7 @@ public class Shooter {
                     break;
                 }
                 case FLINGER: {
-                    if (shooterTimer.getElapsedTimeSeconds() > 1.0) { // was 1.5
+                    if (shooterTimer.getElapsedTimeSeconds() > 0.8) { // was 1.5
                         shooterState = shootingState.END;
                     } else if (shooterTimer.getElapsedTimeSeconds() > 0.5) {  // was 1
                         flipper.down();

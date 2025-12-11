@@ -104,7 +104,7 @@ public class Shooter {
                 }
                 case INTAKE: {
                     intake.spin(1.0);
-                    if (shooterTimer.getElapsedTimeSeconds() > 0.6) {
+                    if (shooterTimer.getElapsedTimeSeconds() > 1.0) {
                         shooterState = shootingState.MOTORSPINUP;
                     }
                     telemetry.addData("SHOOTER UPDATE","INTAKE");
@@ -112,7 +112,7 @@ public class Shooter {
                 }
                 case MOTORSPINUP: {
                     if ((motor.getVelocity() > motorvelocity - 50) &&
-                            (motor.getVelocity() < motorvelocity +50)) {
+                            (motor.getVelocity() < motorvelocity +30)) {
                         shooterTimer.resetTimer();
                         shooterState = shootingState.FLINGER;
                         flipper.up();

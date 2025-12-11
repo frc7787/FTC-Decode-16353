@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstants.*;
 
 @Autonomous(name = "AutoBlueAudience", group = "opmodes")
 public class AutoBlueAudience extends  OpMode{
@@ -29,6 +30,8 @@ public class AutoBlueAudience extends  OpMode{
 
     // INITIALIZING POSES
 
+    /*
+
     private final Pose startPose = new Pose(28, 127, Math.toRadians(180)); // Start Pose of our robot.
     private final Pose leavePoseGoal = new Pose(60, 65, Math.toRadians(135)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
 
@@ -42,21 +45,27 @@ public class AutoBlueAudience extends  OpMode{
     private final Pose pickup2StartPrePose = new Pose(52,58, Math.toRadians(180));
     private final Pose pickup2StartPose = new Pose(48,58, Math.toRadians(180));
 
-    private final Pose pickup2EndPose = new Pose(21,58,Math.toRadians(180));
+    private final Pose pickup2EndPose = new Pose(20,58,Math.toRadians(180));
 
     private final Pose pickup3StartPose = new Pose(48, 34, Math.toRadians(180));
-    private final Pose pickup3EndPose = new Pose(21,34, Math.toRadians(180));
+    private final Pose pickup3EndPose = new Pose(20,34, Math.toRadians(180));
     private final Pose scorePose = new Pose(60, 85, Math.toRadians(135)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
     private final Pose scorePoseAudience = new Pose(55,21, Math.toRadians(113)); // Scoring Pose from the Audience launch zone.
     private final Pose pickup1Pose = new Pose(37, 121, Math.toRadians(0)); // Highest (First Set) of Artifacts from the Spike Mark.
     private final Pose pickup2Pose = new Pose(43, 130, Math.toRadians(0)); // Middle (Second Set) of Artifacts from the Spike Mark.
     private final Pose pickup3Pose = new Pose(49, 135, Math.toRadians(0)); // Lowest (Third Set) of Artifacts from the Spike Mark.
 
+     */
+
     // INITIALIZING PATHS
+
+    /*
     private Path scorePreload, scorePreloadAudience;
     private PathChain grabPickup1, scorePickup1, grabPickup2, scorePickup2, grabPickup3, scorePickup3;
     private PathChain grabPickup3Audience, scorePickup3Audience, grabPickup2PreAudience, grabPickup2Audience, scorePickup2Audience;
     private PathChain leaveGoal, leaveAudience;
+    
+     */
 
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
@@ -65,7 +74,6 @@ public class AutoBlueAudience extends  OpMode{
 
     /* Here is an example for Constant Interpolation
     scorePreload.setConstantInterpolation(startPose.getHeading()); */
-
 
 
         /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
@@ -167,6 +175,7 @@ public class AutoBlueAudience extends  OpMode{
 
 
     } // end of BuildPaths
+
 
     // MANAGING PATH STATES
     public void autonomousPathUpdate() {

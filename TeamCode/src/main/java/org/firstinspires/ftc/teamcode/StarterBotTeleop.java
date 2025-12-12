@@ -180,6 +180,10 @@ public class StarterBotTeleop extends OpMode {
         forward = -gamepad1.left_stick_y;
         strafe = gamepad1.left_stick_x;
         rotate = gamepad1.right_stick_x;
+
+        forward *= Math.abs(forward);
+        strafe  *= Math.abs(strafe);
+        rotate  *= Math.abs(rotate);
         /*
          * Here we call a function called arcadeDrive. The arcadeDrive function takes the input from
          * the joysticks, and applies power to the left and right drive motor to move the robot

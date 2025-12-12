@@ -14,10 +14,10 @@ import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstants.*;
+import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstantsRed.*;
 
-@Autonomous(name = "AutoBlueAudienceLeave", group = "opmodes")
-public class AutoBlueAudienceLeave extends  OpMode{
+@Autonomous(name = "AutoRedAudience", group = "opmodes")
+public class AutoRedAudience extends  OpMode{
 
     private Intake intake;
     private Shooter shooter;
@@ -204,10 +204,10 @@ public class AutoBlueAudienceLeave extends  OpMode{
             case 2: { // JUST SCORING - preloaded
                 if (shooter.score(false, 3, telemetry)) {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(leaveAudience, 0.5, true);
+                    follower.followPath(grabPickup3Audience, 0.5, true);
                     // setPathState(2); OK, let's just test the first two paths.
-                    intake.spin(0.0);
-                    setPathState(9); // go straight to LEAVE AUDIENCE
+                    intake.spin(1.0);
+                    setPathState(3);
                 }
                 break;
             }
@@ -283,7 +283,6 @@ public class AutoBlueAudienceLeave extends  OpMode{
             }
             case 9: { // FOLLOW PATH LEAVEAUDIENCE
                 if (!follower.isBusy()) {
-                    intake.spin(0);
                     setPathState(-1);
                 }
                 break;
@@ -347,6 +346,8 @@ public class AutoBlueAudienceLeave extends  OpMode{
         shooter = new Shooter(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
+        shooter.setShooterVelocity(3); // NEAR for Goal
+
     } // end init
 
     /** This method is called continuously after Init while waiting for "play". **/
@@ -369,3 +370,4 @@ public class AutoBlueAudienceLeave extends  OpMode{
 
 
 } // end of AutoByExampleDec
+

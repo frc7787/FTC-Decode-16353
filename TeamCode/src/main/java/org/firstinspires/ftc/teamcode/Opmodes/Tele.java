@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -9,9 +9,10 @@ import org.firstinspires.ftc.teamcode.Mechanisms.IndicatorLights;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
+import org.firstinspires.ftc.teamcode.TeleOpByTylerNov26;
 
-@TeleOp(name = "TeleOpByTyler", group = "$")
-public class TeleOpByTylerNov26 extends OpMode {
+@TeleOp(name = "Tele", group = "$")
+public class Tele extends OpMode {
 
     private AprilTagSubsystem aprilTagSubsystem;
 
@@ -175,5 +176,4 @@ public class TeleOpByTylerNov26 extends OpMode {
 
         return false;
     }
-} // end class TeleOpByTylerNov26
-
+}

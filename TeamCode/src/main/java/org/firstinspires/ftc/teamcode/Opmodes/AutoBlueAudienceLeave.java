@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstants.*;
 
-@Autonomous(name = "AutoBlueAudience", group = "opmodes")
-public class AutoBlueAudience extends  OpMode{
+@Autonomous(name = "AutoBlueAudienceLeave", group = "opmodes")
+public class AutoBlueAudienceLeave extends  OpMode{
 
     private Intake intake;
     private Shooter shooter;
@@ -64,7 +64,7 @@ public class AutoBlueAudience extends  OpMode{
     private PathChain grabPickup1, scorePickup1, grabPickup2, scorePickup2, grabPickup3, scorePickup3;
     private PathChain grabPickup3Audience, scorePickup3Audience, grabPickup2PreAudience, grabPickup2Audience, scorePickup2Audience;
     private PathChain leaveGoal, leaveAudience;
-    
+
      */
 
     public void buildPaths() {
@@ -204,10 +204,10 @@ public class AutoBlueAudience extends  OpMode{
             case 2: { // JUST SCORING - preloaded
                 if (shooter.score(false, 3, telemetry)) {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup3Audience, 0.5, true);
+                    follower.followPath(leaveAudience, 0.5, true);
                     // setPathState(2); OK, let's just test the first two paths.
-                    intake.spin(1.0);
-                    setPathState(3);
+                    intake.spin(0.0);
+                    setPathState(8); // go straight to LEAVE AUDIENCE
                 }
                 break;
             }

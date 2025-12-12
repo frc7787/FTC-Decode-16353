@@ -7,24 +7,24 @@ import com.pedropathing.paths.PathChain;
 public class AutoConstantsRed {
     // INITIALIZING POSES
 
-    public static Pose startPose = new Pose(28, 127, Math.toRadians(180)); // Start Pose of our robot.
-    public static Pose leavePoseGoal = new Pose(60, 65, Math.toRadians(135)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    public static Pose startPose = new Pose(116, 127, Math.toRadians(0)); // Start Pose of our robot.
+    public static Pose leavePoseGoal = new Pose(96, 80, Math.toRadians(45)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
 
     public static Pose startPoseAudience = new Pose(88, 9, Math.toRadians(90)); // Start Pose of our robot.
     public static Pose leavePoseAudience = new Pose(94,26, Math.toRadians(66)); //
 
-    public static Pose pickup1StartPose = new Pose(48, 83, Math.toRadians(180));
-    public static Pose pickup1EndPose = new Pose(24,83, Math.toRadians(180));
+    public static Pose pickup1StartPose = new Pose(96, 83, Math.toRadians(0));
+    public static Pose pickup1EndPose = new Pose(120,83, Math.toRadians(0));
 
 
-    public static Pose pickup2StartPrePose = new Pose(52,58, Math.toRadians(180));
-    public static Pose pickup2StartPose = new Pose(48,58, Math.toRadians(180));
+    public static Pose pickup2StartPrePose = new Pose(92,58, Math.toRadians(0));
+    public static Pose pickup2StartPose = new Pose(96,58, Math.toRadians(0));
 
-    public static Pose pickup2EndPose = new Pose(21,58,Math.toRadians(180));
+    public static Pose pickup2EndPose = new Pose(123,58,Math.toRadians(0));
 
-    public static Pose pickup3StartPose = new Pose(48, 34, Math.toRadians(180));
-    public static Pose pickup3EndPose = new Pose(21,34, Math.toRadians(180));
-    public static Pose scorePose = new Pose(60, 85, Math.toRadians(135)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    public static Pose pickup3StartPose = new Pose(96, 34, Math.toRadians(0));
+    public static Pose pickup3EndPose = new Pose(123,34, Math.toRadians(0));
+    public static Pose scorePose = new Pose(88, 85, Math.toRadians(45)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
     public static Pose scorePoseAudience = new Pose(89,21, Math.toRadians(67)); // Scoring Pose from the Audience launch zone.
     public static Pose pickup1Pose = new Pose(37, 121, Math.toRadians(0)); // Highest (First Set) of Artifacts from the Spike Mark.
     public static Pose pickup2Pose = new Pose(43, 130, Math.toRadians(0)); // Middle (Second Set) of Artifacts from the Spike Mark.

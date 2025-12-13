@@ -20,7 +20,7 @@ public class AutoConstantsRed {
     public static Pose pickup2StartPrePose = new Pose(92,60, Math.toRadians(0));
     public static Pose pickup2StartPose = new Pose(96,60, Math.toRadians(0));
 
-    public static Pose pickup2EndPose = new Pose(125,60,Math.toRadians(0));
+    public static Pose pickup2EndPose = new Pose(126,60,Math.toRadians(0));
 
     public static Pose pickup3StartPose = new Pose(96, 34, Math.toRadians(0));
     public static Pose pickup3EndPose = new Pose(123,34, Math.toRadians(0));

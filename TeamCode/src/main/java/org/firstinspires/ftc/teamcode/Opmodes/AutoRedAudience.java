@@ -346,7 +346,7 @@ public class AutoRedAudience extends  OpMode{
         shooter = new Shooter(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
-        shooter.setShooterVelocity(3); // NEAR for Goal
+        shooter.setShooterVelocity(2); // 2 = FAR = 2015
 
     } // end init
 

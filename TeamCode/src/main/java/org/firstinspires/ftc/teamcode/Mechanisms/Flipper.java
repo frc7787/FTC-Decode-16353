@@ -12,7 +12,7 @@ public class Flipper {
     }
 
     public void up() {
-        servoFlipper.setPosition(0.35);
+        servoFlipper.setPosition(0.25);
     }
 
     public void down() {

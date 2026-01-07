@@ -14,10 +14,10 @@ import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstants.*;
+import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstantsRed.*;
 
-@Autonomous(name = "AutoBlueGoal", group = "opmodes")
-public class AutoBlueGoal extends  OpMode{
+@Autonomous(name = "AutoRedAudienceLeave", group = "opmodes")
+public class AutoRedAudienceLeave extends  OpMode{
 
     private Intake intake;
     private Shooter shooter;
@@ -27,6 +27,8 @@ public class AutoBlueGoal extends  OpMode{
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
+
+    private double delayStart=0;
 
     // INITIALIZING POSES
 
@@ -88,16 +90,6 @@ public class AutoBlueGoal extends  OpMode{
         scorePickup1 = follower.pathBuilder()
                 .addPath(new BezierLine(pickup1EndPose, scorePose))
                 .setLinearHeadingInterpolation(pickup1EndPose.getHeading(), scorePose.getHeading())
-                .setGlobalDeceleration(4)
-                .setBrakingStrength(4)
-                .setBrakingStart(4)
-                .build();
-
-        grabPickup2Pre = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup2StartPrePose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2StartPrePose.getHeading())
-                .addPath(new BezierLine(pickup2StartPrePose, pickup2StartPose))
-                .setLinearHeadingInterpolation(pickup2StartPrePose.getHeading(), pickup2StartPose.getHeading())
                 .build();
 
         /* This is our grabPickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
@@ -191,8 +183,9 @@ public class AutoBlueGoal extends  OpMode{
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: {  // FOLLOW PATH TO SCORING - preloaded
-                follower.followPath(scorePreload);
-                setPathState(1);
+                if (opmodeTimer.getElapsedTimeSeconds() > delayStart){
+                follower.followPath(scorePreloadAudience);
+                setPathState(1);}
                 //shooter.spin(2000);
                 break;
             }
@@ -214,20 +207,20 @@ public class AutoBlueGoal extends  OpMode{
             case 2: { // JUST SCORING - preloaded
                 if (shooter.score(false, 3, telemetry)) {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup1, 0.5, true);
+                    follower.followPath(leaveAudience, 0.5, true);
                     // setPathState(2); OK, let's just test the first two paths.
-                    intake.spin(1.0);
-                    setPathState(3);
+                    intake.spin(0.0);
+                    setPathState(9); // go straight to LEAVE AUDIENCE
                 }
                 break;
             }
-            case 3: { // FOLLOW GRAB PATH - pickup 1
+            case 3: { // FOLLOW GRAB PATH - pickup 3
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
                 if (!follower.isBusy()) {
                     /* Grab Sample */
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     intake.spin(1.0);
-                    follower.followPath(scorePickup1, true);
+                    follower.followPath(scorePickup3Audience, true);
                     setPathState(4);
                 }
                 break;
@@ -244,7 +237,7 @@ public class AutoBlueGoal extends  OpMode{
                     /* Score Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup2Pre, true);
+                    follower.followPath(grabPickup2PreAudience, true);
                     intake.spin(0.8);
                     setPathState(6);
                 }
@@ -252,7 +245,7 @@ public class AutoBlueGoal extends  OpMode{
             }
             case 6: {
                 if (!follower.isBusy()) {
-                    follower.followPath(grabPickup2,0.5,true);
+                    follower.followPath(grabPickup2Audience,0.5,true);
                     setPathState(61);
                 }
                 break;
@@ -266,7 +259,7 @@ public class AutoBlueGoal extends  OpMode{
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     intake.spin(0.8);
-                    follower.followPath(scorePickup2, true);
+                    follower.followPath(scorePickup2Audience, true);
                     setPathState(7);
                 }
                 break;
@@ -284,7 +277,7 @@ public class AutoBlueGoal extends  OpMode{
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     //follower.followPath(grabPickup3,true);
-                    follower.followPath(leaveGoal, true);
+                    follower.followPath(leaveAudience, true);
                     intake.spin(0.0);  // POWER DOWN FOR END OF AUTO
                     shooter.spin(0);
                     setPathState(9);
@@ -293,6 +286,8 @@ public class AutoBlueGoal extends  OpMode{
             }
             case 9: { // FOLLOW PATH LEAVEAUDIENCE
                 if (!follower.isBusy()) {
+                    shooter.spin(0);
+                    intake.spin(0);
                     setPathState(-1);
                 }
                 break;
@@ -350,19 +345,32 @@ public class AutoBlueGoal extends  OpMode{
 
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
-        follower.setStartingPose(startPose);
+        follower.setStartingPose(startPoseAudience);
 
         intake = new Intake(hardwareMap);
         shooter = new Shooter(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
-        shooter.setShooterVelocity(0); // NEAR for Goal
+        shooter.setShooterVelocity(2); // 2 = FAR = 2015
 
     } // end init
 
     /** This method is called continuously after Init while waiting for "play". **/
     @Override
-    public void init_loop() {}
+    public void init_loop() {
+        telemetry.addData("DELAY START", delayStart);
+        telemetry.addData("Press Y to increase","by 1");
+        telemetry.addData("Press A to decrease", "by 1");
+        telemetry.update();
+        if (gamepad1.yWasPressed()) {
+            delayStart = delayStart + 1;
+        } else if (gamepad1.aWasPressed()) {
+            delayStart = delayStart - 1;
+            if (delayStart < 0) {
+                delayStart = 0;
+            }
+        }
+    }
 
     /** This method is called once at the start of the OpMode.
      * It runs all the setup actions, including building paths and starting the path system **/
@@ -380,3 +388,4 @@ public class AutoBlueGoal extends  OpMode{
 
 
 } // end of AutoByExampleDec
+

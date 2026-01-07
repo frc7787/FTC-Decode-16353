@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "MechanismPortTest")
+@Disabled
 public class MechanismPortTest extends OpMode {
     private AprilTagSubsystem aprilTagSubsystem;
     private Intake intake;

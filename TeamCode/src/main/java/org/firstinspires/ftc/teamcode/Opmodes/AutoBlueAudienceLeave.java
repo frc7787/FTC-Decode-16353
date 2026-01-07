@@ -28,6 +28,9 @@ public class AutoBlueAudienceLeave extends  OpMode{
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
 
+    private double delayStart=0;
+
+
     // INITIALIZING POSES
 
     /*
@@ -181,8 +184,10 @@ public class AutoBlueAudienceLeave extends  OpMode{
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: {  // FOLLOW PATH TO SCORING - preloaded
-                follower.followPath(scorePreloadAudience);
-                setPathState(1);
+                if (opmodeTimer.getElapsedTimeSeconds() > delayStart) {
+                    follower.followPath(scorePreloadAudience);
+                    setPathState(1);
+                }
                 //shooter.spin(2000);
                 break;
             }
@@ -207,7 +212,7 @@ public class AutoBlueAudienceLeave extends  OpMode{
                     follower.followPath(leaveAudience, 0.5, true);
                     // setPathState(2); OK, let's just test the first two paths.
                     intake.spin(0.0);
-                    setPathState(8); // go straight to LEAVE AUDIENCE
+                    setPathState(9); // go straight to LEAVE AUDIENCE
                 }
                 break;
             }
@@ -283,6 +288,8 @@ public class AutoBlueAudienceLeave extends  OpMode{
             }
             case 9: { // FOLLOW PATH LEAVEAUDIENCE
                 if (!follower.isBusy()) {
+                    shooter.spin(0);
+                    intake.spin(0);
                     setPathState(-1);
                 }
                 break;
@@ -350,7 +357,20 @@ public class AutoBlueAudienceLeave extends  OpMode{
 
     /** This method is called continuously after Init while waiting for "play". **/
     @Override
-    public void init_loop() {}
+    public void init_loop() {
+        telemetry.addData("DELAY START", delayStart);
+        telemetry.addData("Press Y to increase","by 1");
+        telemetry.addData("Press A to decrease", "by 1");
+        telemetry.update();
+        if (gamepad1.yWasPressed()) {
+            delayStart = delayStart + 1;
+        } else if (gamepad1.aWasPressed()) {
+            delayStart = delayStart - 1;
+            if (delayStart < 0) {
+                delayStart = 0;
+            }
+        }
+    }
 
     /** This method is called once at the start of the OpMode.
      * It runs all the setup actions, including building paths and starting the path system **/

@@ -14,10 +14,10 @@ import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstants.*;
+import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstantsRed.*;
 
-@Autonomous(name = "AutoBlueGoal", group = "opmodes")
-public class AutoBlueGoal extends  OpMode{
+@Autonomous(name = "AutoRedGoal", group = "opmodes")
+public class AutoRedGoal extends  OpMode{
 
     private Intake intake;
     private Shooter shooter;
@@ -380,3 +380,4 @@ public class AutoBlueGoal extends  OpMode{
 
 
 } // end of AutoByExampleDec
+

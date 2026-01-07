@@ -35,6 +35,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import java.util.Timer;
+
 
 @TeleOp
 public class  teleOpByGhyth extends OpMode {
@@ -44,8 +46,12 @@ public class  teleOpByGhyth extends OpMode {
     private boolean scoringThree = false;
     private boolean scoringOne = false;
 
+    private String flipperPlace;
+
 
     private boolean DEBUG = true;
+
+    private Timer intakeSpinTimer;
 
     private double[] results;
 
@@ -77,6 +83,7 @@ public class  teleOpByGhyth extends OpMode {
         mecanumDrive = new MecanumDriveBase(hardwareMap);
 
 
+        intakeSpinTimer = new Timer();
 
 
         // drive motor init
@@ -140,7 +147,15 @@ public class  teleOpByGhyth extends OpMode {
         }
 
         if (gamepad2.rightBumperWasPressed()) {
-            shooter.spin(shooterTargetVelocity);
+            if(shooterDistance == "Really Far"){
+                shooter.spin(shooter.REALLYFARVELOCITY);
+            } else if (shooterDistance == "Far") {
+                shooter.spin(shooter.FARVELOCITY);
+            } else if (shooterDistance == "Medium") {
+               shooter.spin(shooter.MEDIUMVELOCITY);
+            } else if (shooterDistance == "Near") {
+                shooter.spin(shooter.NEARVELOCITY);
+            }
         } else if (gamepad2.left_bumper) {
             if (shooterVelocity > 1000) {
                 shooter.spin(0.0);
@@ -153,14 +168,22 @@ public class  teleOpByGhyth extends OpMode {
 
         if (gamepad2.dpad_up) {
             flipper.up();
+            flipperPlace = "FlipperUp";
+
         } else if (gamepad2.dpad_down) {
             flipper.down();
+            flipperPlace = "FlipperDown";
         }
-        if (gamepad1.leftBumperWasPressed()) {
+        if(flipperPlace == "FlipperUp"){
+            intake.spin(1);
+
+        }
+
+       /* if (gamepad1.leftBumperWasPressed()) {
             shooterTargetVelocity = shooterTargetVelocity - 5;
         } else if (gamepad1.rightBumperWasPressed()) {
             shooterTargetVelocity = shooterTargetVelocity + 5;
-        }
+        }*/
 
 
 

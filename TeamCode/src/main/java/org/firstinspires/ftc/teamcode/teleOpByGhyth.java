@@ -167,8 +167,8 @@ public class  teleOpByGhyth extends OpMode {
         }
 
         if (gamepad2.dpad_up) {
-            flipper.up();
             flipperPlace = "FlipperUp";
+            flipper.up();
 
         } else if (gamepad2.dpad_down) {
             flipper.down();

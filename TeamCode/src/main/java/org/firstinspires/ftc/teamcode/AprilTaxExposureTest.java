@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Size;
 
+import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -41,6 +42,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainCon
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.WhiteBalanceControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -73,8 +75,11 @@ import java.util.concurrent.TimeUnit;
 
 public class AprilTaxExposureTest extends LinearOpMode
 {
+    private TelemetryManager telemetryM;
+
+    private AprilTagSubsystem aprilTag;
     private VisionPortal visionPortal = null;        // Used to manage the video source.
-    private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
+    //private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
     private int     myExposure  ;
     private int     minExposure ;
     private int     maxExposure ;
@@ -111,14 +116,16 @@ public class AprilTaxExposureTest extends LinearOpMode
     @Override public void runOpMode()
     {
         // Initialize the Apriltag Detection process
-        initAprilTag();
+        //initAprilTag();
+        aprilTag = new AprilTagSubsystem(hardwareMap);
 
         // Establish Min and Max Gains and Exposure.  Then set a low exposure with high gain
         getCameraSetting();
         myExposure = Math.min(5, minExposure);
         myGain = maxGain;
         myWhiteBalance = (int)((minWhiteBalance + maxWhiteBalance)/2);
-        setManualExposure(myExposure, myGain,myWhiteBalance);
+        //setManualExposure(myExposure, myGain,myWhiteBalance);
+        aprilTag.setManualExposure(telemetry, myExposure, myGain, myWhiteBalance);
 
         // Wait for the match to begin.
         telemetry.addData("Camera preview on/off", "3 dots, Camera Stream");
@@ -128,17 +135,25 @@ public class AprilTaxExposureTest extends LinearOpMode
 
         while (opModeIsActive())
         {
+            aprilTag.update();
+            telemetryAprilTag();
+            aprilTag.debug(telemetry, 24);
             telemetry.addLine("Find lowest Exposure that gives reliable detection.");
             telemetry.addLine("Use Left bump/trig to adjust Exposure.");
             telemetry.addLine("Use Right bump/trig to adjust Gain.\n");
 
             // Display how many Tags Detected
+            /*
             List<AprilTagDetection> currentDetections = aprilTag.getDetections();
             int numTags = currentDetections.size();
-            if (numTags > 0 )
-                telemetry.addData("Tag", "####### %d Detected  ######", currentDetections.size());
+            if (numTags > 0 ) {
+                // telemetry.addData("Tag", "####### %d Detected  ######", currentDetections.size());
+                telemetryAprilTag();
+            }
             else
                 telemetry.addData("Tag", "----------- none - ----------");
+
+             */
 
             telemetry.addData("Exposure","%d  (%d - %d)", myExposure, minExposure, maxExposure);
             telemetry.addData("Gain","%d  (%d - %d)", myGain, minGain, maxGain);
@@ -156,27 +171,33 @@ public class AprilTaxExposureTest extends LinearOpMode
             // look for clicks to change exposure
             if (thisExpUp && !lastExpUp) {
                 myExposure = Range.clip(myExposure + 1, minExposure, maxExposure);
-                setManualExposure(myExposure, myGain,myWhiteBalance);
+                //setManualExposure(myExposure, myGain,myWhiteBalance);
+                aprilTag.setManualExposure(telemetry, myExposure, myGain, myWhiteBalance);
             } else if (thisExpDn && !lastExpDn) {
                 myExposure = Range.clip(myExposure - 1, minExposure, maxExposure);
-                setManualExposure(myExposure, myGain,myWhiteBalance);
+                //setManualExposure(myExposure, myGain,myWhiteBalance);
+                aprilTag.setManualExposure(telemetry, myExposure, myGain, myWhiteBalance);
             }
 
             // look for clicks to change the gain
             if (thisGainUp && !lastGainUp) {
                 myGain = Range.clip(myGain + 1, minGain, maxGain );
-                setManualExposure(myExposure, myGain,myWhiteBalance);
+                //setManualExposure(myExposure, myGain,myWhiteBalance);
+                aprilTag.setManualExposure(telemetry, myExposure, myGain, myWhiteBalance);
             } else if (thisGainDn && !lastGainDn) {
                 myGain = Range.clip(myGain - 1, minGain, maxGain );
-                setManualExposure(myExposure, myGain,myWhiteBalance);
+                //setManualExposure(myExposure, myGain,myWhiteBalance);
+                aprilTag.setManualExposure(telemetry, myExposure, myGain, myWhiteBalance);
             }
 
             if (thisWhiteBalanceUp && !lastWhiteBalanceUp) {
                 myWhiteBalance = Range.clip(myWhiteBalance + 100, minWhiteBalance, maxWhiteBalance );
-                setManualExposure(myExposure, myGain,myWhiteBalance);
+                //setManualExposure(myExposure, myGain,myWhiteBalance);
+                aprilTag.setManualExposure(telemetry, myExposure, myGain, myWhiteBalance);
             } else if (thisWhiteBalanceDn && !lastWhiteBalanceDn) {
                 myWhiteBalance = Range.clip(myWhiteBalance - 100, minWhiteBalance, maxWhiteBalance );
-                setManualExposure(myExposure, myGain,myWhiteBalance);
+                //setManualExposure(myExposure, myGain,myWhiteBalance);
+                aprilTag.setManualExposure(telemetry, myExposure, myGain, myWhiteBalance);
             }
 
             lastExpUp = thisExpUp;
@@ -188,7 +209,66 @@ public class AprilTaxExposureTest extends LinearOpMode
 
             sleep(20);
         }
-    }
+    } // end runOpMode
+
+    private void telemetryAprilTag() {
+        AprilTagDetection tag;
+        if (aprilTag.tagDetectedWithId(24)) {
+            tag = aprilTag.tagWithId(24);
+            telemetry.addLine(String.format("RobotPose: XYZ %6.1f %6.1f %6.1f  (inch)",
+                    tag.robotPose.getPosition().x,
+                    tag.robotPose.getPosition().y,
+                    tag.robotPose.getPosition().z));
+            telemetry.addLine(String.format("FTC: XYZ Range Bearing %6.1f %6.1f %6.1f %6.1f %6.1f (inch)",
+                    tag.ftcPose.x,
+                    tag.ftcPose.y,
+                    tag.ftcPose.z,
+                    tag.ftcPose.range,
+                    tag.ftcPose.bearing));
+            telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f %6.1f (deg)",
+                    tag.robotPose.getOrientation().getPitch(AngleUnit.DEGREES),
+                    tag.robotPose.getOrientation().getRoll(AngleUnit.DEGREES),
+                    tag.robotPose.getOrientation().getYaw(AngleUnit.DEGREES),
+            tag.metadata.tagsize));
+        }
+
+    } // end telemetryAprilTag()
+
+    /*
+
+    private void telemetryAprilTag() {
+
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        telemetry.addData("# AprilTags Detected", currentDetections.size());
+
+        // Step through the list of detections and display info for each one.
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                // Only use tags that don't have Obelisk in them
+                if (!detection.metadata.name.contains("Obelisk")) {
+                    telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)",
+                            detection.robotPose.getPosition().x,
+                            detection.robotPose.getPosition().y,
+                            detection.robotPose.getPosition().z));
+                    telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)",
+                            detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES),
+                            detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES),
+                            detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
+                }
+            } else {
+                telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
+                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
+            }
+        }   // end for() loop
+
+        // Add "key" information to telemetry
+        telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
+        telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+
+    }   // end method telemetryAprilTag()
+
+     */
 
     /**
      * Initialize the AprilTag processor.
@@ -196,6 +276,8 @@ public class AprilTaxExposureTest extends LinearOpMode
     private void initAprilTag() {
         // Create the AprilTag processor by using a builder.
         //aprilTag = new AprilTagProcessor.Builder().build();
+
+        /*
         aprilTag = new AprilTagProcessor.Builder()
                 .setDrawTagID(DRAW_TAG_ID)
                 .setDrawTagOutline(DRAW_TAG_OUTLINE)
@@ -211,6 +293,9 @@ public class AprilTaxExposureTest extends LinearOpMode
                 .setCameraResolution(CAMERA_RESOLUTION)
                 .addProcessor(aprilTag)
                 .build();
+
+         */
+
     }
 
     /*

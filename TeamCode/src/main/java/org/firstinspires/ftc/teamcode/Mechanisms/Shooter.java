@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Mechanisms;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad2;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -10,7 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-
+@Configurable
 public class Shooter {
 
     private final DcMotorEx motor;
@@ -27,6 +28,32 @@ public class Shooter {
     public int MEDIUMVELOCITY = 1800;
     public int FARVELOCITY = 2015;
     public int REALLYFARVELOCITY = 2110;
+
+    // THESE VARIABLES ARE FOR THE AUTOMATIC SHOOTER PROCESS.
+    // They can be accessed and changed in Panels: 192.168.43.1:8001
+
+    public static double INTAKE_TIME_START  = 1.0;
+    public static double INTAKE_TIME_CONTINUE = 0.5;
+    public static double VELOCITY_UPPER_OFFSET = 30;
+    public static double VELOCITY_LOWER_OFFSET = 50;
+    public static double FLIPPER_UP = 0.5;
+    public static double FLIPPER_DOWN = 0.8;
+
+
+    public double[] TARGETVELOCITY = {2110, // 0 really far
+            2110, // 1 really far
+            1600, // 2 too close
+            1710, // 3 near
+            1800, // 4 medium
+            2015, // 5  far
+            1600, // 6 too close
+            1710, // 7 medium
+            1800, // 8 medium
+            2015, // 9  far
+            1710, // 10 near
+            1800, // 11 medium
+            2015, // 12 really far
+            2110}; // 13 really far - ZONES indicated zone by number
     private enum shootingState{
         IDLE, START,INTAKE,MOTORSPINUP,FLINGER,END
     }
@@ -64,6 +91,21 @@ public class Shooter {
         }
     }
 
+    public double calculateShooterVelocity(double range) {
+        double velocity = 2000;
+
+        if (range > 118) {
+            velocity = 2400;
+        } else if (range > 111) {
+            velocity = 2270;
+        } else if (range > 107) {
+            velocity = 2190;
+        } else {
+            velocity = 2000;
+        }
+
+        return velocity;
+    }
 
 
     public void spin(double velocity) {
@@ -104,15 +146,19 @@ public class Shooter {
                 }
                 case INTAKE: {
                     intake.spin(1.0);
-                    if (shooterTimer.getElapsedTimeSeconds() > 1.0) {
+                    // FIRST ball, startShootingProcess will be true, so give the intake MORE time
+                    if (startShootingProcess && (shooterTimer.getElapsedTimeSeconds() > INTAKE_TIME_START)) {
+                        shooterState = shootingState.MOTORSPINUP;
+                        // NOT the first ball, startShootingProcess will be false, intake already moving, so give the intake LESS time
+                    } else if (!startShootingProcess && (shooterTimer.getElapsedTimeSeconds() > INTAKE_TIME_CONTINUE)) {
                         shooterState = shootingState.MOTORSPINUP;
                     }
                     telemetry.addData("SHOOTER UPDATE","INTAKE");
                     break;
                 }
                 case MOTORSPINUP: {
-                    if ((motor.getVelocity() > motorvelocity - 50) &&
-                            (motor.getVelocity() < motorvelocity +30)) {
+                    if ((motor.getVelocity() > motorvelocity - VELOCITY_LOWER_OFFSET) &&
+                            (motor.getVelocity() < motorvelocity + VELOCITY_UPPER_OFFSET)) {
                         shooterTimer.resetTimer();
                         shooterState = shootingState.FLINGER;
                         flipper.up();
@@ -121,9 +167,9 @@ public class Shooter {
                     break;
                 }
                 case FLINGER: {
-                    if (shooterTimer.getElapsedTimeSeconds() > 0.8) { // was 1.5
+                    if (shooterTimer.getElapsedTimeSeconds() > FLIPPER_DOWN) { // was 1.5
                         shooterState = shootingState.END;
-                    } else if (shooterTimer.getElapsedTimeSeconds() > 0.5) {  // was 1
+                    } else if (shooterTimer.getElapsedTimeSeconds() > FLIPPER_UP) {  // was 1
                         flipper.down();
                     }
                     telemetry.addData("SHOOTER UPDATE","FLINGER");

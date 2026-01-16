@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.ftc.FTCCoordinates;
 import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.PedroCoordinates;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
@@ -18,6 +20,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.function.Supplier;
 
@@ -28,6 +31,8 @@ public class TelePedroTest extends OpMode {
     private Follower follower;
     public static Pose startingPose;
     private boolean automatedDrive;
+
+    private boolean automatedTargeting;
     private Supplier<PathChain> pathChain;
     private Supplier<PathChain> pathChainGoal;
     private TelemetryManager telemetryM;
@@ -45,6 +50,9 @@ public class TelePedroTest extends OpMode {
     private boolean DEBUG = true;
 
     private double[] results;
+    AprilTagDetection currentTagValues;
+
+    private boolean currentTagDetected;
     private double distanceAprilTag = 9999;
     private double angleAprilTag = 9999;
     private double shooterVelocity = 0;
@@ -54,6 +62,8 @@ public class TelePedroTest extends OpMode {
     private AutomaticShooting automaticShooting = AutomaticShooting.MANUAL;
 
     private double[] idealRanges = {107,172,260,295};
+    private double[] shootingAngles = {0,5,10,10,10,10,5,5,5,5,-5,0,5,10}; // 13 indicated zone by number
+    private double[] targetVelocity = {0,1,2,3,4,5,6,7,8,9,10,11,12,13}; // 13 indicated zone by number
     private double currentRange = 170;
 
     @Override public void init() {
@@ -66,6 +76,7 @@ public class TelePedroTest extends OpMode {
         indicatorLights = new IndicatorLights(hardwareMap);
 
         shooterTargetVelocity = 2000;
+        automatedTargeting = true;
 
         // PEDRO PATHING STUFF
         startingPose = new Pose(56, 9, Math.toRadians(90));
@@ -89,13 +100,11 @@ public class TelePedroTest extends OpMode {
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading,Math.toRadians(135), 0.8))
                 .build();
 
-
-
     }
 
     @Override public void start() {
         follower.startTeleOpDrive(true);
-
+        aprilTagSubsystem.setManualExposure(telemetry, 10, 100, 2500);
     }
 
     @Override public void loop() {
@@ -107,13 +116,13 @@ public class TelePedroTest extends OpMode {
         //drive *= Math.abs(drive);
         double strafe = -gamepad1.left_stick_x;
         //strafe *= Math.abs(strafe);
-        double turn = gamepad1.right_stick_x;
+        double turn = -gamepad1.right_stick_x;
         //turn *= Math.abs(turn);
 
         //mecanumDrive.driveRobotCentric(drive, strafe, turn);
         if (!automatedDrive) {
             //mecanumDrive.driveFieldCentric(drive, strafe, turn);
-            follower.setTeleOpDrive(drive,strafe,turn,true);
+            follower.setTeleOpDrive(drive,strafe,turn,false);
         }
         if (gamepad1.dpadUpWasPressed()) {
             follower.followPath(pathChain.get(),0.9, true);
@@ -138,11 +147,15 @@ public class TelePedroTest extends OpMode {
 
 
         if (gamepad2.rightBumperWasPressed()) {
+            automatedTargeting = true;
             shooter.spin(shooterTargetVelocity);
         } else if (gamepad2.left_bumper) {
+            automatedTargeting = false;
             if (shooterVelocity > 1000) {
+                shooterTargetVelocity = 0;
                 shooter.spin(0.0);
             } else {
+                shooterTargetVelocity = 0;
                 shooter.spin(-500);
             }
         } else if (gamepad2.leftBumperWasReleased()) {
@@ -173,19 +186,36 @@ public class TelePedroTest extends OpMode {
         }
 
 
+        telemetry.addLine(String.format("Current Pedro Pose in loop x %6.1f y %6.1f heading rad %6.1f",
+                follower.getPose().getX(),
+                follower.getPose().getY(),
+                follower.getPose().getHeading()));
         aprilTagSubsystem.update();
-        results = aprilTagSubsystem.angleANDdistance(20);
-        distanceAprilTag = results[0];
-        angleAprilTag = results[1];
-        indicatorLights.display(distanceAprilTag, currentRange, angleAprilTag, 0.0); // should be actual ideal distance for shooting
+        //aprilTagSubsystem.debug(telemetry,20);
+
+        if (!automatedDrive) {
+            currentTagDetected = localizationUpdate();
+            if (automatedTargeting && currentTagDetected) {
+                targetingUpdate(); // update shooterTargetVelocity
+            } else if (currentTagDetected){ // robot is detecting April Tag but autotargeting is OFF
+                indicatorLights.display(IndicatorLights.targeting.RED, 99.9, 0.0); // LED RED for April Tag, but autotargeting OFF
+            } else { // robot is not detecting a tag or autotargeting is off
+                indicatorLights.display(IndicatorLights.targeting.OFF, 99.9, 0.0); // LED OFF for no April Tag, no autotargeting
+            }
+        }
+
 
         // GAMEPAD1 controls
 
         if (gamepad1.leftBumperWasPressed()) {
-            shooterTargetVelocity = shooterTargetVelocity - 5;
+            shooterTargetVelocity = shooterTargetVelocity - 10;
+            shooter.spin(shooterTargetVelocity);
         } else if (gamepad1.rightBumperWasPressed()) {
-            shooterTargetVelocity = shooterTargetVelocity + 5;
+            shooterTargetVelocity = shooterTargetVelocity + 10;
+            shooter.spin(shooterTargetVelocity);
         }
+
+        // Controls for MANUAL control of the SHOOTER speed
 
         if (gamepad1.yWasPressed()) {
             // near
@@ -194,6 +224,7 @@ public class TelePedroTest extends OpMode {
             currentRange = idealRanges[0];
             //shooter.setShooterVelocity(0);
             shooterDistance = "Near";
+            automatedTargeting = false;
         } else if (gamepad1.xWasPressed()) {
             // medium
             shooterTargetVelocity = shooter.MEDIUMVELOCITY;
@@ -201,6 +232,7 @@ public class TelePedroTest extends OpMode {
             currentRange = idealRanges[1];
             //shooter.setShooterVelocity(1);
             shooterDistance = "Medium";
+            automatedTargeting = false;
         } else if (gamepad1.bWasPressed()) {
             // far
             //shooter.setShooterVelocity(2);
@@ -208,6 +240,7 @@ public class TelePedroTest extends OpMode {
             shooter.spin(shooterTargetVelocity);
             currentRange = idealRanges[2];
             shooterDistance = "Far";
+            automatedTargeting = false;
         } else if (gamepad1.aWasPressed()) {
             // really far
             //shooter.setShooterVelocity(3);
@@ -215,7 +248,10 @@ public class TelePedroTest extends OpMode {
             shooter.spin(shooterTargetVelocity);
             currentRange = idealRanges[3];
             shooterDistance = "Really Far";
-        }
+            automatedTargeting = false;
+        } else if (gamepad1.shareWasPressed()) {
+            automatedTargeting = !automatedTargeting; // toggle automatedTargeting ON/OFF
+        }   // turn ON automatedTargeting
 
         if (DEBUG) {
             telemetry.addData("SHOOTER DISTANCE", shooterDistance);
@@ -226,16 +262,131 @@ public class TelePedroTest extends OpMode {
             telemetry.addData("ANGLE",angleAprilTag);
         }
 
-        aprilTagSubsystem.debug(telemetry,20);
+        //aprilTagSubsystem.debug(telemetry,20);
         telemetry.update();
     } // end loop
 
-    public boolean checkRange() {
+    public boolean localizationUpdate() {
+        // at this point we want to check if we have a valid GOAL April Tag available
+        // if YES, then we update the localizer based on the Kalman Filtered April Tag robot pose
+        // keeping in mind that in the AprilTagDetection object, we are storing the robot pose in the FTCPose
+        AprilTagDetection tag;
+        Pose cameraPose;
+        double x, y, heading;
+        double idealShootingAngle;
 
-        double distance;
-        distance = 0;
+        if (aprilTagSubsystem.tagDetectedWithId(20)) {
+            currentTagValues = aprilTagSubsystem.tagWithId(20);
+            // convert from FTC Decode RobotPose to PedroPathing
+            // using the audience side perspective
+            // FTC Decode RobotPose: positive y axis right, negative x axis forward (orients better from blue goal side)
+            // PedroPathing: positive x axis right, positive y axis forward
+            x = currentTagValues.ftcPose.y + 72;
+            y = -currentTagValues.ftcPose.x + 72;
+            heading = follower.getHeading();
+            telemetry.addLine(String.format("Current Pedro Pose %6.1f %6.1f %6.1f (inch)",
+                    follower.getPose().getX(),
+                    follower.getPose().getY(),
+                    follower.getPose().getHeading()));
+            cameraPose = new Pose(-x, -y, heading, FTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+            follower.setPose(cameraPose);
+            telemetry.addLine(String.format("Pedro Pose updated from April Tag %6.1f %6.1f %6.1f (inch)",
+                    x,
+                    y,
+                    heading));
+            return true;
 
-        return false;
+        } // tag 20 visible BLUE Goal
+        else {return false;}
+    } // end localizationUpdate
+
+    public void targetingUpdate() {
+        // at this point we want to check if we have a valid GOAL April Tag available
+        // if YES, then we update the localizer based on the Kalman Filtered April Tag robot pose
+        // keeping in mind that in the AprilTagDetection object, we are storing the robot pose in the FTCPose
+
+        double x, y, heading;
+        double idealShootingAngle;
+        int zone=0;
+        // convert from FTC Decode RobotPose to PedroPathing
+        // using the audience side perspective
+        // FTC Decode RobotPose: positive y axis right, negative x axis forward (orients better from blue goal side)
+        // PedroPathing: positive x axis right, positive y axis forward
+        // THEORETICALLY, the current tag FTC pose should be the correct Pedro Robot Pose, since we have just run localizationupdate()
+        // x = tag.ftcPose.y + 72;
+        // y = -tag.ftcPose.x + 72;
+        x = currentTagValues.ftcPose.x;
+        y = currentTagValues.ftcPose.y;
+
+        distanceAprilTag = currentTagValues.ftcPose.range;
+        angleAprilTag = currentTagValues.ftcPose.bearing;
+
+        zone = calculateShootingZone(x, y);
+        idealShootingAngle = shootingAngles[zone];
+        shooterTargetVelocity = shooter.calculateShooterVelocity(distanceAprilTag);
+
+        // WE have a potentially new shooter target velocity, update if the flywheel is supposed to be spinning
+        // let's use automatedTargeting as a proxy for "supposed to be spinning"
+        if (automatedTargeting) {
+            shooter.spin(shooterTargetVelocity);
+        }
+
+        telemetry.addLine(String.format("Current Targeting: zone, range, angle, ideal angle, RPM %d %6.1f %6.1f %6.1f %6.1f",
+                zone,
+                distanceAprilTag,
+                angleAprilTag,
+                idealShootingAngle,
+                shooterTargetVelocity));
+
+        shooterDistance = String.valueOf(zone);
+
+        indicatorLights.display(IndicatorLights.targeting.GREEN, angleAprilTag, idealShootingAngle); // should be actual ideal distance for shooting
+
+    } // end targetingUpdate
+
+    public int calculateShootingZone(double x, double y) {
+
+        int zone;
+
+        if (y<48) {
+            zone = 1;
+        } else {
+            if (y>120) { // TOP row
+               if (x>96) { // zone 5
+                   zone = 5;
+               } else if (x>72) { // zone 4
+                   zone = 4;
+               } else if (x>48) { // zone 3
+                   zone = 3;
+               } else { // zone 2
+                   zone = 2;
+               } // end of y > 120 top row
+
+            } else if (y>96) { // second from TOP row
+                if (x>96) { // zone 9
+                    zone = 9;
+                } else if (x>72) { // zone 8
+                    zone = 8;
+                } else if (x>48) { // zone 7
+                    zone = 7;
+                } else { // zone 6
+                    zone = 6;
+                } // end of y > 196 second from top row
+
+            } else { // bottom of big launch zone
+                if (x>96) { // zone 13
+                    zone = 13;
+                } else if (x>72) { // zone 12
+                    zone = 12;
+                } else if (x>48) { // zone 11
+                    zone = 11;
+                } else { // zone 10
+                    zone = 10;
+                } // end of y > 72 bottom row
+            }
+        }
+
+        return zone;
     }
 } // end class TeleOpByTylerNov26
 

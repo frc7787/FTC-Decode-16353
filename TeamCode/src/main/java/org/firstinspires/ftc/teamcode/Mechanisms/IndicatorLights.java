@@ -13,39 +13,47 @@ public class IndicatorLights {
     private double GOODANGLEINTERVAL = 6;
     private double BADANGLEINTERVAL = 8;
 
-    LED rangeLEDGreen;
-    LED rangeLEDRed;
+    public enum targeting {GREEN, RED, OFF};
+
+    LED targetLEDGreen;
+    LED targetLEDRed;
     LED angleLEDGreen;
     LED angleLEDRed;
 
     public IndicatorLights(HardwareMap hardwareMap) {
-        rangeLEDGreen = hardwareMap.get(LED.class, "rangeLEDGreen");
-        rangeLEDRed = hardwareMap.get(LED.class, "rangeLEDRed");
+        /*
+        targetLEDGreen = hardwareMap.get(LED.class, "rangeLEDGreen");
+        targetLEDRed = hardwareMap.get(LED.class, "rangeLEDRed");
         angleLEDGreen = hardwareMap.get(LED.class, "angleLEDGreen");
         angleLEDRed = hardwareMap.get(LED.class, "angleLEDRed");
+         */
+        // switch the GREEN and RED, here instead of hardware, because it seems to work ?
+        targetLEDRed = hardwareMap.get(LED.class, "rangeLEDGreen");
+        targetLEDGreen = hardwareMap.get(LED.class, "rangeLEDRed");
+        angleLEDRed = hardwareMap.get(LED.class, "angleLEDGreen");
+        angleLEDGreen = hardwareMap.get(LED.class, "angleLEDRed");
     } // end constructor
 
-    public void display(Double range, Double idealRange, Double angle, Double idealAngle) {
-        if ((range > idealRange - IDEALINTERVAL) && (range < idealRange + IDEALINTERVAL)) {
-            rangeLEDGreen.on();
-            rangeLEDRed.off(); // Green for within ideal range
-        } else if ((range > idealRange - GOODINTERVAL) && (range < idealRange + GOODINTERVAL)) {
-            rangeLEDGreen.off();  // Red for within good range
-            rangeLEDRed.on(); // Yellow doesn't work so well, therefore only 2 ranges
-        } else if ((range > idealRange - BADINTERVAL) && (range < idealRange + BADINTERVAL)) {
-            rangeLEDGreen.off();
-            rangeLEDRed.off();
+    public void display(targeting autoTargeting, Double angle, Double idealAngle) {
+
+        if (autoTargeting == targeting.GREEN) {
+            targetLEDGreen.on();
+            targetLEDRed.off(); // Green for automatic targeting ON
+        } else if (autoTargeting == targeting.RED){
+            targetLEDGreen.off();
+            targetLEDRed.on(); // Red for automatic targeting OFF
         } else {
-            rangeLEDGreen.off();
-            rangeLEDRed.off();
+            targetLEDGreen.off();
+            targetLEDRed.off(); // Green for automatic targeting ON
         }
+
 
         if ((angle > idealAngle - IDEALANGLEINTERVAL) && (angle < idealAngle + IDEALANGLEINTERVAL)) {
             angleLEDGreen.on();
             angleLEDRed.off(); // Green for within ideal range
         } else if ((angle > idealAngle - GOODANGLEINTERVAL) && (angle < idealAngle + GOODANGLEINTERVAL)) {
             angleLEDGreen.off();  // Red for within good range
-            angleLEDRed.on(); // Yellow doesn't work so well, therefore only 2 ranges
+            angleLEDRed.on(); // Yellow doesn't work so well, so red means close but not quite
         } else if ((angle > idealAngle - BADANGLEINTERVAL) && (angle < idealAngle + BADANGLEINTERVAL)) {
             angleLEDGreen.off();
             angleLEDRed.off();

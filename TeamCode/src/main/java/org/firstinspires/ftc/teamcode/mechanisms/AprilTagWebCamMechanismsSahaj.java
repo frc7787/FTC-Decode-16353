@@ -14,6 +14,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.Exposur
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -26,6 +28,11 @@ import java.util.concurrent.TimeUnit;
 public class AprilTagWebCamMechanismsSahaj {
 
     private AprilTagProcessor aprilTagProcessor;
+
+    private Position cameraPosition = new Position(DistanceUnit.INCH,
+            0, 0, 0, 0);
+    private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
+            0, -90, 0, 0);
 
     private VisionPortal visionPortal;
 
@@ -45,8 +52,10 @@ public class AprilTagWebCamMechanismsSahaj {
                 .setDrawTagOutline(true)
                 .setDrawAxes(true)
                 .setDrawCubeProjection(true)
-                .setOutputUnits(DistanceUnit.CM, AngleUnit.DEGREES)
+                .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+                .setCameraPose(cameraPosition, cameraOrientation)
                 .build();
+
         VisionPortal.Builder builder = new VisionPortal.Builder();
         builder.setCamera(hwMap.get(WebcamName.class, "Webcam 1"));
         builder.setCameraResolution(new Size(640 , 480));
@@ -83,9 +92,9 @@ public class AprilTagWebCamMechanismsSahaj {
         if (detectedId == null) {return;}
         if (detectedId.metadata!= null) {
             telemetry.addLine(String.format("\n==== (ID %d) %s", detectedId.id, detectedId.metadata.name));
-            telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f (cm)", detectedId.ftcPose.x, detectedId.ftcPose.y, detectedId.ftcPose.z));
+            telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f (in)", detectedId.ftcPose.x, detectedId.ftcPose.y, detectedId.ftcPose.z));
             telemetry.addLine(String.format("PRY: %6.1f  %6.1f  %6.1f  (deg)", detectedId.ftcPose.pitch, detectedId.ftcPose.roll, detectedId.ftcPose.yaw));
-            telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (cm, deg, deg)", detectedId.ftcPose.range, detectedId.ftcPose.bearing, detectedId.ftcPose.elevation));
+            telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (in, deg, deg)", detectedId.ftcPose.range, detectedId.ftcPose.bearing, detectedId.ftcPose.elevation));
         }
         else {
             telemetry.addLine(String.format("\n==== (ID %d) Unknown", detectedId.id));
@@ -146,8 +155,8 @@ public class AprilTagWebCamMechanismsSahaj {
             telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f (cm, deg, deg)",
                     rangeFilter.getState(), bearingFilter.getState(), elevationFilter.getState()));
             telemetry.addLine("=== SMOOTHED KALMAN DATA ===");
-            telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f (cm)",
-                    xfilter.getState(), yfilter.getState(), zfilter.getState()));
+            telemetry.addLine(String.format("XYZ Range %6.1f %6.1f %6.1f %6.1f cm)",
+                    xfilter.getState(), yfilter.getState(), zfilter.getState(), rangeFilter.getState()));
 
             return realTag;
         }

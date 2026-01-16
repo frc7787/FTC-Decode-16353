@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
+import static java.lang.Thread.sleep;
+
 import android.util.Size;
 
 import com.pedropathing.control.KalmanFilter;
@@ -8,8 +10,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.WhiteBalanceControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
@@ -17,6 +24,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class AprilTagSubsystem {
 
@@ -29,10 +37,15 @@ public class AprilTagSubsystem {
     private static final boolean DRAW_TAG_OUTLINE = true;
     private static final boolean DRAW_AXES = true;
     private static final boolean DRAW_CUBE_PROJECTION = true;
-    private static final DistanceUnit OUTPUT_DISTANCE_UNIT = DistanceUnit.CM;
+    private static final DistanceUnit OUTPUT_DISTANCE_UNIT = DistanceUnit.INCH;
     private static final AngleUnit OUTPUT_ANGLE_UNIT = AngleUnit.DEGREES;
 
     private static final String WEBCAM_NAME = "Webcam 1";
+
+    private Position cameraPosition = new Position(DistanceUnit.INCH,
+            0, 0, 0, 0);
+    private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
+            0, -90, 0, 0);
 
     private final AprilTagProcessor aprilTagProcessor;
     private final VisionPortal visionPortal;
@@ -53,7 +66,11 @@ public class AprilTagSubsystem {
                 .setDrawAxes(DRAW_AXES)
                 .setDrawCubeProjection(DRAW_CUBE_PROJECTION)
                 .setOutputUnits(OUTPUT_DISTANCE_UNIT, OUTPUT_ANGLE_UNIT)
-                .setLensIntrinsics(622.001f, 622.001, 319.803f, 241.251f) // from teamwebcamcalibrations
+                .setCameraPose(cameraPosition, cameraOrientation)
+                // first two numbers are focal length, next two are principal point
+                .setLensIntrinsics(622.001f, 622.001, 319.803f, 241.251f) // Logitech C920 from teamwebcamcalibrations
+                //.setLensIntrinsics(660.750, 660.75, 323.034, 230.681) // C615 measured kk Dec 5 2023
+                //.setLensIntrinsics(822.317f, 822.317f, 319.495f,242.502f" // C270 from teamwebcamcalibrations
                 .build();
 
         visionPortal = new VisionPortal.Builder()
@@ -116,9 +133,13 @@ public class AprilTagSubsystem {
     }
 
     @NotNull private AprilTagDetection filter(@NotNull AprilTagDetection detection) {
-        xFilter.update(detection.ftcPose.x, 0);
-        yFilter.update(detection.ftcPose.y, 0);
-        zFilter.update(detection.ftcPose.z, 0);
+        //xFilter.update(detection.ftcPose.x, 0);
+        //yFilter.update(detection.ftcPose.y, 0);
+        //zFilter.update(detection.ftcPose.z, 0);
+        // use Kalman filter for ROBOTPOSE, but store it in the AprilTagDetection under AAprilTagPoseFtc
+        xFilter.update(detection.robotPose.getPosition().x, 0);
+        yFilter.update(detection.robotPose.getPosition().y, 0);
+        zFilter.update(detection.robotPose.getPosition().z, 0);
 
         rangeFilter.update(detection.ftcPose.range, 0);
         bearingFilter.update(detection.ftcPose.bearing, 0);
@@ -163,6 +184,7 @@ public class AprilTagSubsystem {
             final AprilTagDetection raw = tagWithIdRaw(id);
             final AprilTagDetection filtered = tagWithId(id);
 
+            telemetry.addLine("APRIL TAG SUBSYSTEM Debug");
             telemetry.addLine("X");
             telemetry.addData("Raw", "%.2f", raw.ftcPose.x);
             telemetry.addData("Filtered", "%.2f", filtered.ftcPose.x);
@@ -220,5 +242,26 @@ public class AprilTagSubsystem {
         }
 
         return angleToAprilTag;
+    }
+
+    public void setManualExposure(Telemetry telemetry , int exposureMS, int gain,int whiteBalance) {
+        try {
+            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                sleep(50);
+            }
+            exposureControl.setExposure((long)exposureMS, TimeUnit.MILLISECONDS);
+
+            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
+            gainControl.setGain(gain);
+
+            WhiteBalanceControl whiteBalanceControl = visionPortal.getCameraControl(WhiteBalanceControl.class);
+            whiteBalanceControl.setWhiteBalanceTemperature(whiteBalance);
+            sleep(20);
+
+        } catch (Exception e) {
+            telemetry.addData("Error", "Failed to set camera exposure: " + e.getMessage());
+        }
     }
 }

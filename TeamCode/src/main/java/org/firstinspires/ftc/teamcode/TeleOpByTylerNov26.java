@@ -115,7 +115,7 @@ public class TeleOpByTylerNov26 extends OpMode {
         results = aprilTagSubsystem.angleANDdistance(20);
         distanceAprilTag = results[0];
         angleAprilTag = results[1];
-        indicatorLights.display(distanceAprilTag, currentRange, angleAprilTag, 0.0); // should be actual ideal distance for shooting
+        indicatorLights.display(IndicatorLights.targeting.GREEN, angleAprilTag, 0.0); // should be actual ideal distance for shooting
 
         // GAMEPAD1 controls
 

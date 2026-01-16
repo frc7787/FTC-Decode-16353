@@ -1,29 +1,36 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagWebCamMechanismsSahaj;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
 
-@Autonomous
+@TeleOp(name="April Tag OpMode Sahaj", group = "Concept")
 public class AprilTagWebCamOpModeSahaj extends OpMode {
 
      AprilTagWebCamMechanismsSahaj aprilTagWebCam = new AprilTagWebCamMechanismsSahaj();
+     private boolean exposureSet = false;
 
 
     @Override
     public void init() {
         aprilTagWebCam.init(hardwareMap, telemetry);
-        aprilTagWebCam.setManualExposure(10, 6);
 
 
     }
 
     @Override
     public void loop() {
+
+        if (!exposureSet) {
+            aprilTagWebCam.setManualExposure(10, 6);
+            exposureSet = true;
+        }
         // update the vision portal
         aprilTagWebCam.update();
         List<AprilTagDetection> detectedTags = aprilTagWebCam.getDetectedTags();

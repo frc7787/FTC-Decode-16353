@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstants.*;
 
-@Autonomous(name = "AutoBlueAudience", group = "opmodes")
-public class AutoBlueAudience extends  OpMode{
+@Autonomous(name = "AutoBlueAudienceLeave", group = "opmodes")
+public class AutoBlueAudienceLeave extends  OpMode{
 
     private Intake intake;
     private Shooter shooter;
@@ -27,6 +27,9 @@ public class AutoBlueAudience extends  OpMode{
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
+
+    private double delayStart=0;
+
 
     // INITIALIZING POSES
 
@@ -64,7 +67,7 @@ public class AutoBlueAudience extends  OpMode{
     private PathChain grabPickup1, scorePickup1, grabPickup2, scorePickup2, grabPickup3, scorePickup3;
     private PathChain grabPickup3Audience, scorePickup3Audience, grabPickup2PreAudience, grabPickup2Audience, scorePickup2Audience;
     private PathChain leaveGoal, leaveAudience;
-    
+
      */
 
     public void buildPaths() {
@@ -181,8 +184,10 @@ public class AutoBlueAudience extends  OpMode{
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: {  // FOLLOW PATH TO SCORING - preloaded
-                follower.followPath(scorePreloadAudience);
-                setPathState(1);
+                if (opmodeTimer.getElapsedTimeSeconds() > delayStart) {
+                    follower.followPath(scorePreloadAudience);
+                    setPathState(1);
+                }
                 //shooter.spin(2000);
                 break;
             }
@@ -204,10 +209,10 @@ public class AutoBlueAudience extends  OpMode{
             case 2: { // JUST SCORING - preloaded
                 if (shooter.score(false, 3, telemetry)) {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup3Audience, 0.5, true);
+                    follower.followPath(leaveAudience, 0.5, true);
                     // setPathState(2); OK, let's just test the first two paths.
-                    intake.spin(1.0);
-                    setPathState(3);
+                    intake.spin(0.0);
+                    setPathState(9); // go straight to LEAVE AUDIENCE
                 }
                 break;
             }
@@ -283,6 +288,8 @@ public class AutoBlueAudience extends  OpMode{
             }
             case 9: { // FOLLOW PATH LEAVEAUDIENCE
                 if (!follower.isBusy()) {
+                    shooter.spin(0);
+                    intake.spin(0);
                     setPathState(-1);
                 }
                 break;
@@ -350,7 +357,20 @@ public class AutoBlueAudience extends  OpMode{
 
     /** This method is called continuously after Init while waiting for "play". **/
     @Override
-    public void init_loop() {}
+    public void init_loop() {
+        telemetry.addData("DELAY START", delayStart);
+        telemetry.addData("Press Y to increase","by 1");
+        telemetry.addData("Press A to decrease", "by 1");
+        telemetry.update();
+        if (gamepad1.yWasPressed()) {
+            delayStart = delayStart + 1;
+        } else if (gamepad1.aWasPressed()) {
+            delayStart = delayStart - 1;
+            if (delayStart < 0) {
+                delayStart = 0;
+            }
+        }
+    }
 
     /** This method is called once at the start of the OpMode.
      * It runs all the setup actions, including building paths and starting the path system **/

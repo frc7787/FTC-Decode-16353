@@ -14,10 +14,10 @@ import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstants.*;
+import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstantsRed.*;
 
-@Autonomous(name = "AutoBlueAudience", group = "opmodes")
-public class AutoBlueAudience extends  OpMode{
+@Autonomous(name = "AutoRedAudience", group = "opmodes")
+public class AutoRedAudience extends  OpMode{
 
     private Intake intake;
     private Shooter shooter;
@@ -64,7 +64,7 @@ public class AutoBlueAudience extends  OpMode{
     private PathChain grabPickup1, scorePickup1, grabPickup2, scorePickup2, grabPickup3, scorePickup3;
     private PathChain grabPickup3Audience, scorePickup3Audience, grabPickup2PreAudience, grabPickup2Audience, scorePickup2Audience;
     private PathChain leaveGoal, leaveAudience;
-    
+
      */
 
     public void buildPaths() {
@@ -346,6 +346,8 @@ public class AutoBlueAudience extends  OpMode{
         shooter = new Shooter(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
+        shooter.setShooterVelocity(2); // 2 = FAR = 2015
+
     } // end init
 
     /** This method is called continuously after Init while waiting for "play". **/
@@ -368,3 +370,4 @@ public class AutoBlueAudience extends  OpMode{
 
 
 } // end of AutoByExampleDec
+

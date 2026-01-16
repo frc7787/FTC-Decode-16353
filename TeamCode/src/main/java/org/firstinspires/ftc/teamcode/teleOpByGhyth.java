@@ -21,6 +21,7 @@ import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.teamcode.Mechanisms.Flipper;
+import org.firstinspires.ftc.teamcode.Mechanisms.IndicatorLights;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
@@ -34,20 +35,41 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import java.util.Timer;
+
 
 @TeleOp
 public class  teleOpByGhyth extends OpMode {
     private DcMotor backRightDrive, frontRightDrive, backLeftDrive, frontLeftDrive;
 
+    private double shooterTargetVelocity;
+    private boolean scoringThree = false;
+    private boolean scoringOne = false;
+
+    private String flipperPlace;
+
+
+    private boolean DEBUG = true;
+
+    private Timer intakeSpinTimer;
+
+    private double[] results;
+
+    private double shooterVelocity = 0;
+
     private boolean lastOptions = false;
     private AprilTagSubsystem aprilTagSubsystem;
+    private String shooterDistance;
+
+    private double distanceAprilTag = 9999;
+    private double angleAprilTag = 9999;
 
     private MecanumDriveBase mecanumDrive;
     private Intake intake;
     private Shooter shooter;
-
+    private boolean AUTOSCORE = false;
     private Flipper flipper;
-    private boolean DEBUG = true;
+     private IndicatorLights indicatorLights;
 
 
     private IMU imu;
@@ -58,35 +80,15 @@ public class  teleOpByGhyth extends OpMode {
         intake = new Intake(hardwareMap);
         flipper = new Flipper(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
+        mecanumDrive = new MecanumDriveBase(hardwareMap);
 
+
+        intakeSpinTimer = new Timer();
 
 
         // drive motor init
-        backRightDrive = hardwareMap.get(DcMotor.class, "backRightDrive");
-        backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDrive");
-        frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDrive");
-        frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDrive");
-
-        frontLeftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        frontRightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        backLeftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        backRightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-
-        frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotorEx.Direction.FORWARD);
-        backLeftDrive.setDirection(DcMotorEx.Direction.REVERSE);
 
 
-        imu = hardwareMap.get(IMU.class, "imu");
-        final IMU.Parameters IMU_PARAMETERS = new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                        RevHubOrientationOnRobot.UsbFacingDirection.UP
-                )
-        );
-
-        imu.initialize(IMU_PARAMETERS);
 
 
 
@@ -102,54 +104,60 @@ public class  teleOpByGhyth extends OpMode {
     @Override
     public void loop() {
         //Drive code
-        double drive = -gamepad1.left_stick_y; // forward/backwards
-        double strafe = gamepad1.left_stick_x; // left/right
-        double turn = gamepad1.right_stick_x; // rotation
-        double heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
-        // Robot heading
-        double adjustedStrafe = strafe * Math.cos(heading) + drive * Math.sin(heading);
-        double adjustedDrive = strafe * Math.sin(heading) + drive * Math.cos(heading);
+        double drive = -gamepad1.left_stick_y;
+        drive *= Math.abs(drive);
+        double strafe = gamepad1.left_stick_x;
+        strafe *= Math.abs(strafe);
+        double turn = gamepad1.right_stick_x;
+        turn *= Math.abs(turn);
 
-        double fl = adjustedDrive + adjustedStrafe + turn;
-        double fr = adjustedDrive - adjustedStrafe - turn;
-        double bl = adjustedDrive - adjustedStrafe + turn;
-        double br = adjustedDrive + adjustedStrafe - turn;
+        mecanumDrive.driveFieldCentric(drive, strafe, turn);
+        
+       // Robot heading
 
-        // Normalize
-        double max = Math.max(1.0,
-                Math.max(Math.abs(fl),
-                        Math.max(Math.abs(fr),
-                                Math.max(Math.abs(bl), Math.abs(br)))));
-
-        // Set powers using your motor names
-        frontLeftDrive.setPower(fl / max);
-        frontRightDrive.setPower(fr / max);
-        backLeftDrive.setPower(bl / max);
-        backRightDrive.setPower(br / max);
-
-        // Reset IMU with OPTIONS button
-        boolean optionsPressed = gamepad1.options && !lastOptions;
-        if (optionsPressed) imu.resetYaw();
-        lastOptions = gamepad1.options;
-
-        telemetry.addData("Heading (deg)", Math.toDegrees(heading));
-
-
-
-
-
-        // end of drive code
+        intake.spin(gamepad2.left_trigger - gamepad2.right_trigger) ;
+        shooterVelocity = shooter.velocity();
         if (gamepad1.options) {
             mecanumDrive.resetImu();
         }
+        if (gamepad1.triangleWasPressed()) {
+            // near
+            shooter.setShooterVelocity(0);
+            shooter.spin(shooter.NEARVELOCITY);
+            shooterDistance = "Near";
+        } else if (gamepad1.squareWasPressed()) {
+            shooter.spin(shooter.MEDIUMVELOCITY);
+            // medi
+            shooter.setShooterVelocity(1);
 
-        intake.spin(gamepad2.left_trigger - gamepad2.right_trigger);
+            shooterDistance = "Medium";
+        } else if (gamepad1.circleWasPressed()) {
+            // far
+            shooter.setShooterVelocity(2);
+
+            shooter.spin(shooter.FARVELOCITY);
+            shooterDistance = "Far";
+        } else if (gamepad1.crossWasPressed()) {
+            // really fa
+            shooter.spin(shooter.REALLYFARVELOCITY);
+            shooter.setShooterVelocity(3);
+
+            shooterDistance = "Really Far";
+        }
 
         if (gamepad2.rightBumperWasPressed()) {
-            shooter.spin(2000);
+            if(shooterDistance == "Really Far"){
+                shooter.spin(shooter.REALLYFARVELOCITY);
+            } else if (shooterDistance == "Far") {
+                shooter.spin(shooter.FARVELOCITY);
+            } else if (shooterDistance == "Medium") {
+               shooter.spin(shooter.MEDIUMVELOCITY);
+            } else if (shooterDistance == "Near") {
+                shooter.spin(shooter.NEARVELOCITY);
+            }
         } else if (gamepad2.left_bumper) {
-            if (shooter.velocity() > 1000) {
+            if (shooterVelocity > 1000) {
                 shooter.spin(0.0);
             } else {
                 shooter.spin(-500);
@@ -159,19 +167,64 @@ public class  teleOpByGhyth extends OpMode {
         }
 
         if (gamepad2.dpad_up) {
+            flipperPlace = "FlipperUp";
             flipper.up();
+
         } else if (gamepad2.dpad_down) {
             flipper.down();
+            flipperPlace = "FlipperDown";
+        }
+        if(flipperPlace == "FlipperUp"){
+            intake.spin(1);
+
         }
 
-        aprilTagSubsystem.update();
+       /* if (gamepad1.leftBumperWasPressed()) {
+            shooterTargetVelocity = shooterTargetVelocity - 5;
+        } else if (gamepad1.rightBumperWasPressed()) {
+            shooterTargetVelocity = shooterTargetVelocity + 5;
+        }*/
 
+
+
+
+
+        if (gamepad2.a && !scoringThree) {
+            scoringThree = true;
+            shooter.startScoring = true;    // reset shooter
+        }
+
+        if (scoringThree) {
+            if (shooter.score(true, 3, telemetry)) {
+                scoringThree = false;       // finished scoring all 3 balls
+            }
+        }
+
+        if (gamepad2.x && !scoringOne) {
+            scoringOne = true;
+            shooter.startScoring = true;
+        }
+
+        if (scoringOne) {
+            if (shooter.score(true, 1, telemetry)) {
+                scoringOne = false;         // finished firing 1 ball
+            }
+        }
         if (DEBUG) {
-            telemetry.addData("SHOOTER VELOCITY",shooter.velocity());
-            telemetry.update();
+            telemetry.addData("SHOOTER DISTANCE", shooterDistance);
+            telemetry.addData("SHOOTER TARGET VELOCITY",shooterTargetVelocity);
+            telemetry.addData("SHOOTER ACTUAL VELOCITY",shooterVelocity);
+
+            telemetry.addData("RANGE",distanceAprilTag);
+            telemetry.addData("ANGLE",angleAprilTag);
         }
 
-        aprilTagSubsystem.debug(telemetry,20);
+
+
+
+
+
+
 
 
     }

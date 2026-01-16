@@ -28,9 +28,7 @@ public class TeleOpByTylerNov26 extends OpMode {
     private double[] results;
     private double distanceAprilTag = 9999;
     private double angleAprilTag = 9999;
-    private double shooterVelocity = 0;
-    private double shooterTargetVelocity;
-    private String shooterDistance = "Default";
+
 
     @Override public void init() {
         mecanumDrive = new MecanumDriveBase(hardwareMap);
@@ -41,7 +39,6 @@ public class TeleOpByTylerNov26 extends OpMode {
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
         indicatorLights = new IndicatorLights(hardwareMap);
 
-        shooterTargetVelocity = 2000;
     }
 
     @Override public void start() {
@@ -63,66 +60,27 @@ public class TeleOpByTylerNov26 extends OpMode {
         }
 
         intake.spin(gamepad2.left_trigger - gamepad2.right_trigger);
-        shooterVelocity = shooter.velocity();
 
+        //Changed here
 
+        if (gamepad1.triangle) shooter.setShooterVelocity(0); //near velocity
+        if (gamepad1.square) shooter.setShooterVelocity(1); //medium velocity
+        if (gamepad1.circle) shooter.setShooterVelocity(2); //far velocity
+        if (gamepad1.x) shooter.setShooterVelocity(3); //really far velocity
 
-        if (gamepad2.rightBumperWasPressed()) {
-            shooter.spin(shooterTargetVelocity);
-        } else if (gamepad2.left_bumper) {
-            if (shooterVelocity > 1000) {
-                shooter.spin(0.0);
-            } else {
-                shooter.spin(-500);
-            }
-        } else if (gamepad2.leftBumperWasReleased()) {
-            shooter.spin(0.0);
-        }
+        boolean startSingleShot = gamepad2.rightBumperWasPressed(); //Shoot one ball
+        boolean cancelShot = gamepad2.leftBumperWasPressed(); //Cancel Shooting
+        boolean startThreeShot = gamepad2.yWasPressed(); //Shoot three balls
 
-        if (gamepad2.dpad_up) {
-            flipper.up();
-        } else if (gamepad2.dpad_down) {
-            flipper.down();
-        }
+        shooter.score(startSingleShot, 1, telemetry); //single shot
+        shooter.score(startThreeShot, 3, telemetry); //multi shot
+        telemetry.addData("Shooter Velocity", shooter.velocity()); // shows current speed
 
-
-
-        aprilTagSubsystem.update();
-        results = aprilTagSubsystem.angleANDdistance(20);
-        distanceAprilTag = results[0];
-        angleAprilTag = results[1];
-        indicatorLights.display(distanceAprilTag,150.0, angleAprilTag, 0.0); // should be actual ideal distance for shooting
-
-        if (gamepad1.leftBumperWasPressed()) {
-            shooterTargetVelocity = shooterTargetVelocity - 5;
-        } else if (gamepad1.rightBumperWasPressed()) {
-            shooterTargetVelocity = shooterTargetVelocity + 5;
-        }
-
-        if (gamepad1.triangleWasPressed()) {
-            // near
-            shooter.setShooterVelocity(0);
-            shooterDistance = "Near";
-        } else if (gamepad1.squareWasPressed()) {
-            // medium
-            shooter.setShooterVelocity(1);
-            shooterDistance = "Medium";
-        } else if (gamepad1.circleWasPressed()) {
-            // far
-            shooter.setShooterVelocity(2);
-            shooterDistance = "Far";
-        } else if (gamepad1.xWasPressed()) {
-            // really far
-            shooter.setShooterVelocity(3);
-            shooterDistance = "Really Far";
-        }
 
         if (DEBUG) {
-            telemetry.addData("SHOOTER DISTANCE", shooterDistance);
-            telemetry.addData("SHOOTER VELOCITY",shooterVelocity);
-            telemetry.addData("SHOOTER TARGET VELOCITY",shooterTargetVelocity);
             telemetry.addData("RANGE",distanceAprilTag);
             telemetry.addData("ANGLE",angleAprilTag);
+            telemetry.addData("SHOOTER VELOCITY", shooter.velocity());
         }
 
         aprilTagSubsystem.debug(telemetry,20);

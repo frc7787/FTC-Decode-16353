@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -16,6 +17,11 @@ public class Shooter {
 
     private final DcMotorEx motor;
     private final DcMotorEx motor2;
+
+    public static double PIDF_F = 11.19;
+    public static double PIDF_P = 60.0;
+
+    PIDFCoefficients pidfCoefficients = new PIDFCoefficients(PIDF_P, 0, 0, PIDF_F);
 
     private Flipper flipper;
     private Intake intake;
@@ -29,15 +35,29 @@ public class Shooter {
     public int FARVELOCITY = 2015;
     public int REALLYFARVELOCITY = 2110;
 
+    // THESE VARIABLES ARE FOR THE AUTOMATIC APRIL TAG TARGETING range and flywheel RPM
+
+    public static double RMP_130 = 2440;
+    public static double RPM_123 = 2380;
+    public static double RPM_112 = 2270;
+    public static double RPM_106 = 2190;
+    public static double RPM_76 = 1940;
+    public static double RPM_63 = 1940;
+    public static double RPM_59 = 1900;
+    public static double RPM_50 = 1900;
+
+    public static double RPM_126 = 2400;
+
+
     // THESE VARIABLES ARE FOR THE AUTOMATIC SHOOTER PROCESS.
     // They can be accessed and changed in Panels: 192.168.43.1:8001
 
-    public static double INTAKE_TIME_START  = 1.0;
-    public static double INTAKE_TIME_CONTINUE = 0.5;
+    public static double INTAKE_TIME_START  = 0.5; // was 1.0
+    public static double INTAKE_TIME_CONTINUE = 0.25; // was 0.5
     public static double VELOCITY_UPPER_OFFSET = 30;
-    public static double VELOCITY_LOWER_OFFSET = 50;
-    public static double FLIPPER_UP = 0.5;
-    public static double FLIPPER_DOWN = 0.8;
+    public static double VELOCITY_LOWER_OFFSET = 30;
+    public static double FLIPPER_UP = 0.5; // was 0.5
+    public static double FLIPPER_DOWN = 0.7; // was 0.8
 
 
     public double[] TARGETVELOCITY = {2110, // 0 really far
@@ -68,10 +88,12 @@ public class Shooter {
         motor = hardwareMap.get(DcMotorEx.class, "shooterMotor");
         motor.setDirection(DcMotorEx.Direction.REVERSE);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
 
         motor2 = hardwareMap.get(DcMotorEx.class, "shooterTwo");
         motor2.setDirection(DcMotorEx.Direction.FORWARD);
         motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
 
         scoreTimer = new Timer();
         shooterTimer = new Timer();
@@ -94,15 +116,28 @@ public class Shooter {
     public double calculateShooterVelocity(double range) {
         double velocity = 2000;
 
-        if (range > 118) {
-            velocity = 2400;
+        if (range > 129) {
+            velocity = RMP_130;
+        } else if (range > 125) {
+            velocity = RPM_126;
+        } else if (range > 122) {
+            velocity = RPM_123;
         } else if (range > 111) {
-            velocity = 2270;
-        } else if (range > 107) {
-            velocity = 2190;
-        } else {
-            velocity = 2000;
+            velocity = RPM_112;
+        } else if (range > 105) {
+            velocity = RPM_106;
+        } else if (range> 75){
+            velocity = RPM_76;
+        } else if (range > 62) {
+            velocity = RPM_63;
+        } else if (range > 58) {
+            velocity = RPM_59;
+        } else if (range > 50) {
+            velocity = RPM_50;
         }
+
+        // FORMULA??
+        //velocity = 289.13317*Math.sin(0.0318839*range+2.92209)+2192.51129;
 
         return velocity;
     }

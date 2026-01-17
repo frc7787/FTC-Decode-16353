@@ -186,9 +186,6 @@ public class  teleOpByGhyth extends OpMode {
         }*/
 
 
-
-
-
         if (gamepad2.a && !scoringThree) {
             scoringThree = true;
             shooter.startScoring = true;    // reset shooter
@@ -218,14 +215,6 @@ public class  teleOpByGhyth extends OpMode {
             telemetry.addData("RANGE",distanceAprilTag);
             telemetry.addData("ANGLE",angleAprilTag);
         }
-
-
-
-
-
-
-
-
 
     }
 }

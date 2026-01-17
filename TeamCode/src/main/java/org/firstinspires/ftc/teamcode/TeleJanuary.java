@@ -24,8 +24,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.function.Supplier;
 
-@TeleOp(name = "TelePedroTest", group = "$")
-public class TelePedroTest extends OpMode {
+@TeleOp(name = "TeleJanuary", group = "$")
+public class TeleJanuary extends OpMode {
 
     // PEDRO PATHING STUFF
     private Follower follower;
@@ -79,8 +79,7 @@ public class TelePedroTest extends OpMode {
         automatedTargeting = true;
 
         // PEDRO PATHING STUFF
-        //startingPose = new Pose(56, 9, Math.toRadians(90));
-        startingPose = new Pose(56, 9, Math.toRadians(0));
+        startingPose = new Pose(56, 9, Math.toRadians(90));
         automatedDrive = false;
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
@@ -109,45 +108,75 @@ public class TelePedroTest extends OpMode {
     }
 
     @Override public void loop() {
+
         // Call Pedro once per loop
         follower.update();
         telemetryM.update();
 
+        // DRIVE CONTROLS
+
         double drive = -gamepad1.left_stick_y;
         drive *= Math.abs(drive);
-        double strafe = -gamepad1.left_stick_x;
+        double strafe = gamepad1.left_stick_x;
         strafe *= Math.abs(strafe);
-        double turn = -gamepad1.right_stick_x;
+        double turn = gamepad1.right_stick_x;
         turn *= Math.abs(turn);
 
-        //mecanumDrive.driveRobotCentric(drive, strafe, turn);
-        if (!automatedDrive) {
-            //mecanumDrive.driveFieldCentric(drive, strafe, turn);
-            follower.setTeleOpDrive(drive,strafe,turn,false);
-        }
-        if (gamepad1.dpadUpWasPressed()) {
-            follower.followPath(pathChain.get(),0.9, true);
-            automatedDrive = true;
-        } else if (gamepad1.dpadRightWasPressed()) {
-            follower.followPath(pathChainGoal.get());
-            automatedDrive = true;
-        }
-        if (automatedDrive && (gamepad1.dpadDownWasPressed() || !follower.isBusy())) {
-            follower.startTeleOpDrive(true);
-            automatedDrive = false;
-        }
+        mecanumDrive.driveFieldCentric(drive, strafe, turn);
 
         if (gamepad1.options) {
             mecanumDrive.resetImu();
         }
 
-        // GAMEPAD2 manual controls
 
-        if (automaticShooting == AutomaticShooting.MANUAL){
-            intake.spin(gamepad2.left_trigger - gamepad2.right_trigger);
-        }
+        intake.spin(gamepad2.left_trigger - gamepad2.right_trigger);
         shooterVelocity = shooter.velocity();
 
+        // GAMEPAD 1 - MANUAL control of the SHOOTER speed
+
+        if (gamepad1.yWasPressed()) {
+            // near
+            shooterTargetVelocity = shooter.NEARVELOCITY;
+            shooter.spin(shooterTargetVelocity);
+            //shooter.setShooterVelocity(0);
+            shooterDistance = "Near";
+            automatedTargeting = false;
+        } else if (gamepad1.xWasPressed()) {
+            // medium
+            shooterTargetVelocity = shooter.MEDIUMVELOCITY;
+            shooter.spin(shooterTargetVelocity);
+            //shooter.setShooterVelocity(1);
+            shooterDistance = "Medium";
+            automatedTargeting = false;
+        } else if (gamepad1.bWasPressed()) {
+            // far
+            //shooter.setShooterVelocity(2);
+            shooterTargetVelocity = shooter.FARVELOCITY;
+            shooter.spin(shooterTargetVelocity);
+            shooterDistance = "Far";
+            automatedTargeting = false;
+        } else if (gamepad1.aWasPressed()) {
+            // really far
+            //shooter.setShooterVelocity(3);
+            shooterTargetVelocity = shooter.REALLYFARVELOCITY;
+            shooter.spin(shooterTargetVelocity);
+            shooterDistance = "Really Far";
+            automatedTargeting = false;
+        } else if (gamepad1.shareWasPressed()) {
+            automatedTargeting = !automatedTargeting; // toggle automatedTargeting ON/OFF
+        }   // turn ON automatedTargeting
+
+        // GAMEPAD1 - fine control of shooter velocity
+
+        if (gamepad1.leftBumperWasPressed()) {
+            shooterTargetVelocity = shooterTargetVelocity - 10;
+            shooter.spin(shooterTargetVelocity);
+        } else if (gamepad1.rightBumperWasPressed()) {
+            shooterTargetVelocity = shooterTargetVelocity + 10;
+            shooter.spin(shooterTargetVelocity);
+        }
+
+        // GAMEPAD2 manual controls for turning shooter ON and OFF
 
         if (gamepad2.rightBumperWasPressed()) {
             automatedTargeting = true;
@@ -165,29 +194,15 @@ public class TelePedroTest extends OpMode {
             shooter.spin(0.0);
         }
 
-        if (gamepad2.dpad_up && (shooterVelocity>(shooterTargetVelocity-50))) {
+        // GAMEPAD 2 - MANUAL control of flipper
+
+        if (gamepad2.dpad_up && (shooterVelocity>(shooterTargetVelocity-75))) {
             flipper.up();
         } else if (gamepad2.dpad_down) {
             flipper.down();
         }
 
-        // Gamepad2 automatic scoring controls
-
-        if (gamepad2.yWasPressed()) {
-            automaticShooting = AutomaticShooting.AUTO1;
-            shooter.motorvelocity = (int) shooterTargetVelocity;
-            shooter.score(true,1,telemetry);
-        } else if (gamepad2.aWasPressed()) {
-            automaticShooting = AutomaticShooting.AUTO3;
-            shooter.score(true, 3,telemetry);
-        }
-
-        if ((automaticShooting == AutomaticShooting.AUTO1) || (automaticShooting == AutomaticShooting.AUTO3)) {
-            if (shooter.score(false,3,telemetry)) {
-                automaticShooting = AutomaticShooting.MANUAL;
-            }
-        }
-
+        // PEDRO LOCALIZATION - not currently used except for ZONE calculation
 
         telemetry.addLine(String.format("Current Pedro Pose in loop x %6.1f y %6.1f heading rad %6.1f",
                 follower.getPose().getX(),
@@ -206,55 +221,6 @@ public class TelePedroTest extends OpMode {
                 indicatorLights.display(IndicatorLights.targeting.OFF, 99.9, 0.0); // LED OFF for no April Tag, no autotargeting
             }
         }
-
-
-        // GAMEPAD1 controls
-
-        if (gamepad1.leftBumperWasPressed()) {
-            shooterTargetVelocity = shooterTargetVelocity - 10;
-            shooter.spin(shooterTargetVelocity);
-        } else if (gamepad1.rightBumperWasPressed()) {
-            shooterTargetVelocity = shooterTargetVelocity + 10;
-            shooter.spin(shooterTargetVelocity);
-        }
-
-        // Controls for MANUAL control of the SHOOTER speed
-
-        if (gamepad1.yWasPressed()) {
-            // near
-            shooterTargetVelocity = shooter.NEARVELOCITY;
-            shooter.spin(shooterTargetVelocity);
-            currentRange = idealRanges[0];
-            //shooter.setShooterVelocity(0);
-            shooterDistance = "Near";
-            automatedTargeting = false;
-        } else if (gamepad1.xWasPressed()) {
-            // medium
-            shooterTargetVelocity = shooter.MEDIUMVELOCITY;
-            shooter.spin(shooterTargetVelocity);
-            currentRange = idealRanges[1];
-            //shooter.setShooterVelocity(1);
-            shooterDistance = "Medium";
-            automatedTargeting = false;
-        } else if (gamepad1.bWasPressed()) {
-            // far
-            //shooter.setShooterVelocity(2);
-            shooterTargetVelocity = shooter.FARVELOCITY;
-            shooter.spin(shooterTargetVelocity);
-            currentRange = idealRanges[2];
-            shooterDistance = "Far";
-            automatedTargeting = false;
-        } else if (gamepad1.aWasPressed()) {
-            // really far
-            //shooter.setShooterVelocity(3);
-            shooterTargetVelocity = shooter.REALLYFARVELOCITY;
-            shooter.spin(shooterTargetVelocity);
-            currentRange = idealRanges[3];
-            shooterDistance = "Really Far";
-            automatedTargeting = false;
-        } else if (gamepad1.shareWasPressed()) {
-            automatedTargeting = !automatedTargeting; // toggle automatedTargeting ON/OFF
-        }   // turn ON automatedTargeting
 
         if (DEBUG) {
             telemetry.addData("SHOOTER DISTANCE", shooterDistance);
@@ -355,15 +321,15 @@ public class TelePedroTest extends OpMode {
             zone = 1;
         } else {
             if (y>120) { // TOP row
-               if (x>96) { // zone 5
-                   zone = 5;
-               } else if (x>72) { // zone 4
-                   zone = 4;
-               } else if (x>48) { // zone 3
-                   zone = 3;
-               } else { // zone 2
-                   zone = 2;
-               } // end of y > 120 top row
+                if (x>96) { // zone 5
+                    zone = 5;
+                } else if (x>72) { // zone 4
+                    zone = 4;
+                } else if (x>48) { // zone 3
+                    zone = 3;
+                } else { // zone 2
+                    zone = 2;
+                } // end of y > 120 top row
 
             } else if (y>96) { // second from TOP row
                 if (x>96) { // zone 9
@@ -392,4 +358,5 @@ public class TelePedroTest extends OpMode {
         return zone;
     }
 } // end class TeleOpByTylerNov26
+
 

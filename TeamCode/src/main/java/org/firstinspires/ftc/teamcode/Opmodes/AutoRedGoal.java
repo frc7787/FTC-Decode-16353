@@ -102,16 +102,19 @@ public class AutoRedGoal extends  OpMode{
 
         /* This is our grabPickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup2StartPose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2StartPose.getHeading())
                 .addPath(new BezierLine(pickup2StartPose,pickup2EndPose))
                 .setLinearHeadingInterpolation(pickup2StartPose.getHeading(),pickup2EndPose.getHeading())
+                .setGlobalDeceleration(3)
+                .setBrakingStrength(4)
+                .setBrakingStart(4)
                 .build();
 
         /* This is our scorePickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup2EndPose, scorePose))
-                .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierLine(pickup2EndPose, pickup2StartPose))
+                .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), pickup2StartPose.getHeading())
+                .addPath(new BezierLine(pickup2StartPose, scorePose))
+                .setLinearHeadingInterpolation(pickup2StartPose.getHeading(), scorePose.getHeading())
                 .build();
 
         /* This is our grabPickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
@@ -245,7 +248,7 @@ public class AutoRedGoal extends  OpMode{
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     follower.followPath(grabPickup2Pre, true);
-                    intake.spin(0.8);
+                    intake.spin(1.0);
                     setPathState(6);
                 }
                 break;
@@ -265,7 +268,7 @@ public class AutoRedGoal extends  OpMode{
                     /* Grab Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
-                    intake.spin(0.8);
+                    intake.spin(1.0);
                     follower.followPath(scorePickup2, true);
                     setPathState(7);
                 }
@@ -356,7 +359,7 @@ public class AutoRedGoal extends  OpMode{
         shooter = new Shooter(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
-        shooter.setShooterVelocity(0); // NEAR for Goal
+        shooter.setShooterVelocity(shooter.RPM_GOAL);
 
     } // end init
 

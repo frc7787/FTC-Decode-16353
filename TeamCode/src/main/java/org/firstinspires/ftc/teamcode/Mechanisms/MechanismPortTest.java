@@ -17,11 +17,14 @@ public class MechanismPortTest extends OpMode {
 
     private Servo servo;
 
+    private int motorIndex = 0;
+
+    private double motorPower = 0.5;
+
     private double servoPosition = 0;
 
     @Override
     public void init() {
-
         chPort1 = hardwareMap.get(DcMotorEx.class, "chport1");
         chPort2 = hardwareMap.get(DcMotorEx.class, "chport2");
         chPort3 = hardwareMap.get(DcMotorEx.class, "chport3");
@@ -30,18 +33,10 @@ public class MechanismPortTest extends OpMode {
         ehPort2 = hardwareMap.get(DcMotorEx.class, "ehport2");
         ehPort3 = hardwareMap.get(DcMotorEx.class, "ehport3");
         ehPort0 = hardwareMap.get(DcMotorEx.class, "ehport0");
-
-        servo = hardwareMap.get(Servo.class, "servo");
-
-        servo.setPosition(0);
-
-
-
     }
 
     @Override
     public void init_loop() {
-
 
     }
 
@@ -55,15 +50,58 @@ public class MechanismPortTest extends OpMode {
         }
         servo.setPosition(servoPosition);
 
-        telemetry.addData("servoPosition", servoPosition);
+        if (gamepad1.yWasPressed()) {
+            motorIndex = (motorIndex + 1) % 8;
+        }
+
+        motorPower = gamepad1.right_trigger - gamepad1.left_trigger;
+
+        switch (motorIndex) {
+            case 0: {
+                chPort0.setPower(motorPower);
+                break;
+            }
+            case 1: {
+                chPort1.setPower(motorPower);
+                break;
+            }
+            case 2: {
+                chPort2.setPower(motorPower);
+                break;
+            }
+            case 3: {
+                chPort3.setPower(motorPower);
+                break;
+            }
+            case 4: {
+                ehPort0.setPower(motorPower);
+                break;
+            }
+            case 5: {
+                ehPort1.setPower(motorPower);
+                break;
+            }
+            case 6: {
+                ehPort2.setPower(motorPower);
+                break;
+            }
+            case 7: {
+                ehPort3.setPower(motorPower);
+                break;
+            }
+        }
+
+        telemetry.addData("Current Motor Index", motorIndex);
+        telemetry.addLine("Press Y to increase motor index, 0-3 = Control Hub, 4-7 = Expansion Hub");
+        telemetry.addLine("Remember that the motors on ONE side will be reversed.");
+        telemetry.addLine("Use triggers for motor movement.");
+
         telemetry.update();
 
     }
 
     @Override
     public void start() {
-
-
 
     }
 

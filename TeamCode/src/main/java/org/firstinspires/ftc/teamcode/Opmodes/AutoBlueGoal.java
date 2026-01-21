@@ -102,8 +102,8 @@ public class AutoBlueGoal extends  OpMode{
 
         /* This is our grabPickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup2StartPose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2StartPose.getHeading())
+                //.addPath(new BezierLine(scorePose, pickup2StartPose))
+                //.setLinearHeadingInterpolation(scorePose.getHeading(), pickup2StartPose.getHeading())
                 .addPath(new BezierLine(pickup2StartPose,pickup2EndPose))
                 .setLinearHeadingInterpolation(pickup2StartPose.getHeading(),pickup2EndPose.getHeading())
                 .build();
@@ -212,7 +212,7 @@ public class AutoBlueGoal extends  OpMode{
                 break;
             }
             case 2: { // JUST SCORING - preloaded
-                if (shooter.score(false, 3, telemetry)) {
+                if (shooter.score(false, 3,telemetry)) {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     follower.followPath(grabPickup1, 0.5, true);
                     // setPathState(2); OK, let's just test the first two paths.
@@ -356,7 +356,7 @@ public class AutoBlueGoal extends  OpMode{
         shooter = new Shooter(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
-        shooter.setShooterVelocity(0); // NEAR for Goal
+        shooter.setShooterVelocity(shooter.RPM_76); // NEAR for Goal
 
     } // end init
 

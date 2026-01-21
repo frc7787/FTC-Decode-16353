@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstantsRed.*;
 
-@Autonomous(name = "AutoRedAudience (pickup 2 rows)", group = "opmodes")
-public class AutoRedAudience extends  OpMode{
+@Autonomous(name = "AutoRedAudience2 (pickup 1 row", group = "opmodes")
+public class AutoRedAudience2 extends  OpMode{
 
     private Intake intake;
     private Shooter shooter;
@@ -234,9 +234,12 @@ public class AutoRedAudience extends  OpMode{
                     /* Score Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup2PreAudience, true);
-                    intake.spin(0.8);
-                    setPathState(6);
+                    //follower.followPath(grabPickup2PreAudience, true);
+                    follower.followPath(leaveAudience, 0.5, true);
+                    // setPathState(2); OK, let's just test the first two paths.
+                    intake.spin(0.0);
+                    shooter.spin(0.0);
+                    setPathState(9); // go straight to LEAVE AUDIENCE
                 }
                 break;
             }
@@ -370,4 +373,5 @@ public class AutoRedAudience extends  OpMode{
 
 
 } // end of AutoByExampleDec
+
 

@@ -353,6 +353,8 @@ public class AutoBlueAudienceLeave extends  OpMode{
         shooter = new Shooter(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
+        shooter.setShooterVelocity(shooter.RPM_112);
+
     } // end init
 
     /** This method is called continuously after Init while waiting for "play". **/

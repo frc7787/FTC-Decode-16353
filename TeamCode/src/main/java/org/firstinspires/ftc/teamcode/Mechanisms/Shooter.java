@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad2;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.util.Timer;
@@ -18,6 +19,10 @@ public class Shooter {
     private final DcMotorEx motor;
     private final DcMotorEx motor2;
 
+    private HardwareMap hardwareMap;
+
+    private double motorVoltage;
+
     public static double PIDF_F = 11.19;
     public static double PIDF_P = 60.0;
 
@@ -29,15 +34,16 @@ public class Shooter {
     private  boolean started = false;
     private Timer shooterTimer;
 
-    public int motorvelocity = 2000;
-    public int NEARVELOCITY = 1710;
-    public int MEDIUMVELOCITY = 1800;
-    public int FARVELOCITY = 2015;
-    public int REALLYFARVELOCITY = 2110;
+    public double motorvelocity = 2000;
+    public double NEARVELOCITY = 1710;
+    public double MEDIUMVELOCITY = 1800;
+    public double FARVELOCITY = 2015;
+    public double REALLYFARVELOCITY = 2110;
 
     // THESE VARIABLES ARE FOR THE AUTOMATIC APRIL TAG TARGETING range and flywheel RPM
 
     public static double RMP_130 = 2440;
+    public static double RPM_126 = 2400;
     public static double RPM_123 = 2380;
     public static double RPM_112 = 2270;
     public static double RPM_106 = 2190;
@@ -45,8 +51,10 @@ public class Shooter {
     public static double RPM_63 = 1940;
     public static double RPM_59 = 1900;
     public static double RPM_50 = 1900;
+    public static double RPM_AUDIENCE = 2190; // 2190 @12.9V; was 2290/2240 new wheel
+    public static double RPM_GOAL = 1820; // was 1940 old wheel
 
-    public static double RPM_126 = 2400;
+
 
 
     // THESE VARIABLES ARE FOR THE AUTOMATIC SHOOTER PROCESS.
@@ -54,10 +62,12 @@ public class Shooter {
 
     public static double INTAKE_TIME_START  = 0.5; // was 1.0
     public static double INTAKE_TIME_CONTINUE = 0.25; // was 0.5
-    public static double VELOCITY_UPPER_OFFSET = 30;
-    public static double VELOCITY_LOWER_OFFSET = 30;
+    public static double VELOCITY_UPPER_OFFSET = 40;
+    public static double VELOCITY_LOWER_OFFSET = 40;
     public static double FLIPPER_UP = 0.5; // was 0.5
     public static double FLIPPER_DOWN = 0.7; // was 0.8
+
+    public static double JUST_SHOOT_IT = 1.0; // waiting for motorspinup, but at some point just shoot!
 
 
     public double[] TARGETVELOCITY = {2110, // 0 really far
@@ -83,6 +93,8 @@ public class Shooter {
 
     public Shooter(HardwareMap hardwareMap) {
 
+        this.hardwareMap = hardwareMap;
+
         flipper = new Flipper(hardwareMap);
         intake = new Intake(hardwareMap);
         motor = hardwareMap.get(DcMotorEx.class, "shooterMotor");
@@ -101,7 +113,7 @@ public class Shooter {
         shooterState = shootingState.IDLE;
     }
 
-    public void setShooterVelocity(int velocity) {
+    public void setShooterVelocity(double velocity) {
         if (velocity == 0) {
             motorvelocity= NEARVELOCITY;
         } else if (velocity == 1) {
@@ -110,6 +122,8 @@ public class Shooter {
             motorvelocity = FARVELOCITY;
         } else if (velocity == 3) {
             motorvelocity = REALLYFARVELOCITY;
+        } else {
+            motorvelocity = velocity;
         }
     }
 
@@ -145,8 +159,10 @@ public class Shooter {
 
     public void spin(double velocity) {
 
-        motor.setVelocity(velocity);
-        motor2.setVelocity(velocity);
+        motorVoltage = 12 / hardwareMap.voltageSensor.iterator().next().getVoltage();
+
+        motor.setVelocity(velocity*motorVoltage);
+        motor2.setVelocity(velocity*motorVoltage);
     }
 
     public double velocity() {
@@ -154,6 +170,7 @@ public class Shooter {
     }
 
     public boolean update(boolean startShootingProcess, boolean cancelShootingProcess, Telemetry telemetry) {
+        motorVoltage = 12 / hardwareMap.voltageSensor.iterator().next().getVoltage();
         if (cancelShootingProcess) {
             intake.spin(0);
             flipper.down();
@@ -170,8 +187,8 @@ public class Shooter {
                     break;
                 }
                 case START: {
-                    motor2.setVelocity(motorvelocity);
-                    motor.setVelocity(motorvelocity);
+                    motor2.setVelocity(motorvelocity*motorVoltage);
+                    motor.setVelocity(motorvelocity*motorVoltage);
 
                     shooterTimer.resetTimer();
                     shooterState = shootingState.INTAKE;
@@ -184,16 +201,19 @@ public class Shooter {
                     // FIRST ball, startShootingProcess will be true, so give the intake MORE time
                     if (startShootingProcess && (shooterTimer.getElapsedTimeSeconds() > INTAKE_TIME_START)) {
                         shooterState = shootingState.MOTORSPINUP;
+                        shooterTimer.resetTimer();
                         // NOT the first ball, startShootingProcess will be false, intake already moving, so give the intake LESS time
                     } else if (!startShootingProcess && (shooterTimer.getElapsedTimeSeconds() > INTAKE_TIME_CONTINUE)) {
                         shooterState = shootingState.MOTORSPINUP;
+                        shooterTimer.resetTimer();
                     }
                     telemetry.addData("SHOOTER UPDATE","INTAKE");
                     break;
                 }
                 case MOTORSPINUP: {
                     if ((motor.getVelocity() > motorvelocity - VELOCITY_LOWER_OFFSET) &&
-                            (motor.getVelocity() < motorvelocity + VELOCITY_UPPER_OFFSET)) {
+                            (motor.getVelocity() < motorvelocity + VELOCITY_UPPER_OFFSET)
+                    || shooterTimer.getElapsedTimeSeconds() > JUST_SHOOT_IT) {
                         shooterTimer.resetTimer();
                         shooterState = shootingState.FLINGER;
                         flipper.up();

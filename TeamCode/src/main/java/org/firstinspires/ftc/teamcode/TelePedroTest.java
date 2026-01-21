@@ -122,6 +122,8 @@ public class TelePedroTest extends OpMode {
 
         //mecanumDrive.driveRobotCentric(drive, strafe, turn);
         if (!automatedDrive) {
+            // USE mecanumDrive if not using the PEDRO follower teleopDrive
+            // however, if using mecanumDrive, disable the follower.startTeleOpDrive in the start()
             //mecanumDrive.driveFieldCentric(drive, strafe, turn);
             follower.setTeleOpDrive(drive,strafe,turn,false);
         }
@@ -187,7 +189,6 @@ public class TelePedroTest extends OpMode {
                 automaticShooting = AutomaticShooting.MANUAL;
             }
         }
-
 
         telemetry.addLine(String.format("Current Pedro Pose in loop x %6.1f y %6.1f heading rad %6.1f",
                 follower.getPose().getX(),
@@ -278,6 +279,7 @@ public class TelePedroTest extends OpMode {
         double x, y, heading;
         double idealShootingAngle;
 
+        // TAG 20 BLUE goal
         if (aprilTagSubsystem.tagDetectedWithId(20)) {
             currentTagValues = aprilTagSubsystem.tagWithId(20);
             // convert from FTC Decode RobotPose to PedroPathing
@@ -299,7 +301,30 @@ public class TelePedroTest extends OpMode {
                     heading));
             return true;
 
-        } // tag 20 visible BLUE Goal
+        } // end of tag 20 visible BLUE Goal
+        // TAG 24 RED goal
+        else if (aprilTagSubsystem.tagDetectedWithId(24)) {
+            currentTagValues = aprilTagSubsystem.tagWithId(24);
+            // convert from FTC Decode RobotPose to PedroPathing
+            // using the audience side perspective
+            // FTC Decode RobotPose: positive y axis right, negative x axis forward (orients better from blue goal side)
+            // PedroPathing: positive x axis right, positive y axis forward
+            x = currentTagValues.ftcPose.y + 72;
+            y = -currentTagValues.ftcPose.x + 72;
+            heading = follower.getHeading();
+            telemetry.addLine(String.format("Current Pedro Pose %6.1f %6.1f %6.1f (inch)",
+                    follower.getPose().getX(),
+                    follower.getPose().getY(),
+                    follower.getPose().getHeading()));
+            cameraPose = new Pose(-x, -y, heading, FTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+            follower.setPose(cameraPose);
+            telemetry.addLine(String.format("Pedro Pose updated from April Tag %6.1f %6.1f %6.1f (inch)",
+                    x,
+                    y,
+                    heading));
+            return true;
+
+        } // end of tag 24 visible RED Goal
         else {return false;}
     } // end localizationUpdate
 

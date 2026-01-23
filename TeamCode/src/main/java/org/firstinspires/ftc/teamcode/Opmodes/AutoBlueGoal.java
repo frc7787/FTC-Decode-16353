@@ -16,6 +16,8 @@ import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstants.*;
 
+
+
 @Autonomous(name = "AutoBlueGoal", group = "opmodes")
 public class AutoBlueGoal extends  OpMode{
 
@@ -86,16 +88,16 @@ public class AutoBlueGoal extends  OpMode{
 
         /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup1EndPose, scorePose))
-                .setLinearHeadingInterpolation(pickup1EndPose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierLine(pickup1EndPose, scorePoseFake))
+                .setLinearHeadingInterpolation(pickup1EndPose.getHeading(), scorePoseFake.getHeading())
                 .setGlobalDeceleration(4)
                 .setBrakingStrength(4)
                 .setBrakingStart(4)
                 .build();
 
         grabPickup2Pre = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup2StartPrePose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2StartPrePose.getHeading())
+                .addPath(new BezierLine(scorePoseFake, pickup2StartPrePose))
+                .setLinearHeadingInterpolation(scorePoseFake.getHeading(), pickup2StartPrePose.getHeading())
                 .addPath(new BezierLine(pickup2StartPrePose, pickup2StartPose))
                 .setLinearHeadingInterpolation(pickup2StartPrePose.getHeading(), pickup2StartPose.getHeading())
                 .build();
@@ -106,12 +108,17 @@ public class AutoBlueGoal extends  OpMode{
                 //.setLinearHeadingInterpolation(scorePose.getHeading(), pickup2StartPose.getHeading())
                 .addPath(new BezierLine(pickup2StartPose,pickup2EndPose))
                 .setLinearHeadingInterpolation(pickup2StartPose.getHeading(),pickup2EndPose.getHeading())
+                .setGlobalDeceleration(3)
+                .setBrakingStrength(4)
+                .setBrakingStart(4)
                 .build();
 
         /* This is our scorePickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup2EndPose, scorePose))
-                .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierLine(pickup2EndPose, pickup2StartPose))
+                .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), pickup2StartPose.getHeading())
+                .addPath(new BezierLine(pickup2StartPose, scorePoseFake2))
+                .setLinearHeadingInterpolation(pickup2StartPose.getHeading(), scorePoseFake2.getHeading())
                 .build();
 
         /* This is our grabPickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
@@ -171,7 +178,7 @@ public class AutoBlueGoal extends  OpMode{
                 .build();
 
         scorePickup2Audience= follower.pathBuilder()
-                .addPath(new BezierLine(pickup2EndPose, scorePoseAudience))
+                .addPath(new BezierLine(pickup2EndPose  , scorePoseAudience))
                 .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), scorePoseAudience.getHeading())
                 .setGlobalDeceleration(4)
                 .setBrakingStrength(4)
@@ -227,7 +234,7 @@ public class AutoBlueGoal extends  OpMode{
                     /* Grab Sample */
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     intake.spin(1.0);
-                    follower.followPath(scorePickup1, true);
+                    follower.followPath(scorePickup1, 0.7,true);
                     setPathState(4);
                 }
                 break;
@@ -245,7 +252,7 @@ public class AutoBlueGoal extends  OpMode{
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     follower.followPath(grabPickup2Pre, true);
-                    intake.spin(0.8);
+                    intake.spin(1.0);
                     setPathState(6);
                 }
                 break;
@@ -265,7 +272,7 @@ public class AutoBlueGoal extends  OpMode{
                     /* Grab Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
-                    intake.spin(0.8);
+                    intake.spin(1.0);
                     follower.followPath(scorePickup2, true);
                     setPathState(7);
                 }
@@ -356,7 +363,7 @@ public class AutoBlueGoal extends  OpMode{
         shooter = new Shooter(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
-        shooter.setShooterVelocity(shooter.RPM_76); // NEAR for Goal
+        shooter.setShooterVelocity(shooter.RPM_GOAL); // NEAR for Goal
 
     } // end init
 

@@ -57,6 +57,7 @@ public class TeleJanuary extends OpMode {
     private double angleAprilTag = 9999;
     private double shooterVelocity = 0;
     private double shooterTargetVelocity;
+    private double motorVoltage;
     private String shooterDistance = "Default";
     private enum AutomaticShooting {MANUAL, AUTO1,AUTO3};
     private AutomaticShooting automaticShooting = AutomaticShooting.MANUAL;
@@ -67,6 +68,8 @@ public class TeleJanuary extends OpMode {
     private double currentRange = 170;
 
     @Override public void init() {
+        follower = Constants.createFollower(hardwareMap);
+
         mecanumDrive = new MecanumDriveBase(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
@@ -81,7 +84,7 @@ public class TeleJanuary extends OpMode {
         // PEDRO PATHING STUFF
         startingPose = new Pose(56, 9, Math.toRadians(90));
         automatedDrive = false;
-        follower = Constants.createFollower(hardwareMap);
+
         follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
         follower.update();
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -142,26 +145,23 @@ public class TeleJanuary extends OpMode {
             // near
             shooterTargetVelocity = shooter.NEARVELOCITY;
             shooter.spin(shooterTargetVelocity);
-            //shooter.setShooterVelocity(0);
+
             shooterDistance = "Near";
             automatedTargeting = false;
         } else if (gamepad1.xWasPressed()) {
             // medium
             shooterTargetVelocity = shooter.MEDIUMVELOCITY;
             shooter.spin(shooterTargetVelocity);
-            //shooter.setShooterVelocity(1);
             shooterDistance = "Medium";
             automatedTargeting = false;
         } else if (gamepad1.bWasPressed()) {
             // far
-            //shooter.setShooterVelocity(2);
             shooterTargetVelocity = shooter.FARVELOCITY;
             shooter.spin(shooterTargetVelocity);
             shooterDistance = "Far";
             automatedTargeting = false;
         } else if (gamepad1.aWasPressed()) {
             // really far
-            //shooter.setShooterVelocity(3);
             shooterTargetVelocity = shooter.REALLYFARVELOCITY;
             shooter.spin(shooterTargetVelocity);
             shooterDistance = "Really Far";
@@ -210,10 +210,13 @@ public class TeleJanuary extends OpMode {
 
         // PEDRO LOCALIZATION - not currently used except for ZONE calculation
 
-        telemetry.addLine(String.format("Current Pedro Pose in loop x %6.1f y %6.1f heading rad %6.1f",
-                follower.getPose().getX(),
-                follower.getPose().getY(),
-                follower.getPose().getHeading()));
+        if (DEBUG && false) {
+            telemetry.addLine(String.format("Current Pedro Pose in loop x %6.1f y %6.1f heading rad %6.1f",
+                    follower.getPose().getX(),
+                    follower.getPose().getY(),
+                    follower.getPose().getHeading()));
+        } // end DEBUT
+
         aprilTagSubsystem.update();
         //aprilTagSubsystem.debug(telemetry,20);
 
@@ -229,13 +232,22 @@ public class TeleJanuary extends OpMode {
         }
 
         if (DEBUG) {
-            telemetry.addData("SHOOTER DISTANCE", shooterDistance);
-            telemetry.addData("SHOOTER TARGET VELOCITY",shooterTargetVelocity);
-            telemetry.addData("SHOOTER ACTUAL VELOCITY",shooterVelocity);
 
-            telemetry.addData("RANGE",distanceAprilTag);
-            telemetry.addData("ANGLE",angleAprilTag);
-        }
+            motorVoltage = 12 / hardwareMap.voltageSensor.iterator().next().getVoltage();
+
+            if (!automatedTargeting) {
+                telemetry.addData("MANUAL TARGETING. Shooter Distance:", shooterDistance);
+            } else {
+                telemetry.addLine("AUTOMATED TARGETING in LOOP");
+
+            }
+
+            telemetry.addData("Shooter Target Velocity %6.1",shooterTargetVelocity);
+            telemetry.addData("Shooter Target Velocity Normalized %6.1f",shooterTargetVelocity*motorVoltage);
+            telemetry.addData("Shooter Actual Velocity %6.1f",shooterVelocity);
+            telemetry.addData("Range from April Tag %6.1f",distanceAprilTag);
+            telemetry.addData("Angle from April Tag %6.1f",angleAprilTag);
+        } // end DEBUT
 
         //aprilTagSubsystem.debug(telemetry,20);
         telemetry.update();
@@ -259,16 +271,22 @@ public class TeleJanuary extends OpMode {
             x = currentTagValues.ftcPose.y + 72;
             y = -currentTagValues.ftcPose.x + 72;
             heading = follower.getHeading();
-            telemetry.addLine(String.format("Current Pedro Pose %6.1f %6.1f %6.1f (inch)",
-                    follower.getPose().getX(),
-                    follower.getPose().getY(),
-                    follower.getPose().getHeading()));
+
             cameraPose = new Pose(-x, -y, heading, FTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
-            follower.setPose(cameraPose);
-            telemetry.addLine(String.format("Pedro Pose updated from April Tag %6.1f %6.1f %6.1f (inch)",
-                    x,
-                    y,
-                    heading));
+
+            if (DEBUG) {
+                telemetry.addLine(" ");
+                telemetry.addLine(String.format("LOCALIZATION: Current Pedro Pose %6.1f %6.1f %6.1f (inch)",
+                        follower.getPose().getX(),
+                        follower.getPose().getY(),
+                        follower.getPose().getHeading()));
+                follower.setPose(cameraPose);
+                telemetry.addLine(String.format("Pedro Pose updated from April Tag %6.1f %6.1f %6.1f (inch)",
+                        x,
+                        y,
+                        heading));
+            } // end DEBUG
+
             return true;
 
         } // tag 20 visible BLUE Goal
@@ -282,20 +300,26 @@ public class TeleJanuary extends OpMode {
             x = currentTagValues.ftcPose.y + 72;
             y = -currentTagValues.ftcPose.x + 72;
             heading = follower.getHeading();
-            telemetry.addLine(String.format("Current Pedro Pose %6.1f %6.1f %6.1f (inch)",
-                    follower.getPose().getX(),
-                    follower.getPose().getY(),
-                    follower.getPose().getHeading()));
+
             cameraPose = new Pose(-x, -y, heading, FTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
-            follower.setPose(cameraPose);
-            telemetry.addLine(String.format("Pedro Pose updated from April Tag %6.1f %6.1f %6.1f (inch)",
-                    x,
-                    y,
-                    heading));
+
+            if (DEBUG) {
+                telemetry.addLine(" ");
+                telemetry.addLine(String.format("LOCALIZATION: Current Pedro Pose %6.1f %6.1f %6.1f (inch)",
+                        follower.getPose().getX(),
+                        follower.getPose().getY(),
+                        follower.getPose().getHeading()));
+                follower.setPose(cameraPose);
+                telemetry.addLine(String.format("Pedro Pose updated from April Tag %6.1f %6.1f %6.1f (inch)",
+                        x,
+                        y,
+                        heading));
+            } // end DEBUG
+
             return true;
 
         } // end of tag 24 visible RED Goal
-        else {return false;}
+        else {return false;} // neither tag 20 or 24 detected
     } // end localizationUpdate
 
     public void targetingUpdate() {
@@ -329,14 +353,16 @@ public class TeleJanuary extends OpMode {
             shooter.spin(shooterTargetVelocity);
         }
 
-        telemetry.addLine(String.format("Current Targeting: zone, range, angle, ideal angle, RPM %d %6.1f %6.1f %6.1f %6.1f",
+
+        telemetry.addLine(" ");
+        telemetry.addLine(String.format("Current TARGETING: zone, range, angle, ideal angle, RPM %d %6.1f %6.1f %6.1f %6.1f",
                 zone,
                 distanceAprilTag,
                 angleAprilTag,
                 idealShootingAngle,
                 shooterTargetVelocity));
 
-        shooterDistance = String.valueOf(zone);
+        //shooterDistance = String.valueOf(zone); // why is shooterDistance set to ZONE???
 
         indicatorLights.display(IndicatorLights.targeting.GREEN, angleAprilTag, idealShootingAngle); // should be actual ideal distance for shooting
 

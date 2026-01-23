@@ -209,7 +209,7 @@ public class AutoBlueAudienceLeave extends  OpMode{
             case 2: { // JUST SCORING - preloaded
                 if (shooter.score(false, 3, telemetry)) {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(leaveAudience, 0.5, true);
+                    follower.followPath(leaveAudience, 0.95, true);
                     // setPathState(2); OK, let's just test the first two paths.
                     intake.spin(0.0);
                     setPathState(9); // go straight to LEAVE AUDIENCE
@@ -353,7 +353,7 @@ public class AutoBlueAudienceLeave extends  OpMode{
         shooter = new Shooter(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
-        shooter.setShooterVelocity(shooter.RPM_112);
+        shooter.setShooterVelocity(shooter.RPM_AUDIENCE);
 
     } // end init
 

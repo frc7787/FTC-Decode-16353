@@ -175,6 +175,16 @@ public class AutoRedAudienceLeave extends  OpMode{
                 .setLinearHeadingInterpolation(scorePoseAudience.getHeading(),leavePoseAudience.getHeading())
                 .build();
 
+        pickupBalls = follower.pathBuilder()
+                .addPath(new BezierLine(leavePoseAudience,pickupBallsPose))
+                .setLinearHeadingInterpolation(leavePoseAudience.getHeading(), pickupBallsPose.getHeading())
+                .build();
+
+        leaveBalls = follower.pathBuilder()
+                .addPath(new BezierLine(pickupBallsPose,leavePoseAudience))
+                .setLinearHeadingInterpolation(pickupBallsPose.getHeading(), leavePoseAudience.getHeading())
+                .build();
+
 
     } // end of BuildPaths
 
@@ -324,15 +334,18 @@ public class AutoRedAudienceLeave extends  OpMode{
     public void loop() {
 
         // These loop the movements of the robot, these must be called continuously in order to work
-        follower.update();
-        autonomousPathUpdate();
 
-        // Feedback to Driver Hub for debugging
-        telemetry.addData("path state", pathState);
-        telemetry.addData("x", follower.getPose().getX());
-        telemetry.addData("y", follower.getPose().getY());
-        telemetry.addData("heading", follower.getPose().getHeading());
-        telemetry.update();
+            follower.update();
+            autonomousPathUpdate();
+
+            // Feedback to Driver Hub for debugging
+            telemetry.addData("path state", pathState);
+            telemetry.addData("x", follower.getPose().getX());
+            telemetry.addData("y", follower.getPose().getY());
+            telemetry.addData("heading", follower.getPose().getHeading());
+            telemetry.update();
+
+
     } // end loop
 
     /** This method is called once at the init of the OpMode. **/

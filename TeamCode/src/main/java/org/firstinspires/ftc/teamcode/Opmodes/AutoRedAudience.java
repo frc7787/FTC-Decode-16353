@@ -28,6 +28,8 @@ public class AutoRedAudience extends  OpMode{
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
 
+    private boolean DEBUG = true;
+
     // INITIALIZING POSES
 
     /*
@@ -138,16 +140,16 @@ public class AutoRedAudience extends  OpMode{
 
         /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup3Audience= follower.pathBuilder()
-                .addPath(new BezierLine(pickup3EndPose, scorePoseAudience))
-                .setLinearHeadingInterpolation(pickup3EndPose.getHeading(), scorePoseAudience.getHeading())
+                .addPath(new BezierLine(pickup3EndPose, scorePoseAudienceFake))
+                .setLinearHeadingInterpolation(pickup3EndPose.getHeading(), scorePoseAudienceFake.getHeading())
                 .setGlobalDeceleration(4)
                 .setBrakingStrength(4)
                 .setBrakingStart(4)
                 .build();
 
         grabPickup2PreAudience = follower.pathBuilder()
-                .addPath(new BezierLine(scorePoseAudience, pickup2StartPrePose))
-                .setLinearHeadingInterpolation(scorePoseAudience.getHeading(), pickup2StartPrePose.getHeading())
+                .addPath(new BezierLine(scorePoseAudienceFake, pickup2StartPrePose))
+                .setLinearHeadingInterpolation(scorePoseAudienceFake.getHeading(), pickup2StartPrePose.getHeading())
                 .addPath(new BezierLine(pickup2StartPrePose, pickup2StartPose))
                 .setLinearHeadingInterpolation(pickup2StartPrePose.getHeading(), pickup2StartPose.getHeading())
                 .build();
@@ -161,16 +163,16 @@ public class AutoRedAudience extends  OpMode{
                 .build();
 
         scorePickup2Audience= follower.pathBuilder()
-                .addPath(new BezierLine(pickup2EndPose, scorePoseAudience))
-                .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), scorePoseAudience.getHeading())
+                .addPath(new BezierLine(pickup2EndPose, scorePoseAudienceFake))
+                .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), scorePoseAudienceFake.getHeading())
                 .setGlobalDeceleration(4)
                 .setBrakingStrength(4)
                 .setBrakingStart(4)
                 .build();
 
         leaveAudience = follower.pathBuilder()
-                .addPath(new BezierLine(scorePoseAudience,leavePoseAudience))
-                .setLinearHeadingInterpolation(scorePoseAudience.getHeading(),leavePoseAudience.getHeading())
+                .addPath(new BezierLine(scorePoseAudienceFake,leavePoseAudience))
+                .setLinearHeadingInterpolation(scorePoseAudienceFake.getHeading(),leavePoseAudience.getHeading())
                 .build();
 
 
@@ -323,11 +325,13 @@ public class AutoRedAudience extends  OpMode{
         autonomousPathUpdate();
 
         // Feedback to Driver Hub for debugging
-        telemetry.addData("path state", pathState);
-        telemetry.addData("x", follower.getPose().getX());
-        telemetry.addData("y", follower.getPose().getY());
-        telemetry.addData("heading", follower.getPose().getHeading());
-        telemetry.update();
+        if (DEBUG) {
+            telemetry.addData("path state", pathState);
+            telemetry.addData("x", follower.getPose().getX());
+            telemetry.addData("y", follower.getPose().getY());
+            telemetry.addData("heading", follower.getPose().getHeading());
+            telemetry.update();
+        } // end DEBUG
     } // end loop
 
     /** This method is called once at the init of the OpMode. **/

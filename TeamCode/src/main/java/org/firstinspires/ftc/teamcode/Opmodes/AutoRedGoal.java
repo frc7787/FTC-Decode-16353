@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstantsRed.*;
 
+
 @Autonomous(name = "AutoRedGoal", group = "opmodes")
 public class AutoRedGoal extends  OpMode{
 
@@ -86,16 +87,16 @@ public class AutoRedGoal extends  OpMode{
 
         /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup1EndPose, scorePose))
-                .setLinearHeadingInterpolation(pickup1EndPose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierLine(pickup1EndPose, scorePoseFake))
+                .setLinearHeadingInterpolation(pickup1EndPose.getHeading(), scorePoseFake.getHeading())
                 .setGlobalDeceleration(4)
                 .setBrakingStrength(4)
                 .setBrakingStart(4)
                 .build();
 
         grabPickup2Pre = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup2StartPrePose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2StartPrePose.getHeading())
+                .addPath(new BezierLine(scorePoseFake, pickup2StartPrePose))
+                .setLinearHeadingInterpolation(scorePoseFake.getHeading(), pickup2StartPrePose.getHeading())
                 .addPath(new BezierLine(pickup2StartPrePose, pickup2StartPose))
                 .setLinearHeadingInterpolation(pickup2StartPrePose.getHeading(), pickup2StartPose.getHeading())
                 .build();
@@ -113,8 +114,8 @@ public class AutoRedGoal extends  OpMode{
         scorePickup2 = follower.pathBuilder()
                 .addPath(new BezierLine(pickup2EndPose, pickup2StartPose))
                 .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), pickup2StartPose.getHeading())
-                .addPath(new BezierLine(pickup2StartPose, scorePose))
-                .setLinearHeadingInterpolation(pickup2StartPose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierLine(pickup2StartPose, scorePoseFake2))
+                .setLinearHeadingInterpolation(pickup2StartPose.getHeading(), scorePoseFake2.getHeading())
                 .build();
 
         /* This is our grabPickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
@@ -230,7 +231,7 @@ public class AutoRedGoal extends  OpMode{
                     /* Grab Sample */
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     intake.spin(1.0);
-                    follower.followPath(scorePickup1, true);
+                    follower.followPath(scorePickup1, 0.7,true);
                     setPathState(4);
                 }
                 break;
@@ -269,7 +270,7 @@ public class AutoRedGoal extends  OpMode{
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     intake.spin(1.0);
-                    follower.followPath(scorePickup2, true);
+                    follower.followPath(scorePickup2, 0.7,true);
                     setPathState(7);
                 }
                 break;

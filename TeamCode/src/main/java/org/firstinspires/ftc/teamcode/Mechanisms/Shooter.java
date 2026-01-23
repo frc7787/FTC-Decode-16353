@@ -35,6 +35,7 @@ public class Shooter {
     private Timer shooterTimer;
 
     public double motorvelocity = 2000;
+    public double normalizedMotorVelocity;
     public double NEARVELOCITY = 1710;
     public double MEDIUMVELOCITY = 1800;
     public double FARVELOCITY = 2015;
@@ -51,8 +52,8 @@ public class Shooter {
     public static double RPM_63 = 1940;
     public static double RPM_59 = 1900;
     public static double RPM_50 = 1900;
-    public static double RPM_AUDIENCE = 2190; // 2190 @12.9V; was 2290/2240 new wheel
-    public static double RPM_GOAL = 1820; // was 1940 old wheel
+    public static double RPM_AUDIENCE = 2290; // 2190 @12.9V; was 2290/2240 new wheel
+    public static double RPM_GOAL = 1870; // was 1940 old wheel
 
 
 
@@ -62,12 +63,12 @@ public class Shooter {
 
     public static double INTAKE_TIME_START  = 0.5; // was 1.0
     public static double INTAKE_TIME_CONTINUE = 0.25; // was 0.5
-    public static double VELOCITY_UPPER_OFFSET = 40;
-    public static double VELOCITY_LOWER_OFFSET = 40;
-    public static double FLIPPER_UP = 0.5; // was 0.5
-    public static double FLIPPER_DOWN = 0.7; // was 0.8
+    public static double VELOCITY_UPPER_OFFSET = 20;
+    public static double VELOCITY_LOWER_OFFSET = 20;
+    public static double FLIPPER_UP = 0.6; // was 0.5
+    public static double FLIPPER_DOWN = 0.8; // was 0.8
 
-    public static double JUST_SHOOT_IT = 1.0; // waiting for motorspinup, but at some point just shoot!
+    public static double JUST_SHOOT_IT = 2.0; // waiting for motorspinup, but at some point just shoot!
 
 
     public double[] TARGETVELOCITY = {2110, // 0 really far
@@ -170,7 +171,7 @@ public class Shooter {
     }
 
     public boolean update(boolean startShootingProcess, boolean cancelShootingProcess, Telemetry telemetry) {
-        motorVoltage = 12 / hardwareMap.voltageSensor.iterator().next().getVoltage();
+
         if (cancelShootingProcess) {
             intake.spin(0);
             flipper.down();
@@ -187,13 +188,16 @@ public class Shooter {
                     break;
                 }
                 case START: {
-                    motor2.setVelocity(motorvelocity*motorVoltage);
-                    motor.setVelocity(motorvelocity*motorVoltage);
+                    motorVoltage = 12 / hardwareMap.voltageSensor.iterator().next().getVoltage();
+                    normalizedMotorVelocity = motorvelocity*motorVoltage;
+                    motor2.setVelocity(normalizedMotorVelocity);
+                    motor.setVelocity(normalizedMotorVelocity);
 
                     shooterTimer.resetTimer();
                     shooterState = shootingState.INTAKE;
                     intake.spin(1.0);
-                    telemetry.addData("SHOOTER UPDATE","START");
+                    telemetry.addLine(String.format("SHOOTER UPDATE:START normalized velocity %6.1f",
+                            normalizedMotorVelocity));
                     break;
                 }
                 case INTAKE: {
@@ -211,14 +215,15 @@ public class Shooter {
                     break;
                 }
                 case MOTORSPINUP: {
-                    if ((motor.getVelocity() > motorvelocity - VELOCITY_LOWER_OFFSET) &&
-                            (motor.getVelocity() < motorvelocity + VELOCITY_UPPER_OFFSET)
+                    if ((motor.getVelocity() > normalizedMotorVelocity - VELOCITY_LOWER_OFFSET) &&
+                            (motor.getVelocity() < normalizedMotorVelocity + VELOCITY_UPPER_OFFSET)
                     || shooterTimer.getElapsedTimeSeconds() > JUST_SHOOT_IT) {
                         shooterTimer.resetTimer();
                         shooterState = shootingState.FLINGER;
                         flipper.up();
                     }
-                    telemetry.addData("SHOOTER UPDATE","MOTORSPINUP");
+                    telemetry.addLine(String.format("SHOOTER UPDATE:MOTORSPINUP actual velocity %6.1f",
+                            motor.getVelocity()));
                     break;
                 }
                 case FLINGER: {

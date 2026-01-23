@@ -13,7 +13,12 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 public class FlywheelTunerPractice extends OpMode {
     public DcMotorEx flywheelMotor, flywheelMotor2;
 
-    public static double highVelocity = 2300;
+    double[] listOfLowVelocities = {1900, 1940, 2190, 2270, 2380, 2400};
+
+    double[] listOfHighVelocities = {1940, 2190, 2270, 2380, 2400, 2440};
+    int highVelocityStepIndex = 1;
+    int lowVelocityStepIndex = 1;
+    public static double highVelocity = 1940;
     public static double lowVelocity = 1900;
     double curTargetVelocity = highVelocity;
     double F = 0;
@@ -56,6 +61,17 @@ public class FlywheelTunerPractice extends OpMode {
                 curTargetVelocity = lowVelocity;
             } else { curTargetVelocity = highVelocity; }
         }
+        if (gamepad1.xWasPressed()) {
+            highVelocityStepIndex = (highVelocityStepIndex + 1) % listOfHighVelocities.length;
+            highVelocity = listOfHighVelocities[highVelocityStepIndex];
+            curTargetVelocity = highVelocity;
+        }
+
+        if (gamepad1.aWasPressed()) {
+            lowVelocityStepIndex = (lowVelocityStepIndex + 1) % listOfLowVelocities.length;
+            lowVelocity = listOfLowVelocities[lowVelocityStepIndex];
+            curTargetVelocity = lowVelocity;
+        }
 
         if (gamepad1.bWasPressed()) {
             stepIndex = (stepIndex + 1) % stepSizes.length;
@@ -96,8 +112,12 @@ public class FlywheelTunerPractice extends OpMode {
         telemetry.addLine("Use PANELS to change the upper and lower velocity: 192.168.43.1:8001");
         telemetry.addLine("Y to Change Velocity");
         telemetry.addLine("B to Change Step Size");
+        telemetry.addLine("X to change high Velocity");
+        telemetry.addLine("A to change low Velocity");
         telemetry.addData("Target Velocity", curTargetVelocity);
         telemetry.addData("Current Velocity", "%.2f", curVelocity);
+        telemetry.addData("High Velocity", highVelocity);
+        telemetry.addData("Low Velocity", lowVelocity);
         telemetry.addData("Error", "%.2f", error);
         telemetry.addLine("-----------------------------");
 

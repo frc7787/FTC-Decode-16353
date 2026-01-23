@@ -242,11 +242,11 @@ public class TeleJanuary extends OpMode {
 
             }
 
-            telemetry.addData("Shooter Target Velocity %6.1",shooterTargetVelocity);
-            telemetry.addData("Shooter Target Velocity Normalized %6.1f",shooterTargetVelocity*motorVoltage);
-            telemetry.addData("Shooter Actual Velocity %6.1f",shooterVelocity);
-            telemetry.addData("Range from April Tag %6.1f",distanceAprilTag);
-            telemetry.addData("Angle from April Tag %6.1f",angleAprilTag);
+            telemetry.addData("Shooter Target Velocity ",shooterTargetVelocity);
+            telemetry.addData("Shooter Target Velocity Normalized ",shooterTargetVelocity*motorVoltage);
+            telemetry.addData("Shooter Actual Velocity ",shooterVelocity);
+            telemetry.addData("Range from April Tag ",distanceAprilTag);
+            telemetry.addData("Angle from April Tag ",angleAprilTag);
         } // end DEBUT
 
         //aprilTagSubsystem.debug(telemetry,20);
@@ -274,7 +274,7 @@ public class TeleJanuary extends OpMode {
 
             cameraPose = new Pose(-x, -y, heading, FTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
 
-            if (DEBUG) {
+            if (DEBUG && false) {
                 telemetry.addLine(" ");
                 telemetry.addLine(String.format("LOCALIZATION: Current Pedro Pose %6.1f %6.1f %6.1f (inch)",
                         follower.getPose().getX(),
@@ -303,7 +303,7 @@ public class TeleJanuary extends OpMode {
 
             cameraPose = new Pose(-x, -y, heading, FTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
 
-            if (DEBUG) {
+            if (DEBUG && false) {
                 telemetry.addLine(" ");
                 telemetry.addLine(String.format("LOCALIZATION: Current Pedro Pose %6.1f %6.1f %6.1f (inch)",
                         follower.getPose().getX(),

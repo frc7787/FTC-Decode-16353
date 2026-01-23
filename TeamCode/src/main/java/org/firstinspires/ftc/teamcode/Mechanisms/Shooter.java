@@ -46,14 +46,14 @@ public class Shooter {
     public static double RMP_130 = 2440;
     public static double RPM_126 = 2400;
     public static double RPM_123 = 2380;
-    public static double RPM_112 = 2270;
-    public static double RPM_106 = 2190;
-    public static double RPM_76 = 1940;
+    public static double RPM_112 = 2300;
+    public static double RPM_106 = 2220;
+    public static double RPM_76 = 2000;
     public static double RPM_63 = 1940;
     public static double RPM_59 = 1900;
     public static double RPM_50 = 1900;
     public static double RPM_AUDIENCE = 2290; // 2190 @12.9V; was 2290/2240 new wheel
-    public static double RPM_GOAL = 1870; // was 1940 old wheel
+    public static double RPM_GOAL = 1910; // was 1940 old wheel
 
 
 
@@ -63,12 +63,12 @@ public class Shooter {
 
     public static double INTAKE_TIME_START  = 0.5; // was 1.0
     public static double INTAKE_TIME_CONTINUE = 0.25; // was 0.5
-    public static double VELOCITY_UPPER_OFFSET = 20;
-    public static double VELOCITY_LOWER_OFFSET = 20;
+    public static double VELOCITY_UPPER_OFFSET = 35;
+    public static double VELOCITY_LOWER_OFFSET = 15;
     public static double FLIPPER_UP = 0.6; // was 0.5
     public static double FLIPPER_DOWN = 0.8; // was 0.8
 
-    public static double JUST_SHOOT_IT = 2.0; // waiting for motorspinup, but at some point just shoot!
+    public static double JUST_SHOOT_IT = 1.8; // waiting for motorspinup, but at some point just shoot!
 
 
     public double[] TARGETVELOCITY = {2110, // 0 really far
@@ -129,7 +129,7 @@ public class Shooter {
     }
 
     public double calculateShooterVelocity(double range) {
-        double velocity = 2000;
+        double velocity = RPM_50;
 
         if (range > 129) {
             velocity = RMP_130;

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,8 +10,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 @Configurable
-@TeleOp
-public class FlywheelTunerPractice extends OpMode {
+
+@Disabled
+@TeleOp(name = "Flywheel Tuner Testing", group = "$")
+public class FlywheelTunerTesting extends OpMode {
     public DcMotorEx flywheelMotor, flywheelMotor2;
 
     double[] listOfLowVelocities = {1900, 1940, 2190, 2270, 2380, 2400};

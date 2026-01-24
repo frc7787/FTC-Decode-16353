@@ -16,6 +16,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
 
+@Disabled
 @TeleOp(name="AprilTag Subsystem OpMode", group = "Concept")
 public class AprilTagSubsystemOpMode extends OpMode {
 

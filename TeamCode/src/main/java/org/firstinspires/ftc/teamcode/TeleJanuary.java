@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.IndicatorLights;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
+import org.firstinspires.ftc.teamcode.Mechanisms.ShooterTele;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -41,7 +42,7 @@ public class TeleJanuary extends OpMode {
 
     private MecanumDriveBase mecanumDrive;
     private Intake intake;
-    private Shooter shooter;
+    private ShooterTele shooter;
 
     private Flipper flipper;
 
@@ -71,7 +72,7 @@ public class TeleJanuary extends OpMode {
         follower = Constants.createFollower(hardwareMap);
 
         mecanumDrive = new MecanumDriveBase(hardwareMap);
-        shooter = new Shooter(hardwareMap);
+        shooter = new ShooterTele(hardwareMap);
         intake = new Intake(hardwareMap);
         flipper = new Flipper(hardwareMap);
 

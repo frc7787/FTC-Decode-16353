@@ -13,8 +13,8 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@Configurable
-public class Shooter {
+
+public class ShooterTele {
 
     private final DcMotorEx motor;
     private final DcMotorEx motor2;
@@ -92,7 +92,7 @@ public class Shooter {
     public boolean startScoring = true;
     private double totalBalls = 3;
 
-    public Shooter(HardwareMap hardwareMap) {
+    public ShooterTele(HardwareMap hardwareMap) {
 
         this.hardwareMap = hardwareMap;
 
@@ -189,8 +189,8 @@ public class Shooter {
                 }
                 case START: {
                     motorVoltage = 12 / hardwareMap.voltageSensor.iterator().next().getVoltage();
-                    //normalizedMotorVelocity = motorvelocity*motorVoltage;
-                    normalizedMotorVelocity = motorvelocity;
+                    normalizedMotorVelocity = motorvelocity*motorVoltage;  // SHOOTER TELE normalized
+                    //normalizedMotorVelocity = motorvelocity;
 
                     motor2.setVelocity(normalizedMotorVelocity);
                     motor.setVelocity(normalizedMotorVelocity);
@@ -219,7 +219,7 @@ public class Shooter {
                 case MOTORSPINUP: {
                     if ((motor.getVelocity() > normalizedMotorVelocity - VELOCITY_LOWER_OFFSET) &&
                             (motor.getVelocity() < normalizedMotorVelocity + VELOCITY_UPPER_OFFSET)
-                    || shooterTimer.getElapsedTimeSeconds() > JUST_SHOOT_IT) {
+                            || shooterTimer.getElapsedTimeSeconds() > JUST_SHOOT_IT) {
                         shooterTimer.resetTimer();
                         shooterState = shootingState.FLINGER;
                         flipper.up();

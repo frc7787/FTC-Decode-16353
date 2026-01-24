@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Opmodes;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
@@ -11,6 +12,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.TeleOpByTylerNov26;
 
+@Disabled
 @TeleOp(name = "Tele", group = "$")
 public class Tele extends OpMode {
 

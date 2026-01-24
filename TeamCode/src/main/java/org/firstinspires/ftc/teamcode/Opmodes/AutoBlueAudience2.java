@@ -16,8 +16,8 @@ import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstants.*;
 
-@Autonomous(name = "AutoBlueAudienceLeave (pickup 0 rows)", group = "opmodes")
-public class AutoBlueAudienceLeave extends  OpMode{
+@Autonomous(name = "AutoBlueAudience2 (pickup 1 row)", group = "opmodes")
+public class AutoBlueAudience2 extends  OpMode{
 
     private Intake intake;
     private Shooter shooter;
@@ -27,9 +27,6 @@ public class AutoBlueAudienceLeave extends  OpMode{
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
-
-    private double delayStart=0;
-
 
     // INITIALIZING POSES
 
@@ -71,58 +68,6 @@ public class AutoBlueAudienceLeave extends  OpMode{
      */
 
     public void buildPaths() {
-        /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
-        scorePreload = new Path(new BezierLine(startPose, scorePose));
-        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
-
-    /* Here is an example for Constant Interpolation
-    scorePreload.setConstantInterpolation(startPose.getHeading()); */
-
-
-        /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        grabPickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup1StartPose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1StartPose.getHeading())
-                .addPath(new BezierLine(pickup1StartPose, pickup1EndPose))
-                .setLinearHeadingInterpolation(pickup1StartPose.getHeading(), pickup1EndPose.getHeading())
-                .build();
-
-        /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        scorePickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup1EndPose, scorePose))
-                .setLinearHeadingInterpolation(pickup1EndPose.getHeading(), scorePose.getHeading())
-                .build();
-
-        /* This is our grabPickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup2StartPose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2StartPose.getHeading())
-                .addPath(new BezierLine(pickup2StartPose,pickup2EndPose))
-                .setLinearHeadingInterpolation(pickup2StartPose.getHeading(),pickup2EndPose.getHeading())
-                .build();
-
-        /* This is our scorePickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        scorePickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup2EndPose, scorePose))
-                .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), scorePose.getHeading())
-                .build();
-
-        /* This is our grabPickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        grabPickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup3StartPose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup3StartPose.getHeading())
-                .build();
-
-        /* This is our scorePickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        scorePickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup3Pose, scorePose))
-                .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
-                .build();
-
-        leaveGoal = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose,leavePoseGoal))
-                .setLinearHeadingInterpolation(scorePose.getHeading(),leavePoseGoal.getHeading())
-                .build();
 
         // AUDIENCE SIDE PATHS
 
@@ -141,16 +86,16 @@ public class AutoBlueAudienceLeave extends  OpMode{
 
         /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup3Audience= follower.pathBuilder()
-                .addPath(new BezierLine(pickup3EndPose, scorePoseAudience))
-                .setLinearHeadingInterpolation(pickup3EndPose.getHeading(), scorePoseAudience.getHeading())
+                .addPath(new BezierLine(pickup3EndPose, scorePoseAudienceFake))
+                .setLinearHeadingInterpolation(pickup3EndPose.getHeading(), scorePoseAudienceFake.getHeading())
                 .setGlobalDeceleration(4)
                 .setBrakingStrength(4)
                 .setBrakingStart(4)
                 .build();
 
         grabPickup2PreAudience = follower.pathBuilder()
-                .addPath(new BezierLine(scorePoseAudience, pickup2StartPrePose))
-                .setLinearHeadingInterpolation(scorePoseAudience.getHeading(), pickup2StartPrePose.getHeading())
+                .addPath(new BezierLine(scorePoseAudienceFake, pickup2StartPrePose))
+                .setLinearHeadingInterpolation(scorePoseAudienceFake.getHeading(), pickup2StartPrePose.getHeading())
                 .addPath(new BezierLine(pickup2StartPrePose, pickup2StartPose))
                 .setLinearHeadingInterpolation(pickup2StartPrePose.getHeading(), pickup2StartPose.getHeading())
                 .build();
@@ -164,16 +109,16 @@ public class AutoBlueAudienceLeave extends  OpMode{
                 .build();
 
         scorePickup2Audience= follower.pathBuilder()
-                .addPath(new BezierLine(pickup2EndPose, scorePoseAudience))
-                .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), scorePoseAudience.getHeading())
+                .addPath(new BezierLine(pickup2EndPose, scorePoseAudienceFake))
+                .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), scorePoseAudienceFake.getHeading())
                 .setGlobalDeceleration(4)
                 .setBrakingStrength(4)
                 .setBrakingStart(4)
                 .build();
 
         leaveAudience = follower.pathBuilder()
-                .addPath(new BezierLine(scorePoseAudience,leavePoseAudience))
-                .setLinearHeadingInterpolation(scorePoseAudience.getHeading(),leavePoseAudience.getHeading())
+                .addPath(new BezierLine(scorePoseAudienceFake,leavePoseAudience))
+                .setLinearHeadingInterpolation(scorePoseAudienceFake.getHeading(),leavePoseAudience.getHeading())
                 .build();
 
 
@@ -184,10 +129,8 @@ public class AutoBlueAudienceLeave extends  OpMode{
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: {  // FOLLOW PATH TO SCORING - preloaded
-                if (opmodeTimer.getElapsedTimeSeconds() > delayStart) {
-                    follower.followPath(scorePreloadAudience);
-                    setPathState(1);
-                }
+                follower.followPath(scorePreloadAudience);
+                setPathState(1);
                 //shooter.spin(2000);
                 break;
             }
@@ -209,10 +152,10 @@ public class AutoBlueAudienceLeave extends  OpMode{
             case 2: { // JUST SCORING - preloaded
                 if (shooter.score(false, 3, telemetry)) {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(leaveAudience, 0.95, true);
+                    follower.followPath(grabPickup3Audience, 0.5, true);
                     // setPathState(2); OK, let's just test the first two paths.
-                    intake.spin(0.0);
-                    setPathState(9); // go straight to LEAVE AUDIENCE
+                    intake.spin(1.0);
+                    setPathState(3);
                 }
                 break;
             }
@@ -239,9 +182,11 @@ public class AutoBlueAudienceLeave extends  OpMode{
                     /* Score Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup2PreAudience, true);
-                    intake.spin(0.8);
-                    setPathState(6);
+                    //follower.followPath(grabPickup3,true);
+                    follower.followPath(leaveAudience, true);
+                    intake.spin(0.0);  // POWER DOWN FOR END OF AUTO
+                    shooter.spin(0);
+                    setPathState(9);
                 }
                 break;
             }
@@ -252,8 +197,6 @@ public class AutoBlueAudienceLeave extends  OpMode{
                 }
                 break;
             }
-
-
             case 61: { // FOLLOW GRAB PATH - pickup 2
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup2Pose's position */
                 if (!follower.isBusy()) {
@@ -288,8 +231,6 @@ public class AutoBlueAudienceLeave extends  OpMode{
             }
             case 9: { // FOLLOW PATH LEAVEAUDIENCE
                 if (!follower.isBusy()) {
-                    shooter.spin(0);
-                    intake.spin(0);
                     setPathState(-1);
                 }
                 break;
@@ -359,20 +300,7 @@ public class AutoBlueAudienceLeave extends  OpMode{
 
     /** This method is called continuously after Init while waiting for "play". **/
     @Override
-    public void init_loop() {
-        telemetry.addData("DELAY START", delayStart);
-        telemetry.addData("Press Y to increase","by 1");
-        telemetry.addData("Press A to decrease", "by 1");
-        telemetry.update();
-        if (gamepad1.yWasPressed()) {
-            delayStart = delayStart + 1;
-        } else if (gamepad1.aWasPressed()) {
-            delayStart = delayStart - 1;
-            if (delayStart < 0) {
-                delayStart = 0;
-            }
-        }
-    }
+    public void init_loop() {}
 
     /** This method is called once at the start of the OpMode.
      * It runs all the setup actions, including building paths and starting the path system **/
@@ -390,3 +318,4 @@ public class AutoBlueAudienceLeave extends  OpMode{
 
 
 } // end of AutoByExampleDec
+

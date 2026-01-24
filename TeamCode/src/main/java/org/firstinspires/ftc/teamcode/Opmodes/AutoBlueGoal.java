@@ -221,7 +221,7 @@ public class AutoBlueGoal extends  OpMode{
             case 2: { // JUST SCORING - preloaded
                 if (shooter.score(false, 3,telemetry)) {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup1, 0.5, true);
+                    follower.followPath(grabPickup1, 0.6, true);
                     // setPathState(2); OK, let's just test the first two paths.
                     intake.spin(1.0);
                     setPathState(3);
@@ -259,7 +259,7 @@ public class AutoBlueGoal extends  OpMode{
             }
             case 6: {
                 if (!follower.isBusy()) {
-                    follower.followPath(grabPickup2,0.5,true);
+                    follower.followPath(grabPickup2,0.6,true);
                     setPathState(61);
                 }
                 break;

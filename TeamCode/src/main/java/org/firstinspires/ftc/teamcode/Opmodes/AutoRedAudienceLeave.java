@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstantsRed.*;
 
-@Autonomous(name = "AutoRedAudienceLeave (pickup 0 rows", group = "opmodes")
+@Autonomous(name = "AutoRedAudienceLeave (pickup 0 rows)", group = "opmodes")
 public class AutoRedAudienceLeave extends  OpMode{
 
     private Intake intake;

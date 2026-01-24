@@ -10,6 +10,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
 
+@Disabled
 @TeleOp(name="April Tag OpMode Sahaj", group = "Concept")
 public class AprilTagWebCamOpModeSahaj extends OpMode {
 

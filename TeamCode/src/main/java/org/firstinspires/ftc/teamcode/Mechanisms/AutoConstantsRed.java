@@ -44,6 +44,8 @@ public class AutoConstantsRed {
     //public static Pose scorePoseAudience = new Pose(89,21, Math.toRadians(67)); // Scoring Pose from the Audience launch zone.
     public static double scorePoseAudienceHeading = 72;
     public static Pose scorePoseAudience = new Pose(88,15, Math.toRadians(scorePoseAudienceHeading)); // Scoring Pose from the Audience launch zone.
+    public static Pose scorePoseAudienceBalls = new Pose(88,15, Math.toRadians(78)); // Scoring Pose from the Audience launch zone.
+
     public static double scorePoseAudienceFakeHeading = 69;
     public static Pose scorePoseAudienceFake = new Pose(88, 15, Math.toRadians(scorePoseAudienceFakeHeading));
 

@@ -71,58 +71,6 @@ public class AutoRedAudienceLeaveBallsShoot extends  OpMode{
      */
 
     public void buildPaths() {
-        /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
-        scorePreload = new Path(new BezierLine(startPose, scorePose));
-        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
-
-    /* Here is an example for Constant Interpolation
-    scorePreload.setConstantInterpolation(startPose.getHeading()); */
-
-
-        /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        grabPickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup1StartPose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1StartPose.getHeading())
-                .addPath(new BezierLine(pickup1StartPose, pickup1EndPose))
-                .setLinearHeadingInterpolation(pickup1StartPose.getHeading(), pickup1EndPose.getHeading())
-                .build();
-
-        /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        scorePickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup1EndPose, scorePose))
-                .setLinearHeadingInterpolation(pickup1EndPose.getHeading(), scorePose.getHeading())
-                .build();
-
-        /* This is our grabPickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup2StartPose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2StartPose.getHeading())
-                .addPath(new BezierLine(pickup2StartPose,pickup2EndPose))
-                .setLinearHeadingInterpolation(pickup2StartPose.getHeading(),pickup2EndPose.getHeading())
-                .build();
-
-        /* This is our scorePickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        scorePickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup2EndPose, scorePose))
-                .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), scorePose.getHeading())
-                .build();
-
-        /* This is our grabPickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        grabPickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup3StartPose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup3StartPose.getHeading())
-                .build();
-
-        /* This is our scorePickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        scorePickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup3Pose, scorePose))
-                .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
-                .build();
-
-        leaveGoal = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose,leavePoseGoal))
-                .setLinearHeadingInterpolation(scorePose.getHeading(),leavePoseGoal.getHeading())
-                .build();
 
         // AUDIENCE SIDE PATHS
 
@@ -187,8 +135,8 @@ public class AutoRedAudienceLeaveBallsShoot extends  OpMode{
                 .build();
 
         scorePickupBalls = follower.pathBuilder()
-                .addPath(new BezierLine(pickupBallsPose,scorePoseAudience))
-                .setLinearHeadingInterpolation(pickupBallsPose.getHeading(), scorePoseAudience.getHeading())
+                .addPath(new BezierLine(pickupBallsPose,scorePoseAudienceBalls))
+                .setLinearHeadingInterpolation(pickupBallsPose.getHeading(), scorePoseAudienceBalls.getHeading())
                 .build();
 
 

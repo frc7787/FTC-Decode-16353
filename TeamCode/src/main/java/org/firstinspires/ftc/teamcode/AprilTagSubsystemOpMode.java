@@ -16,7 +16,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
 
-@Disabled
+
 @TeleOp(name="AprilTag Subsystem OpMode", group = "Concept")
 public class AprilTagSubsystemOpMode extends OpMode {
 
@@ -65,7 +65,7 @@ public class AprilTagSubsystemOpMode extends OpMode {
 
         if (!exposureSet) {
             //aprilTagWebCam.setManualExposure(10, 6);
-            aprilTagWebcam.setManualExposure(telemetry, 10, 100, 4000);
+            aprilTagWebcam.setManualExposure(telemetry, 1, 20, 4000);
             exposureSet = true;
         }
         // update the vision portal

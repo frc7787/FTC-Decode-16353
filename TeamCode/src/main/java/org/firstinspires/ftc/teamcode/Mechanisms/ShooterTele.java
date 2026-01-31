@@ -189,8 +189,8 @@ public class ShooterTele {
                 }
                 case START: {
                     motorVoltage = 12 / hardwareMap.voltageSensor.iterator().next().getVoltage();
-                    normalizedMotorVelocity = motorvelocity*motorVoltage;  // SHOOTER TELE normalized
-                    //normalizedMotorVelocity = motorvelocity;
+                    //normalizedMotorVelocity = motorvelocity*motorVoltage;  // SHOOTER TELE normalized
+                    normalizedMotorVelocity = motorvelocity;
 
                     motor2.setVelocity(normalizedMotorVelocity);
                     motor.setVelocity(normalizedMotorVelocity);

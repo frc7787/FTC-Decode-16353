@@ -331,7 +331,7 @@ public class AutoRedAudienceLeaveBallsShoot extends  OpMode{
         telemetry.addData("DELAYED START: Before firing preloaded", delayStart);
         telemetry.addData("Press Y to increase","by 1");
         telemetry.addData("Press A to decrease", "by 1");
-        telemetry.update();
+
         if (gamepad1.yWasPressed()) {
             delayStart = delayStart + 1;
         } else if (gamepad1.aWasPressed()) {

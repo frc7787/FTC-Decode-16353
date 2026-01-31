@@ -75,6 +75,7 @@ public class AprilTagSubsystem {
 
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, WEBCAM_NAME))
+                .setStreamFormat(VisionPortal.StreamFormat.MJPEG) // switch to MJPEG for Arducam Global Shutter?
                 .setCameraResolution(CAMERA_RESOLUTION)
                 .addProcessor(aprilTagProcessor)
                 .build();

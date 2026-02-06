@@ -1,12 +1,8 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad2;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -47,7 +43,7 @@ public class ShooterPIDF {
 
     PIDFCoefficients pidfCoefficients = new PIDFCoefficients(PIDF_P, 0, 0, PIDF_F);
 
-    private Flipper flipper;
+    private Gate gate;
     private Intake intake;
     private Timer scoreTimer;
     private  boolean started = false;
@@ -115,7 +111,7 @@ public class ShooterPIDF {
 
         this.hardwareMap = hardwareMap;
 
-        flipper = new Flipper(hardwareMap);
+        gate = new Gate(hardwareMap);
         intake = new Intake(hardwareMap);
         motor = hardwareMap.get(DcMotorEx.class, "shooterMotor");
         motor.setDirection(DcMotorEx.Direction.REVERSE);
@@ -269,7 +265,7 @@ public class ShooterPIDF {
 
         if (cancelShootingProcess) {
             intake.spin(0);
-            flipper.down();
+            gate.closed(); // TODO I only changed the method name, the logic might still need to be updated
             startScoring =true;
             shooterState = shootingState.IDLE;
             return false;
@@ -317,7 +313,7 @@ public class ShooterPIDF {
                             || shooterTimer.getElapsedTimeSeconds() > JUST_SHOOT_IT) {
                         shooterTimer.resetTimer();
                         shooterState = shootingState.FLINGER;
-                        flipper.up();
+                        gate.open(); // TODO I only changed the method name, the logic might still need to be updated
                     }
                     telemetry.addLine(String.format("SHOOTER UPDATE:MOTORSPINUP actual velocity %6.1f",
                             motor.getVelocity()));
@@ -327,7 +323,7 @@ public class ShooterPIDF {
                     if (shooterTimer.getElapsedTimeSeconds() > FLIPPER_DOWN) { // was 1.5
                         shooterState = shootingState.END;
                     } else if (shooterTimer.getElapsedTimeSeconds() > FLIPPER_UP) {  // was 1
-                        flipper.down();
+                        gate.closed(); // TODO I only changed the method name, the logic might still need to be updated
                     }
                     telemetry.addData("SHOOTER UPDATE","FLINGER");
                     break;

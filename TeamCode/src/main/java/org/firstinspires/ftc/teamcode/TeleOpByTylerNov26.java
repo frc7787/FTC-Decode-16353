@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
-import org.firstinspires.ftc.teamcode.Mechanisms.Flipper;
+import org.firstinspires.ftc.teamcode.Mechanisms.Gate;
 import org.firstinspires.ftc.teamcode.Mechanisms.IndicatorLights;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
@@ -22,7 +22,7 @@ public class TeleOpByTylerNov26 extends OpMode {
     private Intake intake;
     private Shooter shooter;
 
-    private Flipper flipper;
+    private Gate gate;
 
     private IndicatorLights indicatorLights;
 
@@ -44,7 +44,7 @@ public class TeleOpByTylerNov26 extends OpMode {
         mecanumDrive = new MecanumDriveBase(hardwareMap);
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
-        flipper = new Flipper(hardwareMap);
+        gate = new Gate(hardwareMap);
 
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
         indicatorLights = new IndicatorLights(hardwareMap);
@@ -91,9 +91,9 @@ public class TeleOpByTylerNov26 extends OpMode {
         }
 
         if (gamepad2.dpad_up && (shooterVelocity>(shooterTargetVelocity-50))) {
-            flipper.up();
+            gate.closed();
         } else if (gamepad2.dpad_down) {
-            flipper.down();
+            gate.open();
         }
 
         // Gamepad2 automatic scoring controls

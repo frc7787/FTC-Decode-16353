@@ -1,39 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
-import org.firstinspires.ftc.teamcode.Mechanisms.Flipper;
+import org.firstinspires.ftc.teamcode.Mechanisms.Gate;
 import org.firstinspires.ftc.teamcode.Mechanisms.IndicatorLights;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
-
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.Timer;
 
@@ -46,7 +24,7 @@ public class  teleOpByGhyth extends OpMode {
     private boolean scoringThree = false;
     private boolean scoringOne = false;
 
-    private String flipperPlace;
+    private String gatePlace;
 
 
     private boolean DEBUG = true;
@@ -68,7 +46,7 @@ public class  teleOpByGhyth extends OpMode {
     private Intake intake;
     private Shooter shooter;
     private boolean AUTOSCORE = false;
-    private Flipper flipper;
+    private Gate gate;
      private IndicatorLights indicatorLights;
 
 
@@ -78,7 +56,7 @@ public class  teleOpByGhyth extends OpMode {
 
         shooter = new Shooter(hardwareMap);
         intake = new Intake(hardwareMap);
-        flipper = new Flipper(hardwareMap);
+        gate = new Gate(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
         mecanumDrive = new MecanumDriveBase(hardwareMap);
 
@@ -167,17 +145,18 @@ public class  teleOpByGhyth extends OpMode {
         }
 
         if (gamepad2.dpad_up) {
-            flipperPlace = "FlipperUp";
-            flipper.up();
+            gatePlace = "GateClosed";
+            gate.closed();
 
         } else if (gamepad2.dpad_down) {
-            flipper.down();
-            flipperPlace = "FlipperDown";
+            gate.open();
+            gatePlace = "GateOpen";
         }
-        if(flipperPlace == "FlipperUp"){
-            intake.spin(1);
-
-        }
+// Please don't use strings for comparison, use a boolean instead - Tyler. S
+//        if(gatePlace == "FlipperUp"){
+//            intake.spin(1);
+//
+//        }
 
        /* if (gamepad1.leftBumperWasPressed()) {
             shooterTargetVelocity = shooterTargetVelocity - 5;

@@ -14,10 +14,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
-import org.firstinspires.ftc.teamcode.Mechanisms.Flipper;
+import org.firstinspires.ftc.teamcode.Mechanisms.Gate;
 import org.firstinspires.ftc.teamcode.Mechanisms.IndicatorLights;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
-import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.Mechanisms.ShooterTele;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -44,7 +43,7 @@ public class TeleJanuary extends OpMode {
     private Intake intake;
     private ShooterTele shooter;
 
-    private Flipper flipper;
+    private Gate gate;
 
     private IndicatorLights indicatorLights;
 
@@ -74,7 +73,7 @@ public class TeleJanuary extends OpMode {
         mecanumDrive = new MecanumDriveBase(hardwareMap);
         shooter = new ShooterTele(hardwareMap);
         intake = new Intake(hardwareMap);
-        flipper = new Flipper(hardwareMap);
+        gate = new Gate(hardwareMap);
 
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
         indicatorLights = new IndicatorLights(hardwareMap);
@@ -203,10 +202,9 @@ public class TeleJanuary extends OpMode {
 
         //if (gamepad2.dpad_up && (shooterVelocity>(shooterTargetVelocity-75))) {
         if (gamepad2.dpad_up) {
-            intake.spin(1.0);
-            flipper.up();
+            gate.closed();
         } else if (gamepad2.dpad_down) {
-            flipper.down();
+            gate.open();
         }
 
         // PEDRO LOCALIZATION - not currently used except for ZONE calculation

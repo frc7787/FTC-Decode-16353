@@ -15,12 +15,12 @@ public class ShooterPIDF {
 
     // FLYWHEEL configurable PIDF variables
 
-    public static double kP = 0.0003;
+    public static double kP = 0.0000005;  // 0.0000005
     public static double kI = 0.0000;
-    public static double kD = 0.00002;
-    public static double kF = 0.00012;
+    public static double kD = 0.0000;
+    public static double kF = 0.0008154; // 0.0008154
 
-    public static double targetRPM = 2200;
+    public static double targetRPM = 1500;
 
     public static double nominalVoltage = 12.0;
 
@@ -168,7 +168,8 @@ public class ShooterPIDF {
     public void flywheelUpdatePower(double targetVelocity) {
         double ticksPerRev = 28;
         double targetTicksPerSecond =
-                targetRPM * ticksPerRev / 60.0;
+                targetVelocity * ticksPerRev / 60.0;
+                // targetRPM * ticksPerRev / 60.0;
 
         double currentVelocity = motor.getVelocity();
         double batteryVoltage = batteryVoltageSensor.getVoltage();
@@ -189,6 +190,8 @@ public class ShooterPIDF {
 
         motor.setPower(Math.max(-1.0, Math.min(1.0, power)));
         motor2.setPower(Math.max(-1.0, Math.min(1.0, power)));
+
+
 
         /*
 
@@ -258,7 +261,7 @@ public class ShooterPIDF {
     }
 
     public double velocity() {
-        return motor2.getVelocity();
+        return motor.getVelocity();
     }
 
     public boolean update(boolean startShootingProcess, boolean cancelShootingProcess, Telemetry telemetry) {

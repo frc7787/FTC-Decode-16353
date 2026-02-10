@@ -146,26 +146,30 @@ public class TeleFebruary extends OpMode {
         if (gamepad1.yWasPressed()) {
             // near
             shooterTargetVelocity = shooter.NEARVELOCITY;
-            shooter.spin(shooterTargetVelocity);
+            //shooter.spin(shooterTargetVelocity);
+            shooter.flywheelUpdatePower(shooterTargetVelocity);
 
             shooterDistance = "Near";
             automatedTargeting = false;
         } else if (gamepad1.xWasPressed()) {
             // medium
             shooterTargetVelocity = shooter.MEDIUMVELOCITY;
-            shooter.spin(shooterTargetVelocity);
+            //shooter.spin(shooterTargetVelocity);
+            shooter.flywheelUpdatePower(shooterTargetVelocity);
             shooterDistance = "Medium";
             automatedTargeting = false;
         } else if (gamepad1.bWasPressed()) {
             // far
             shooterTargetVelocity = shooter.FARVELOCITY;
-            shooter.spin(shooterTargetVelocity);
+            //shooter.spin(shooterTargetVelocity);
+            shooter.flywheelUpdatePower(shooterTargetVelocity);
             shooterDistance = "Far";
             automatedTargeting = false;
         } else if (gamepad1.aWasPressed()) {
             // really far
             shooterTargetVelocity = shooter.REALLYFARVELOCITY;
-            shooter.spin(shooterTargetVelocity);
+            //shooter.spin(shooterTargetVelocity);
+            shooter.flywheelUpdatePower(shooterTargetVelocity);
             shooterDistance = "Really Far";
             automatedTargeting = false;
         } else if (gamepad1.shareWasPressed()) {
@@ -176,28 +180,34 @@ public class TeleFebruary extends OpMode {
 
         if (gamepad1.leftBumperWasPressed()) {
             shooterTargetVelocity = shooterTargetVelocity - 10;
-            shooter.spin(shooterTargetVelocity);
+            //shooter.spin(shooterTargetVelocity);
+            shooter.flywheelUpdatePower(shooterTargetVelocity);
         } else if (gamepad1.rightBumperWasPressed()) {
             shooterTargetVelocity = shooterTargetVelocity + 10;
-            shooter.spin(shooterTargetVelocity);
+            //shooter.spin(shooterTargetVelocity);
+            shooter.flywheelUpdatePower(shooterTargetVelocity);
         }
 
         // GAMEPAD2 manual controls for turning shooter ON and OFF
 
         if (gamepad2.rightBumperWasPressed()) {
             automatedTargeting = true;
-            shooter.spin(shooterTargetVelocity);
+            //shooter.spin(shooterTargetVelocity);
         } else if (gamepad2.left_bumper) {
             automatedTargeting = false;
             if (shooterVelocity > 1000) {
                 shooterTargetVelocity = 0;
-                shooter.spin(0.0);
+                //shooter.spin(0.0);
+                shooter.flywheelUpdatePower(0.0);
             } else {
                 shooterTargetVelocity = 0;
-                shooter.spin(-500);
+                //shooter.spin(-500);
+                shooter.flywheelUpdatePower(0.0);
             }
         } else if (gamepad2.leftBumperWasReleased()) {
-            shooter.spin(0.0);
+            //shooter.spin(0.0);
+            shooterTargetVelocity = 0;
+            shooter.flywheelUpdatePower(0.0);
         }
 
         // GAMEPAD 2 - MANUAL control of flipper
@@ -241,9 +251,9 @@ public class TeleFebruary extends OpMode {
             motorVoltage = 12 / hardwareMap.voltageSensor.iterator().next().getVoltage();
 
             if (!automatedTargeting) {
-                telemetry.addData("MANUAL TARGETING. Shooter Distance:", shooterDistance);
+                telemetry.addData("AUTOMATED TARGETING", "off!!!!!!!!!!!");
             } else {
-                telemetry.addData("AUTOMATED TARGETING in LOOP","UPDATED");
+                telemetry.addData("AUTOMATED TARGETING","ON");
 
             }
 

@@ -150,6 +150,8 @@ public class ShooterPIDF {
         private double lastError = 0;
         private long lastTime = System.nanoTime();
 
+        private ShotProfile formerProfile = ShotProfile.MID;
+
         public double calculate(
                 ShotProfile profile,
                 double currentVelocity,
@@ -157,6 +159,10 @@ public class ShooterPIDF {
         ) {
             double target;
             double kP, kI, kD, kF;
+
+            if (formerProfile != profile) {
+                reset();
+            }
 
             switch (profile) {
                 case OFF:

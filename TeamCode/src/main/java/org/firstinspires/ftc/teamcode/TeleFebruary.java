@@ -152,6 +152,7 @@ public class TeleFebruary extends OpMode {
             shooterTargetVelocity = shooter.NEARVELOCITY;
             currentProfile = ShotProfile.CLOSE;
             //shooter.spin(shooterTargetVelocity);
+
             shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
 
             shooterDistance = "Close";
@@ -263,9 +264,15 @@ public class TeleFebruary extends OpMode {
 
             if (!automatedTargeting) {
                 telemetry.addData("AUTOMATED TARGETING", "off!!!!!!!!!!!");
+                telemetry.addData("Detecting", "OFF");
             } else {
                 telemetry.addData("AUTOMATED TARGETING","ON");
-
+                if (currentTagDetected) {
+                    telemetry.addData("Detecting", "YES");
+                }
+                else {
+                    telemetry.addData("Detecting", "NO");
+                }
             }
 
             telemetry.addData("Shooter Target Velocity ",shooterTargetVelocity);

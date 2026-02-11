@@ -20,6 +20,8 @@ import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.Mechanisms.ShooterPIDF;
+import org.firstinspires.ftc.teamcode.Mechanisms.ShooterPIDF.ShotProfile;
+
 import org.firstinspires.ftc.teamcode.Mechanisms.ShooterTele;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -44,6 +46,8 @@ public class TeleFebruary extends OpMode {
     private MecanumDriveBase mecanumDrive;
     private Intake intake;
     private ShooterPIDF shooter;
+
+    private ShotProfile currentProfile = ShotProfile.MID;
 
     private Gate gate;
 
@@ -146,31 +150,35 @@ public class TeleFebruary extends OpMode {
         if (gamepad1.yWasPressed()) {
             // near
             shooterTargetVelocity = shooter.NEARVELOCITY;
+            currentProfile = ShotProfile.CLOSE;
             //shooter.spin(shooterTargetVelocity);
-            shooter.flywheelUpdatePower(shooterTargetVelocity);
+            shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
 
-            shooterDistance = "Near";
+            shooterDistance = "Close";
             automatedTargeting = false;
         } else if (gamepad1.xWasPressed()) {
             // medium
             shooterTargetVelocity = shooter.MEDIUMVELOCITY;
+            currentProfile = ShotProfile.MID;
             //shooter.spin(shooterTargetVelocity);
-            shooter.flywheelUpdatePower(shooterTargetVelocity);
-            shooterDistance = "Medium";
+            shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
+            shooterDistance = "Mid";
             automatedTargeting = false;
         } else if (gamepad1.bWasPressed()) {
             // far
             shooterTargetVelocity = shooter.FARVELOCITY;
+            currentProfile = ShotProfile.FAR;
             //shooter.spin(shooterTargetVelocity);
-            shooter.flywheelUpdatePower(shooterTargetVelocity);
+            shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
             shooterDistance = "Far";
             automatedTargeting = false;
         } else if (gamepad1.aWasPressed()) {
             // really far
             shooterTargetVelocity = shooter.REALLYFARVELOCITY;
+            currentProfile = ShotProfile.POWER;
             //shooter.spin(shooterTargetVelocity);
-            shooter.flywheelUpdatePower(shooterTargetVelocity);
-            shooterDistance = "Really Far";
+            shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
+            shooterDistance = "Power";
             automatedTargeting = false;
         } else if (gamepad1.shareWasPressed()) {
             automatedTargeting = !automatedTargeting; // toggle automatedTargeting ON/OFF
@@ -181,11 +189,11 @@ public class TeleFebruary extends OpMode {
         if (gamepad1.leftBumperWasPressed()) {
             shooterTargetVelocity = shooterTargetVelocity - 10;
             //shooter.spin(shooterTargetVelocity);
-            shooter.flywheelUpdatePower(shooterTargetVelocity);
+            shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
         } else if (gamepad1.rightBumperWasPressed()) {
             shooterTargetVelocity = shooterTargetVelocity + 10;
             //shooter.spin(shooterTargetVelocity);
-            shooter.flywheelUpdatePower(shooterTargetVelocity);
+            shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
         }
 
         // GAMEPAD2 manual controls for turning shooter ON and OFF
@@ -197,17 +205,20 @@ public class TeleFebruary extends OpMode {
             automatedTargeting = false;
             if (shooterVelocity > 1000) {
                 shooterTargetVelocity = 0;
+                currentProfile = ShotProfile.OFF;
                 //shooter.spin(0.0);
-                shooter.flywheelUpdatePower(0.0);
+                shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
             } else {
                 shooterTargetVelocity = 0;
+                currentProfile = ShotProfile.OFF;
                 //shooter.spin(-500);
-                shooter.flywheelUpdatePower(0.0);
+                shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
             }
         } else if (gamepad2.leftBumperWasReleased()) {
             //shooter.spin(0.0);
             shooterTargetVelocity = 0;
-            shooter.flywheelUpdatePower(0.0);
+            currentProfile = ShotProfile.OFF;
+            shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
         }
 
         // GAMEPAD 2 - MANUAL control of flipper
@@ -244,7 +255,7 @@ public class TeleFebruary extends OpMode {
         }
 
         // AFTER targetingUpdate, we have the current target Velocity, so update the shooter power
-        shooter.flywheelUpdatePower(shooterTargetVelocity);
+        shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
 
         if (DEBUG) {
 
@@ -258,6 +269,7 @@ public class TeleFebruary extends OpMode {
             }
 
             telemetry.addData("Shooter Target Velocity ",shooterTargetVelocity);
+            telemetry.addData("ShotProfile Target RPM", shooter.getTargetRPM(currentProfile));
             telemetry.addData("Shooter Actual Velocity ",shooterVelocity);
             telemetry.addData("Range from April Tag ",distanceAprilTag);
             telemetry.addData("Angle from April Tag ",angleAprilTag);
@@ -367,6 +379,7 @@ public class TeleFebruary extends OpMode {
             //shooter.spin(shooterTargetVelocity); update shooter power should now be done in main loop
         }
 
+        /*  WHY IS THIS STILL PRINTING?
         if (DEBUG && false) {
             telemetry.addLine(" ");
             telemetry.addLine(String.format("Current TARGETING: zone, range, angle, ideal angle, RPM %d %6.1f %6.1f %6.1f %6.1f",
@@ -376,6 +389,8 @@ public class TeleFebruary extends OpMode {
                     idealShootingAngle,
                     shooterTargetVelocity));
         }
+
+         */
 
         //shooterDistance = String.valueOf(zone); // why is shooterDistance set to ZONE???
 

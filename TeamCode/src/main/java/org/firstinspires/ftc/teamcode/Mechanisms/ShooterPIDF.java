@@ -56,6 +56,18 @@ public class ShooterPIDF {
     public double FARVELOCITY = 2015;
     public double REALLYFARVELOCITY = 2110;
 
+    public enum ShotProfile {
+        OFF,
+        CLOSE,
+        MID,
+        FAR,
+        POWER
+    }
+
+
+
+
+
     // THESE VARIABLES ARE FOR THE AUTOMATIC APRIL TAG TARGETING range and flywheel RPM
 
     public static double RMP_130 = 2440;
@@ -133,29 +145,79 @@ public class ShooterPIDF {
     }
 
     public class PIDFController {
+
         private double integralSum = 0;
         private double lastError = 0;
         private long lastTime = System.nanoTime();
 
-        public double calculate(double target, double current, double voltage) {
-            double error = target - current;
+        public double calculate(
+                ShotProfile profile,
+                double currentVelocity,
+                double voltage
+        ) {
+            double target;
+            double kP, kI, kD, kF;
+
+            switch (profile) {
+                case OFF:
+                    target = ShotProfileConfig.offRPM;
+                    kP = ShotProfileConfig.offP;
+                    kI = ShotProfileConfig.offI;
+                    kD = ShotProfileConfig.offD;
+                    kF = ShotProfileConfig.offF;
+                    break;
+                case CLOSE:
+                    target = ShotProfileConfig.closeRPM;
+                    kP = ShotProfileConfig.closeP;
+                    kI = ShotProfileConfig.closeI;
+                    kD = ShotProfileConfig.closeD;
+                    kF = ShotProfileConfig.closeF;
+                    break;
+
+                case MID:
+                    target = ShotProfileConfig.midRPM;
+                    kP = ShotProfileConfig.midP;
+                    kI = ShotProfileConfig.midI;
+                    kD = ShotProfileConfig.midD;
+                    kF = ShotProfileConfig.midF;
+                    break;
+
+                case FAR:
+                    target = ShotProfileConfig.farRPM;
+                    kP = ShotProfileConfig.farP;
+                    kI = ShotProfileConfig.farI;
+                    kD = ShotProfileConfig.farD;
+                    kF = ShotProfileConfig.farF;
+                    break;
+
+                default: // POWER
+                    target = ShotProfileConfig.powerRPM;
+                    kP = ShotProfileConfig.powerP;
+                    kI = ShotProfileConfig.powerI;
+                    kD = ShotProfileConfig.powerD;
+                    kF = ShotProfileConfig.powerF;
+                    break;
+            }
+
+            double ticksPerRev = 28;
+            double targetTicksPerSec = target * ticksPerRev / 60.0;
+
+            double error = targetTicksPerSec - currentVelocity;
 
             long now = System.nanoTime();
-            double deltaTime = (now - lastTime) / 1e9;
+            double dt = (now - lastTime) / 1e9;
             lastTime = now;
 
-            integralSum += error * deltaTime;
-            double derivative = (error - lastError) / deltaTime;
+            integralSum += error * dt;
+            double derivative = (error - lastError) / dt;
             lastError = error;
 
-            double voltageComp = nominalVoltage / voltage;
-
-            double feedforward = kF * target * voltageComp;
+            double voltageComp = ShooterPIDF.nominalVoltage / voltage;
 
             return (kP * error)
                     + (kI * integralSum)
                     + (kD * derivative)
-                    + feedforward;
+                    + (kF * targetTicksPerSec * voltageComp);
         }
 
         public void reset() {
@@ -163,9 +225,10 @@ public class ShooterPIDF {
             lastError = 0;
             lastTime = System.nanoTime();
         }
-    } // end of PIDFController()
+    }
+    // end of PIDFController()
 
-    public void flywheelUpdatePower(double targetVelocity) {
+    public void flywheelUpdatePower(ShotProfile currentProfile, double targetVelocity) {
         double ticksPerRev = 28;
         double targetTicksPerSecond =
                 targetVelocity * ticksPerRev / 60.0;
@@ -182,8 +245,10 @@ public class ShooterPIDF {
          */
 
 
+        // FOR NOW, take out the targetTicksPerSecond calculated from PARAMETER targetVelocity
+        // and just use the PROFILE targetVelocity
         double power = pidf.calculate(
-                targetTicksPerSecond,
+                currentProfile,
                 currentVelocity,
                 batteryVoltage
         );
@@ -205,8 +270,16 @@ public class ShooterPIDF {
          */
 
 
-    }
+    } // end flywheelUpdatePower
 
+    public double getTargetRPM(ShotProfile profile) {
+        switch (profile) {
+            case CLOSE: return ShotProfileConfig.closeRPM;
+            case MID: return ShotProfileConfig.midRPM;
+            case FAR: return ShotProfileConfig.farRPM;
+            default: return ShotProfileConfig.powerRPM;
+        }
+    } // end getTargetRPM
 
     public void setShooterVelocity(double velocity) {
         if (velocity == 0) {

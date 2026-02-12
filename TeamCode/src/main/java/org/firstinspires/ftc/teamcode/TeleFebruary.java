@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.ShooterPIDF;
 import org.firstinspires.ftc.teamcode.Mechanisms.ShooterPIDF.ShotProfile;
 
 import org.firstinspires.ftc.teamcode.Mechanisms.ShooterTele;
+import org.firstinspires.ftc.teamcode.Mechanisms.ShotProfileConfig;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -149,8 +150,9 @@ public class TeleFebruary extends OpMode {
 
         if (gamepad1.yWasPressed()) {
             // near
-            shooterTargetVelocity = shooter.NEARVELOCITY;
+            //shooterTargetVelocity = shooter.NEARVELOCITY;
             currentProfile = ShotProfile.CLOSE;
+            shooterTargetVelocity = ShotProfileConfig.closeRPM;
             //shooter.spin(shooterTargetVelocity);
 
             shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
@@ -159,24 +161,27 @@ public class TeleFebruary extends OpMode {
             automatedTargeting = false;
         } else if (gamepad1.xWasPressed()) {
             // medium
-            shooterTargetVelocity = shooter.MEDIUMVELOCITY;
+            //shooterTargetVelocity = shooter.MEDIUMVELOCITY;
             currentProfile = ShotProfile.MID;
+            shooterTargetVelocity = ShotProfileConfig.midRPM;
             //shooter.spin(shooterTargetVelocity);
             shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
             shooterDistance = "Mid";
             automatedTargeting = false;
         } else if (gamepad1.bWasPressed()) {
             // far
-            shooterTargetVelocity = shooter.FARVELOCITY;
+            //shooterTargetVelocity = shooter.FARVELOCITY;
             currentProfile = ShotProfile.FAR;
+            shooterTargetVelocity = ShotProfileConfig.farRPM;
             //shooter.spin(shooterTargetVelocity);
             shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
             shooterDistance = "Far";
             automatedTargeting = false;
         } else if (gamepad1.aWasPressed()) {
             // really far
-            shooterTargetVelocity = shooter.REALLYFARVELOCITY;
+            //shooterTargetVelocity = shooter.REALLYFARVELOCITY;
             currentProfile = ShotProfile.POWER;
+            shooterTargetVelocity = ShotProfileConfig.powerRPM;
             //shooter.spin(shooterTargetVelocity);
             shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
             shooterDistance = "Power";
@@ -379,6 +384,7 @@ public class TeleFebruary extends OpMode {
         zone = calculateShootingZone(x, y);
         idealShootingAngle = shootingAngles[zone];
         shooterTargetVelocity = shooter.calculateShooterVelocity(distanceAprilTag);
+        currentProfile = shooter.calculateShooterProfile(distanceAprilTag);
 
         // WE have a potentially new shooter target velocity, update if the flywheel is supposed to be spinning
         // let's use automatedTargeting as a proxy for "supposed to be spinning"

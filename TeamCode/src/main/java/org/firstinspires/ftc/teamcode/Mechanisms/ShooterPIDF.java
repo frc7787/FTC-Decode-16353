@@ -154,6 +154,7 @@ public class ShooterPIDF {
 
         public double calculate(
                 ShotProfile profile,
+                double targetVelocity,
                 double currentVelocity,
                 double voltage
         ) {
@@ -162,6 +163,7 @@ public class ShooterPIDF {
 
             if (formerProfile != profile) {
                 reset();
+                formerProfile = profile;
             }
 
             switch (profile) {
@@ -255,6 +257,7 @@ public class ShooterPIDF {
         // and just use the PROFILE targetVelocity
         double power = pidf.calculate(
                 currentProfile,
+                targetVelocity,
                 currentVelocity,
                 batteryVoltage
         );
@@ -328,6 +331,27 @@ public class ShooterPIDF {
         //velocity = 289.13317*Math.sin(0.0318839*range+2.92209)+2192.51129;
 
         return velocity;
+    }
+
+    public ShotProfile calculateShooterProfile(double range) {
+        ShotProfile profile = ShotProfile.MID;
+
+        if (range<54) {
+            profile = ShotProfile.CLOSE;
+        } else if (range <72) {
+            profile = ShotProfile.MID;
+        } else if (range < 105) {
+            profile = ShotProfile.FAR;
+        } else {
+            profile = ShotProfile.POWER;
+        }
+
+
+
+        // FORMULA??
+        //velocity = 289.13317*Math.sin(0.0318839*range+2.92209)+2192.51129;
+
+        return profile;
     }
 
 

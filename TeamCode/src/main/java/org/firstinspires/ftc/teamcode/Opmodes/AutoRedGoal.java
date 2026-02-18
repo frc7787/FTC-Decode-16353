@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Opmodes;
 
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
@@ -12,7 +13,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
-import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
+
+import org.firstinspires.ftc.teamcode.Mechanisms.ShooterTeleBoring;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstantsRed.*;
 
@@ -21,7 +23,7 @@ import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstantsRed.*;
 public class AutoRedGoal extends  OpMode{
 
     private Intake intake;
-    private Shooter shooter;
+    private ShooterTeleBoring shooter;
 
     private AprilTagSubsystem aprilTagSubsystem;
 
@@ -111,11 +113,19 @@ public class AutoRedGoal extends  OpMode{
                 .build();
 
         /* This is our scorePickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
+        /*
         scorePickup2 = follower.pathBuilder()
                 .addPath(new BezierLine(pickup2EndPose, pickup2StartPose))
                 .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), pickup2StartPose.getHeading())
                 .addPath(new BezierLine(pickup2StartPose, scorePoseFake2))
                 .setLinearHeadingInterpolation(pickup2StartPose.getHeading(), scorePoseFake2.getHeading())
+                .build();
+         */
+
+        // The NEW scorePickup2 for Provincials
+        scorePickup2 = follower.pathBuilder()
+                .addPath(new BezierCurve(pickup2EndPose, scorePoseFake2Control, scorePoseFake2))
+                .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), scorePoseFake2.getHeading())
                 .build();
 
         /* This is our grabPickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
@@ -288,7 +298,7 @@ public class AutoRedGoal extends  OpMode{
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     //follower.followPath(grabPickup3,true);
-                    follower.followPath(leaveGoal, true);
+                    //follower.followPath(leaveGoal, true); // no need to leave, we are now off the launch line
                     intake.spin(0.0);  // POWER DOWN FOR END OF AUTO
                     shooter.spin(0);
                     setPathState(9);
@@ -297,6 +307,8 @@ public class AutoRedGoal extends  OpMode{
             }
             case 9: { // FOLLOW PATH LEAVEAUDIENCE
                 if (!follower.isBusy()) {
+                    shooter.spin(0);
+                    intake.spin(0);
                     setPathState(-1);
                 }
                 break;
@@ -357,7 +369,7 @@ public class AutoRedGoal extends  OpMode{
         follower.setStartingPose(startPose);
 
         intake = new Intake(hardwareMap);
-        shooter = new Shooter(hardwareMap);
+        shooter = new ShooterTeleBoring(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
         shooter.setShooterVelocity(shooter.RPM_GOAL);

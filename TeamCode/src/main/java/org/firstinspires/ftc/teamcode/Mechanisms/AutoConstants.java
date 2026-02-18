@@ -30,6 +30,9 @@ public class AutoConstants {
     //public static Pose pickup3EndPose = new Pose(21,34, Math.toRadians(180));
     public static Pose pickup3EndPose = new Pose(11,34, Math.toRadians(180));
 
+    public static Pose pickupBallsPose = new Pose(11,10,180); // steal enemy balls!
+
+
     // THIS scorePose is different from the mirror image of Red Goal in AutoConstants Red
     //public static Pose scorePose = new Pose(56, 85, Math.toRadians(135)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
     // USE THIS scorePose to have the mirror image of Red Goal
@@ -38,8 +41,11 @@ public class AutoConstants {
     // let's move the score pose for Pickup 2 OFF the launch line
     public static Pose scorePoseFake2 = new Pose(57, 97, Math.toRadians(147)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
 
-    public static Pose scorePoseAudience = new Pose(56,21, Math.toRadians(112)); // Scoring Pose from the Audience launch zone.
-    public static Pose scorePoseAudienceFake = new Pose(55,21, Math.toRadians(115)); // Scoring Pose from the Audience launch zone.
+    public static Pose scorePoseAudience = new Pose(56,21, Math.toRadians(110)); // was 112 Scoring Pose from the Audience launch zone.
+    public static Pose scorePoseAudienceFake = new Pose(55,21, Math.toRadians(114)); // was 115 Scoring Pose from the Audience launch zone.
+
+    public static Pose dumpPose = new Pose(15,62, Math.toRadians(270));
+    public static Pose dumpControl = new Pose(37, 63);
 
 
     public static Pose pickup1Pose = new Pose(37, 121, Math.toRadians(0)); // Highest (First Set) of Artifacts from the Spike Mark.
@@ -48,7 +54,7 @@ public class AutoConstants {
 
     // INITIALIZING PATHS
     public static Path scorePreload, scorePreloadAudience;
-    public static PathChain grabPickup1, scorePickup1, grabPickup2Pre, grabPickup2, scorePickup2, grabPickup3, scorePickup3;
-    public static PathChain grabPickup3Audience, scorePickup3Audience, grabPickup2PreAudience, grabPickup2Audience, scorePickup2Audience;
+    public static PathChain grabPickup1, scorePickup1, grabPickup2Pre, grabPickup2, scorePickup2, grabPickup3, scorePickup3, dumpPath, scoreDump;
+    public static PathChain grabPickup3Audience, scorePickup3Audience, grabPickup2PreAudience, grabPickup2Audience, scorePickup2Audience, pickupBalls, leaveBalls, scorePickupBalls;
     public static PathChain leaveGoal, leaveAudience;
 }

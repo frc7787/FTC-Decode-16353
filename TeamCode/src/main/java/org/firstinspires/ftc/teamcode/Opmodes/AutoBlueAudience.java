@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
+import org.firstinspires.ftc.teamcode.Mechanisms.ShooterTeleBoring;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstants.*;
 
@@ -20,7 +21,7 @@ import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstants.*;
 public class AutoBlueAudience extends  OpMode{
 
     private Intake intake;
-    private Shooter shooter;
+    private ShooterTeleBoring shooter;
 
     private AprilTagSubsystem aprilTagSubsystem;
 
@@ -231,6 +232,8 @@ public class AutoBlueAudience extends  OpMode{
             }
             case 9: { // FOLLOW PATH LEAVEAUDIENCE
                 if (!follower.isBusy()) {
+                    shooter.spin(0);
+                    intake.spin(0);
                     setPathState(-1);
                 }
                 break;
@@ -291,7 +294,7 @@ public class AutoBlueAudience extends  OpMode{
         follower.setStartingPose(startPoseAudience);
 
         intake = new Intake(hardwareMap);
-        shooter = new Shooter(hardwareMap);
+        shooter = new ShooterTeleBoring(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
         shooter.setShooterVelocity(shooter.RPM_AUDIENCE);

@@ -129,6 +129,10 @@ public class TeleJanuary extends OpMode {
         double turn = gamepad1.right_stick_x;
         turn *= Math.abs(turn);
 
+        if (gamepad1.left_trigger>0.1) {
+            turn = turn / 3;
+        }
+
         mecanumDrive.driveFieldCentric(drive, strafe, turn);
 
         if (gamepad1.options) {

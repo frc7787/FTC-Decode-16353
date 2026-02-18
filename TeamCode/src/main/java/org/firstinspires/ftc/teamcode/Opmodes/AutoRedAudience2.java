@@ -27,6 +27,8 @@ public class AutoRedAudience2 extends  OpMode{
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
+    private double delayStart=0;
+    private double delayStart2=0;
 
     // INITIALIZING POSES
 
@@ -129,8 +131,10 @@ public class AutoRedAudience2 extends  OpMode{
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: {  // FOLLOW PATH TO SCORING - preloaded
-                follower.followPath(scorePreloadAudience);
-                setPathState(1);
+                if (opmodeTimer.getElapsedTimeSeconds() > delayStart) {
+                    follower.followPath(scorePreloadAudience);
+                    setPathState(1);
+                }
                 //shooter.spin(2000);
                 break;
             }
@@ -171,7 +175,7 @@ public class AutoRedAudience2 extends  OpMode{
                 break;
             }
             case 4: { // FOLLOW PATH TO SCORING - pickup 3
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && opmodeTimer.getElapsedTimeSeconds() > delayStart2) {
                     setPathState(5);
                 }
                 break;
@@ -234,6 +238,8 @@ public class AutoRedAudience2 extends  OpMode{
             }
             case 9: { // FOLLOW PATH LEAVEAUDIENCE
                 if (!follower.isBusy()) {
+                    shooter.spin(0);
+                    intake.spin(0);
                     setPathState(-1);
                 }
                 break;
@@ -303,7 +309,33 @@ public class AutoRedAudience2 extends  OpMode{
 
     /** This method is called continuously after Init while waiting for "play". **/
     @Override
-    public void init_loop() {}
+    public void init_loop() {
+        telemetry.addData("DELAYED START: Before firing preloaded", delayStart);
+        telemetry.addData("Press Y to increase","by 1");
+        telemetry.addData("Press A to decrease", "by 1");
+        telemetry.addData("DELAYED START 2: Before firing opposing alliance pickup balls", delayStart2);
+        telemetry.addData("Press X to increase","by 1");
+        telemetry.addData("Press B to decrease", "by 1");
+        telemetry.update();
+
+        if (gamepad1.yWasPressed()) {
+            delayStart = delayStart + 1;
+        } else if (gamepad1.aWasPressed()) {
+            delayStart = delayStart - 1;
+            if (delayStart < 0) {
+                delayStart = 0;
+            }
+        }
+
+        if (gamepad1.xWasPressed()) {
+            delayStart2 = delayStart2 + 1;
+        } else if (gamepad1.aWasPressed()) {
+            delayStart2 = delayStart2 - 1;
+            if (delayStart2 < 0) {
+                delayStart2 = 0;
+            }
+        }
+    } // end init_loop()
 
     /** This method is called once at the start of the OpMode.
      * It runs all the setup actions, including building paths and starting the path system **/

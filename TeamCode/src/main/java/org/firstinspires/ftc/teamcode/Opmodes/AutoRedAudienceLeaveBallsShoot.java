@@ -331,6 +331,10 @@ public class AutoRedAudienceLeaveBallsShoot extends  OpMode{
         telemetry.addData("DELAYED START: Before firing preloaded", delayStart);
         telemetry.addData("Press Y to increase","by 1");
         telemetry.addData("Press A to decrease", "by 1");
+        telemetry.addData("DELAYED START 2: Before firing opposing alliance pickup balls", delayStart2);
+        telemetry.addData("Press X to increase","by 1");
+        telemetry.addData("Press B to decrease", "by 1");
+        telemetry.update();
 
         if (gamepad1.yWasPressed()) {
             delayStart = delayStart + 1;
@@ -340,10 +344,7 @@ public class AutoRedAudienceLeaveBallsShoot extends  OpMode{
                 delayStart = 0;
             }
         }
-        telemetry.addData("DELAYED START 2: Before firing opposing alliance pickup balls", delayStart2);
-        telemetry.addData("Press X to increase","by 1");
-        telemetry.addData("Press B to decrease", "by 1");
-        telemetry.update();
+
         if (gamepad1.xWasPressed()) {
             delayStart2 = delayStart2 + 1;
         } else if (gamepad1.aWasPressed()) {

@@ -68,9 +68,11 @@ public class AprilTagSubsystem {
                 .setOutputUnits(OUTPUT_DISTANCE_UNIT, OUTPUT_ANGLE_UNIT)
                 .setCameraPose(cameraPosition, cameraOrientation)
                 // first two numbers are focal length, next two are principal point
-                .setLensIntrinsics(622.001f, 622.001, 319.803f, 241.251f) // Logitech C920 from teamwebcamcalibrations
+                //.setLensIntrinsics(622.001f, 622.001, 319.803f, 241.251f) // Logitech C920 from teamwebcamcalibrations
                 //.setLensIntrinsics(660.750, 660.75, 323.034, 230.681) // C615 measured kk Dec 5 2023
                 //.setLensIntrinsics(822.317f, 822.317f, 319.495f,242.502f" // C270 from teamwebcamcalibrations
+                // https://ftc-community.firstinspires.org/t/sticky-camera-calibration-crowdsourcing/577
+                .setLensIntrinsics(539.0239404, 539.0239404, 316.450283269, 236.364794005) // arducam ov9281 global shutter 640x480 only
                 .build();
 
         visionPortal = new VisionPortal.Builder()

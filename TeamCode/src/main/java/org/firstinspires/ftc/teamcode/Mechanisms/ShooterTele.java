@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -9,6 +10,8 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
+
+@Configurable
 public class ShooterTele {
 
     private final DcMotorEx motor;
@@ -31,22 +34,22 @@ public class ShooterTele {
 
     public double motorvelocity = 2000;
     public double normalizedMotorVelocity;
-    public double NEARVELOCITY = 1710;
-    public double MEDIUMVELOCITY = 1800;
-    public double FARVELOCITY = 2015;
-    public double REALLYFARVELOCITY = 2110;
+    public double NEARVELOCITY = 1500;
+    public double MEDIUMVELOCITY = 1700;
+    public double FARVELOCITY = 1940;
+    public double REALLYFARVELOCITY = 2020;
 
     // THESE VARIABLES ARE FOR THE AUTOMATIC APRIL TAG TARGETING range and flywheel RPM
 
-    public static double RMP_130 = 2440;
-    public static double RPM_126 = 2400;
-    public static double RPM_123 = 2380;
-    public static double RPM_112 = 2300;
-    public static double RPM_106 = 2220;
-    public static double RPM_76 = 2000;
-    public static double RPM_63 = 1940;
-    public static double RPM_59 = 1900;
-    public static double RPM_50 = 1900;
+    public static double RMP_130 = 2000;
+    public static double RPM_126 = 1950;
+    public static double RPM_123 = 1900;
+    public static double RPM_112 = 1850;
+    public static double RPM_106 = 1800;
+    public static double RPM_76 = 1700;
+    public static double RPM_63 = 1650;
+    public static double RPM_59 = 1600;
+    public static double RPM_50 = 1500;
     public static double RPM_AUDIENCE = 2290; // 2190 @12.9V; was 2290/2240 new wheel
     public static double RPM_GOAL = 1910; // was 1940 old wheel
 

@@ -48,8 +48,8 @@ public class Shooter {
     public static double RPM_63 = 1940;
     public static double RPM_59 = 1900;
     public static double RPM_50 = 1900;
-    public static double RPM_AUDIENCE = 2290; // 2190 @12.9V; was 2290/2240 new wheel
-    public static double RPM_GOAL = 1910; // was 1940 old wheel
+    public static double RPM_AUDIENCE = 1820; // 2190 @12.9V; was 2290/2240 new wheel
+    public static double RPM_GOAL = 1610; // was 1940 old wheel
 
 
 

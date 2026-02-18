@@ -3,9 +3,7 @@ package org.firstinspires.ftc.teamcode.Opmodes;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -17,8 +15,10 @@ import org.firstinspires.ftc.teamcode.Mechanisms.ShooterTeleBoring;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstants.*;
 
-@Autonomous(name = "AutoBlueAudience2 (pickup 1 row)", group = "opmodes")
-public class AutoBlueAudience2 extends  OpMode{
+
+
+@Autonomous(name = "AutoBlueAudienceLeaveBallsShoot (pickup loading balls AND shoots", group = "opmodes")
+public class AutoBlueAudienceLeaveBallsShoot extends  OpMode{
 
     private Intake intake;
     private ShooterTeleBoring shooter;
@@ -125,6 +125,21 @@ public class AutoBlueAudience2 extends  OpMode{
                 .setLinearHeadingInterpolation(scorePoseAudienceFake.getHeading(),leavePoseAudience.getHeading())
                 .build();
 
+        pickupBalls = follower.pathBuilder()
+                .addPath(new BezierLine(leavePoseAudience,pickupBallsPose))
+                .setLinearHeadingInterpolation(leavePoseAudience.getHeading(), pickupBallsPose.getHeading())
+                .build();
+
+        leaveBalls = follower.pathBuilder()
+                .addPath(new BezierLine(pickupBallsPose,leavePoseAudience))
+                .setLinearHeadingInterpolation(pickupBallsPose.getHeading(), leavePoseAudience.getHeading())
+                .build();
+
+        scorePickupBalls = follower.pathBuilder()
+                .addPath(new BezierLine(pickupBallsPose,scorePoseAudience))
+                .setLinearHeadingInterpolation(pickupBallsPose.getHeading(), scorePoseAudience.getHeading())
+                .build();
+
 
     } // end of BuildPaths
 
@@ -158,7 +173,7 @@ public class AutoBlueAudience2 extends  OpMode{
             case 2: { // JUST SCORING - preloaded
                 if (shooter.score(false, 3, telemetry)) {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup3Audience, 0.5, true);
+                    follower.followPath(leaveAudience, 0.95, true);
                     // setPathState(2); OK, let's just test the first two paths.
                     intake.spin(1.0);
                     setPathState(3);
@@ -171,18 +186,26 @@ public class AutoBlueAudience2 extends  OpMode{
                     /* Grab Sample */
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     intake.spin(1.0);
-                    follower.followPath(scorePickup3Audience, true);
+                    follower.followPath(pickupBalls, true);
                     setPathState(4);
                 }
                 break;
             }
             case 4: { // FOLLOW PATH TO SCORING - pickup 3
+                if (!follower.isBusy()) {
+                    intake.spin(1.0);
+                    follower.followPath(scorePickupBalls,true);
+                    setPathState(5);
+                }
+                break;
+            }
+            case 5: { // FOLLOW PATH TO SCORING - pickup 3
                 if (!follower.isBusy() && opmodeTimer.getElapsedTimeSeconds() > delayStart2) {
                     setPathState(5);
                 }
                 break;
             }
-            case 5: { // JUST SCORING - pickup 3
+            case 6: { // JUST SCORING - pickup 3
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if (shooter.score(false, 3, telemetry)) {
                     /* Score Sample */
@@ -196,7 +219,7 @@ public class AutoBlueAudience2 extends  OpMode{
                 }
                 break;
             }
-            case 6: {
+            case 60: {
                 if (!follower.isBusy()) {
                     follower.followPath(grabPickup2Audience,0.5,true);
                     setPathState(61);
@@ -352,4 +375,5 @@ public class AutoBlueAudience2 extends  OpMode{
 
 
 } // end of AutoByExampleDec
+
 

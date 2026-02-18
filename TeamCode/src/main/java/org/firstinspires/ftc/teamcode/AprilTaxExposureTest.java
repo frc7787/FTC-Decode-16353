@@ -121,6 +121,14 @@ public class AprilTaxExposureTest extends LinearOpMode
 
         // Establish Min and Max Gains and Exposure.  Then set a low exposure with high gain
         getCameraSetting();
+        // What the heck is wrong with the camera not giving the correct min and max???
+        // OK, just give up and set those manually.
+        minExposure = 0;
+        maxExposure = 50;
+        minGain = 0;
+        maxGain = 100;
+        minWhiteBalance = 0;
+        maxWhiteBalance = 7000;
         myExposure = Math.min(5, minExposure);
         myGain = maxGain;
         myWhiteBalance = (int)((minWhiteBalance + maxWhiteBalance)/2);

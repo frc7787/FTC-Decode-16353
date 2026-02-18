@@ -13,10 +13,14 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Configurable
-public class ShooterPIDF {
+public class ShooterTeleBoring {
     private TelemetryManager telemetryM;
 
     // FLYWHEEL configurable PIDF variables
+
+    public static double PIDF_F_BORING = 11.19;
+    public static double PIDF_P_BORING = 60.0;
+    PIDFCoefficients pidfCoefficientsBoring = new PIDFCoefficients(PIDF_P_BORING,0,0,PIDF_F_BORING);
 
     public static double kP = 0.0000005;  // 0.0000005
     public static double kI = 0.0000;
@@ -41,10 +45,10 @@ public class ShooterPIDF {
 
     private double motorVoltage;
 
-    public static double PIDF_F = 11.19;
-    public static double PIDF_P = 60.0;
+    //public static double PIDF_F = 11.19;
+    //public static double PIDF_P = 60.0;
 
-    PIDFCoefficients pidfCoefficients = new PIDFCoefficients(PIDF_P, 0, 0, PIDF_F);
+    //PIDFCoefficients pidfCoefficients = new PIDFCoefficients(PIDF_P, 0, 0, PIDF_F);
 
     private Gate gate;
     private Intake intake;
@@ -69,17 +73,19 @@ public class ShooterPIDF {
 
     // THESE VARIABLES ARE FOR THE AUTOMATIC APRIL TAG TARGETING range and flywheel RPM
 
-    public static double RMP_130 = 2440;
-    public static double RPM_126 = 2400;
-    public static double RPM_123 = 2380;
-    public static double RPM_112 = 2300;
-    public static double RPM_106 = 2220;
-    public static double RPM_76 = 2000;
-    public static double RPM_63 = 1940;
-    public static double RPM_59 = 1900;
-    public static double RPM_50 = 1900;
-    public static double RPM_AUDIENCE = 2290; // 2190 @12.9V; was 2290/2240 new wheel
-    public static double RPM_GOAL = 1910; // was 1940 old wheel
+    public static double RMP_130 = 1960;
+    public static double RPM_126 = 1930;
+    public static double RPM_123 = 1900;
+    public static double RPM_112 = 1820;
+    public static double RPM_106 = 1760;
+    public static double RPM_76 = 1610;
+    public static double RPM_63 = 1540;
+    public static double RPM_59 = 1510;
+    public static double RPM_50 = 1440;
+    public static double RPM_46 = 1360;
+    public static double RPM_42 = 1340;
+    public static double RPM_AUDIENCE = 1790; // was 1760 @12.9V; was 2290/2240 new wheel
+    public static double RPM_GOAL = 1400; // was 1940 old wheel
 
 
     // THESE VARIABLES ARE FOR THE AUTOMATIC SHOOTER PROCESS.
@@ -116,7 +122,7 @@ public class ShooterPIDF {
     public boolean startScoring = true;
     private double totalBalls = 3;
 
-    public ShooterPIDF(HardwareMap hardwareMap) {
+    public ShooterTeleBoring(HardwareMap hardwareMap) {
 
         this.hardwareMap = hardwareMap;
 
@@ -124,13 +130,13 @@ public class ShooterPIDF {
         intake = new Intake(hardwareMap);
         motor = hardwareMap.get(DcMotorEx.class, "shooterMotor");
         motor.setDirection(DcMotorEx.Direction.REVERSE);
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+        //motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficientsBoring);
 
         motor2 = hardwareMap.get(DcMotorEx.class, "shooterTwo");
         motor2.setDirection(DcMotorEx.Direction.FORWARD);
-        motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //motor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+        //motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficientsBoring);
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
         pidf = new PIDFController();
@@ -210,8 +216,6 @@ public class ShooterPIDF {
             }
 
             double ticksPerRev = 28;
-            // currently set to use "target" velocity matching current profile
-            // for target velocity using April Tag Distance, change "target" to "targetVelocity"
             double targetTicksPerSec = target * ticksPerRev / 60.0;
 
             double error = targetTicksPerSec - currentVelocity;
@@ -249,10 +253,10 @@ public class ShooterPIDF {
         double ticksPerRev = 28;
         double targetTicksPerSecond =
                 targetVelocity * ticksPerRev / 60.0;
-                // targetRPM * ticksPerRev / 60.0;
+        // targetRPM * ticksPerRev / 60.0;
 
         double currentVelocity = motor.getVelocity();
-        double batteryVoltage = batteryVoltageSensor.getVoltage();
+        double batteryVoltage = 12 / batteryVoltageSensor.getVoltage();
         double currentRPM = currentVelocity * 60 / ticksPerRev;
 
         /*
@@ -272,11 +276,20 @@ public class ShooterPIDF {
         );
 
         telemetryM.addData("POWER:", power);
+        telemetryM.addData("Battery:", batteryVoltage);
+        telemetryM.addData("Target Velocity:", targetVelocity);
+        telemetryM.addData("Current Velocity", currentRPM);
         telemetryM.update();
 
+        /*
         motor.setPower(Math.max(-1.0, Math.min(1.0, power)));
         motor2.setPower(Math.max(-1.0, Math.min(1.0, power)));
+         */
 
+        //motor.setVelocity(targetVelocity*batteryVoltage);
+        //motor2.setVelocity(targetVelocity*batteryVoltage);
+        motor.setVelocity(targetVelocity);
+        motor2.setVelocity(targetVelocity);
 
 
         /*
@@ -317,7 +330,7 @@ public class ShooterPIDF {
     }
 
     public double calculateShooterVelocity(double range) {
-        double velocity = RPM_50;
+        double velocity = RPM_76;
 
         if (range > 129) {
             velocity = RMP_130;
@@ -335,8 +348,14 @@ public class ShooterPIDF {
             velocity = RPM_63;
         } else if (range > 58) {
             velocity = RPM_59;
-        } else if (range > 50) {
+        } else if (range > 49) {
             velocity = RPM_50;
+        } else if (range > 45) {
+            velocity = RPM_46;
+        } else if (range > 41) {
+            velocity = RPM_42;
+        } else {
+            velocity = RPM_42 - 40;
         }
 
         // FORMULA??
@@ -406,13 +425,13 @@ public class ShooterPIDF {
 
                     shooterTimer.resetTimer();
                     shooterState = shootingState.INTAKE;
-                    intake.spin(1.0);
+                    //intake.spin(1.0);
                     telemetry.addLine(String.format("SHOOTER UPDATE:START normalized velocity %6.1f",
                             normalizedMotorVelocity));
                     break;
                 }
                 case INTAKE: {
-                    intake.spin(1.0);
+                    //intake.spin(1.0);
                     // FIRST ball, startShootingProcess will be true, so give the intake MORE time
                     if (startShootingProcess && (shooterTimer.getElapsedTimeSeconds() > INTAKE_TIME_START)) {
                         shooterState = shootingState.MOTORSPINUP;
@@ -431,7 +450,8 @@ public class ShooterPIDF {
                             || shooterTimer.getElapsedTimeSeconds() > JUST_SHOOT_IT) {
                         shooterTimer.resetTimer();
                         shooterState = shootingState.FLINGER;
-                        gate.open(); // TODO I only changed the method name, the logic might still need to be updated
+                        intake.spin(1.0);
+                        //gate.open(); // TODO I only changed the method name, the logic might still need to be updated
                     }
                     telemetry.addLine(String.format("SHOOTER UPDATE:MOTORSPINUP actual velocity %6.1f",
                             motor.getVelocity()));
@@ -441,7 +461,7 @@ public class ShooterPIDF {
                     if (shooterTimer.getElapsedTimeSeconds() > FLIPPER_DOWN) { // was 1.5
                         shooterState = shootingState.END;
                     } else if (shooterTimer.getElapsedTimeSeconds() > FLIPPER_UP) {  // was 1
-                        gate.closed(); // TODO I only changed the method name, the logic might still need to be updated
+                        //gate.closed(); // TODO I only changed the method name, the logic might still need to be updated
                     }
                     telemetry.addData("SHOOTER UPDATE","FLINGER");
                     break;
@@ -463,6 +483,8 @@ public class ShooterPIDF {
             telemetry.addData("SHOOTER SCORE","startScoring");
             totalBalls = numberBalls;
             startScoring = false;
+            intake.spin(0.0);
+            gate.open();
             this.update(true,false, telemetry); // start the shooting update process, with "true" for shootingstate START
         } else if (this.update(false,false, telemetry)) {
             telemetry.addData("SHOOTER SCORE", "update true, so minus one ball");
@@ -470,6 +492,7 @@ public class ShooterPIDF {
             if (totalBalls == 0) {
                 telemetry.addData("SHOOTER SCORE", "total balls equals ZERO");
                 startScoring = true;
+                gate.closed(); // only close the gate after firing ALL the balls
                 return true; // finished firing all balls, return true for "score"
             } else {
                 this.update(true, false, telemetry); // start the shooting update process, with "true" for shootingstate START
@@ -479,3 +502,4 @@ public class ShooterPIDF {
         return false;
     } // end score
 }
+

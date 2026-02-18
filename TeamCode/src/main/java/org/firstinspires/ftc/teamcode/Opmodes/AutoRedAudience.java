@@ -285,6 +285,8 @@ public class AutoRedAudience extends  OpMode{
             }
             case 9: { // FOLLOW PATH LEAVEAUDIENCE
                 if (!follower.isBusy()) {
+                    shooter.spin(0);
+                    intake.spin(0);
                     setPathState(-1);
                 }
                 break;

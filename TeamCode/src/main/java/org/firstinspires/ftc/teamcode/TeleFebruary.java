@@ -20,10 +20,13 @@ import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.Mechanisms.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.Mechanisms.ShooterPIDF;
-import org.firstinspires.ftc.teamcode.Mechanisms.ShooterPIDF.ShotProfile;
+//import org.firstinspires.ftc.teamcode.Mechanisms.ShooterPIDF.ShotProfile;
 
 import org.firstinspires.ftc.teamcode.Mechanisms.ShooterTele;
+import org.firstinspires.ftc.teamcode.Mechanisms.ShooterTeleBoring.ShotProfile;
+import org.firstinspires.ftc.teamcode.Mechanisms.ShooterTeleBoring;
 import org.firstinspires.ftc.teamcode.Mechanisms.ShotProfileConfig;
+import org.firstinspires.ftc.teamcode.Mechanisms.ShotProfileConfigBoring;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -46,7 +49,8 @@ public class TeleFebruary extends OpMode {
 
     private MecanumDriveBase mecanumDrive;
     private Intake intake;
-    private ShooterPIDF shooter;
+    //private ShooterPIDF shooter;
+    private ShooterTeleBoring shooter;
 
     private ShotProfile currentProfile = ShotProfile.MID;
 
@@ -78,7 +82,8 @@ public class TeleFebruary extends OpMode {
         follower = Constants.createFollower(hardwareMap);
 
         mecanumDrive = new MecanumDriveBase(hardwareMap);
-        shooter = new ShooterPIDF(hardwareMap);
+        //shooter = new ShooterPIDF(hardwareMap);
+        shooter = new ShooterTeleBoring(hardwareMap);
         intake = new Intake(hardwareMap);
         gate = new Gate(hardwareMap);
 
@@ -118,7 +123,7 @@ public class TeleFebruary extends OpMode {
         // this needs to be enabled for automatic pedro driving, but is probably the cause of the
         // difficulties when using mecanumDrive.driveFieldCentric
         //follower.startTeleOpDrive(true);
-        aprilTagSubsystem.setManualExposure(telemetry, 10, 100, 2500);
+        aprilTagSubsystem.setManualExposure(telemetry, 1, 100, 4500);
     }
 
     @Override public void loop() {
@@ -136,6 +141,10 @@ public class TeleFebruary extends OpMode {
         double turn = gamepad1.right_stick_x;
         turn *= Math.abs(turn);
 
+        if (gamepad1.left_trigger>0.1) {
+            turn = turn / 3;
+        }
+
         mecanumDrive.driveFieldCentric(drive, strafe, turn);
 
         if (gamepad1.options) {
@@ -152,7 +161,7 @@ public class TeleFebruary extends OpMode {
             // near
             //shooterTargetVelocity = shooter.NEARVELOCITY;
             currentProfile = ShotProfile.CLOSE;
-            shooterTargetVelocity = ShotProfileConfig.closeRPM;
+            shooterTargetVelocity = ShotProfileConfigBoring.closeRPM;
             //shooter.spin(shooterTargetVelocity);
 
             shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
@@ -163,7 +172,7 @@ public class TeleFebruary extends OpMode {
             // medium
             //shooterTargetVelocity = shooter.MEDIUMVELOCITY;
             currentProfile = ShotProfile.MID;
-            shooterTargetVelocity = ShotProfileConfig.midRPM;
+            shooterTargetVelocity = ShotProfileConfigBoring.midRPM;
             //shooter.spin(shooterTargetVelocity);
             shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
             shooterDistance = "Mid";
@@ -172,7 +181,7 @@ public class TeleFebruary extends OpMode {
             // far
             //shooterTargetVelocity = shooter.FARVELOCITY;
             currentProfile = ShotProfile.FAR;
-            shooterTargetVelocity = ShotProfileConfig.farRPM;
+            shooterTargetVelocity = ShotProfileConfigBoring.farRPM;
             //shooter.spin(shooterTargetVelocity);
             shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
             shooterDistance = "Far";
@@ -181,7 +190,7 @@ public class TeleFebruary extends OpMode {
             // really far
             //shooterTargetVelocity = shooter.REALLYFARVELOCITY;
             currentProfile = ShotProfile.POWER;
-            shooterTargetVelocity = ShotProfileConfig.powerRPM;
+            shooterTargetVelocity = ShotProfileConfigBoring.powerRPM;
             //shooter.spin(shooterTargetVelocity);
             shooter.flywheelUpdatePower(currentProfile, shooterTargetVelocity);
             shooterDistance = "Power";
@@ -231,7 +240,7 @@ public class TeleFebruary extends OpMode {
 
         //if (gamepad2.dpad_up && (shooterVelocity>(shooterTargetVelocity-75))) {
         if (gamepad2.dpad_up) {
-            intake.spin(1.0);
+            //intake.spin(1.0);
             gate.closed();
         } else if (gamepad2.dpad_down) {
             gate.open();
@@ -266,6 +275,8 @@ public class TeleFebruary extends OpMode {
         if (DEBUG) {
 
             motorVoltage = 12 / hardwareMap.voltageSensor.iterator().next().getVoltage();
+
+            telemetry.addData("CurrentTagDetected", currentTagDetected);
 
             if (!automatedTargeting) {
                 telemetry.addData("AUTOMATED TARGETING", "off!!!!!!!!!!!");

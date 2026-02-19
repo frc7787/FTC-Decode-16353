@@ -90,8 +90,8 @@ public class AutoBlueGoalDump extends  OpMode{
 
         /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup1EndPose, scorePoseFake))
-                .setLinearHeadingInterpolation(pickup1EndPose.getHeading(), scorePoseFake.getHeading())
+                .addPath(new BezierLine(pickup1EndPose, scorePoseFake2))
+                .setLinearHeadingInterpolation(pickup1EndPose.getHeading(), scorePoseFake2.getHeading())
                 .setGlobalDeceleration(4)
                 .setBrakingStrength(4)
                 .setBrakingStart(4)
@@ -195,12 +195,12 @@ public class AutoBlueGoalDump extends  OpMode{
         dumpPath = follower.pathBuilder()
                 .addPath(new BezierCurve(pickup2EndPose, dumpControl, dumpPose))
                 .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), dumpPose.getHeading())
-                //.setTimeoutConstraint(2.0) // add DELAY to allow balls to come out of chute
+                .setTimeoutConstraint(3.0) // add DELAY to allow balls to come out of chute
                 .build();
 
         scoreDump = follower.pathBuilder()
-                .addPath(new BezierLine(dumpPose, scorePose))
-                .setLinearHeadingInterpolation(dumpPose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierCurve(dumpPose, dumpScoreControl, scorePoseFake))
+                .setLinearHeadingInterpolation(dumpPose.getHeading(), scorePoseFake.getHeading())
                 .build();
 
 
@@ -211,8 +211,10 @@ public class AutoBlueGoalDump extends  OpMode{
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: {  // FOLLOW PATH TO SCORING - preloaded
-                follower.followPath(scorePreload);
-                setPathState(1);
+                if (opmodeTimer.getElapsedTimeSeconds() > 0.1) {
+                    follower.followPath(scorePreload);
+                    setPathState(1);
+                }
                 //shooter.spin(2000);
                 break;
             }
@@ -303,7 +305,7 @@ public class AutoBlueGoalDump extends  OpMode{
                     /* Score Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(leaveGoal, true);
+                    //follower.followPath(leaveGoal, true);
                     intake.spin(0.0);  // POWER DOWN FOR END OF AUTO
                     shooter.spin(0);
                     setPathState(11);
@@ -372,6 +374,13 @@ public class AutoBlueGoalDump extends  OpMode{
     public void start() {
         opmodeTimer.resetTimer();
         setPathState(0);
+        follower.startTeleopDrive(); // give this a try
+        follower.setTeleOpDrive(
+                -0.5,
+                0.0,
+                0.0,
+                true // Robot Centric
+        );
     }
 
     /** We do not use this because everything should automatically disable **/

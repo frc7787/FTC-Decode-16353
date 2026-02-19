@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Opmodes;
 
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
@@ -13,6 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
+import org.firstinspires.ftc.teamcode.Mechanisms.ShooterTeleBoring;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstants.*;
 
@@ -22,7 +24,7 @@ import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstants.*;
 public class AutoBlueGoal extends  OpMode{
 
     private Intake intake;
-    private Shooter shooter;
+    private ShooterTeleBoring shooter;
 
     private AprilTagSubsystem aprilTagSubsystem;
 
@@ -115,10 +117,8 @@ public class AutoBlueGoal extends  OpMode{
 
         /* This is our scorePickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup2EndPose, pickup2StartPose))
-                .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), pickup2StartPose.getHeading())
-                .addPath(new BezierLine(pickup2StartPose, scorePoseFake2))
-                .setLinearHeadingInterpolation(pickup2StartPose.getHeading(), scorePoseFake2.getHeading())
+                .addPath(new BezierCurve(pickup2EndPose, scorePoseFake2Control,scorePoseFake2))
+                .setLinearHeadingInterpolation(pickup2EndPose.getHeading(), scorePoseFake2.getHeading())
                 .build();
 
         /* This is our grabPickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
@@ -198,9 +198,11 @@ public class AutoBlueGoal extends  OpMode{
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: {  // FOLLOW PATH TO SCORING - preloaded
-                follower.followPath(scorePreload);
-                setPathState(1);
-                //shooter.spin(2000);
+                if (opmodeTimer.getElapsedTimeSeconds() > 0.1) {
+                    follower.followPath(scorePreload);
+                    setPathState(1);
+                    //shooter.spin(2000);
+                }
                 break;
             }
             case 1: { // DONE PATH
@@ -233,7 +235,7 @@ public class AutoBlueGoal extends  OpMode{
                 if (!follower.isBusy()) {
                     /* Grab Sample */
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
-                    intake.spin(1.0);
+                    intake.spin(0.0);
                     follower.followPath(scorePickup1, 0.7,true);
                     setPathState(4);
                 }
@@ -272,7 +274,7 @@ public class AutoBlueGoal extends  OpMode{
                     /* Grab Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
-                    intake.spin(1.0);
+                    //intake.spin(1.0);
                     follower.followPath(scorePickup2, true);
                     setPathState(7);
                 }
@@ -291,7 +293,7 @@ public class AutoBlueGoal extends  OpMode{
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     //follower.followPath(grabPickup3,true);
-                    follower.followPath(leaveGoal, true);
+                    //follower.followPath(leaveGoal, true);
                     intake.spin(0.0);  // POWER DOWN FOR END OF AUTO
                     shooter.spin(0);
                     setPathState(9);
@@ -362,7 +364,7 @@ public class AutoBlueGoal extends  OpMode{
         follower.setStartingPose(startPose);
 
         intake = new Intake(hardwareMap);
-        shooter = new Shooter(hardwareMap);
+        shooter = new ShooterTeleBoring(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
         shooter.setShooterVelocity(shooter.RPM_GOAL); // NEAR for Goal
@@ -379,6 +381,13 @@ public class AutoBlueGoal extends  OpMode{
     public void start() {
         opmodeTimer.resetTimer();
         setPathState(0);
+        follower.startTeleopDrive(); // give this a try
+        follower.setTeleOpDrive(
+                -0.5,
+                0.0,
+                0.0,
+                true // Robot Centric
+        );
     }
 
     /** We do not use this because everything should automatically disable **/

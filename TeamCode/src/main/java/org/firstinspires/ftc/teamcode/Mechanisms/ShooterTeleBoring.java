@@ -85,7 +85,7 @@ public class ShooterTeleBoring {
     public static double RPM_46 = 1360;
     public static double RPM_42 = 1340;
     public static double RPM_AUDIENCE = 1790; // was 1760 @12.9V; was 2290/2240 new wheel
-    public static double RPM_GOAL = 1400; // was 1940 old wheel
+    public static double RPM_GOAL = 1300; // was 1400 old wheel
 
 
     // THESE VARIABLES ARE FOR THE AUTOMATIC SHOOTER PROCESS.
@@ -98,7 +98,7 @@ public class ShooterTeleBoring {
     public static double FLIPPER_UP = 0.5; // was 0.5
     public static double FLIPPER_DOWN = 0.8; // was 0.8
 
-    public static double JUST_SHOOT_IT = 1.6; // waiting for motorspinup, but at some point just shoot!
+    public static double JUST_SHOOT_IT = 1.4; // waiting for motorspinup, but at some point just shoot!
 
 
     public double[] TARGETVELOCITY = {2110, // 0 really far
@@ -431,7 +431,7 @@ public class ShooterTeleBoring {
                     break;
                 }
                 case INTAKE: {
-                    //intake.spin(1.0);
+                    //intake.spin(0.0);
                     // FIRST ball, startShootingProcess will be true, so give the intake MORE time
                     if (startShootingProcess && (shooterTimer.getElapsedTimeSeconds() > INTAKE_TIME_START)) {
                         shooterState = shootingState.MOTORSPINUP;
@@ -450,7 +450,7 @@ public class ShooterTeleBoring {
                             || shooterTimer.getElapsedTimeSeconds() > JUST_SHOOT_IT) {
                         shooterTimer.resetTimer();
                         shooterState = shootingState.FLINGER;
-                        intake.spin(1.0);
+                        intake.spin(0.5);
                         //gate.open(); // TODO I only changed the method name, the logic might still need to be updated
                     }
                     telemetry.addLine(String.format("SHOOTER UPDATE:MOTORSPINUP actual velocity %6.1f",
@@ -483,7 +483,7 @@ public class ShooterTeleBoring {
             telemetry.addData("SHOOTER SCORE","startScoring");
             totalBalls = numberBalls;
             startScoring = false;
-            intake.spin(0.0);
+            intake.spin(-0.4);
             gate.open();
             this.update(true,false, telemetry); // start the shooting update process, with "true" for shootingstate START
         } else if (this.update(false,false, telemetry)) {
@@ -493,6 +493,7 @@ public class ShooterTeleBoring {
                 telemetry.addData("SHOOTER SCORE", "total balls equals ZERO");
                 startScoring = true;
                 gate.closed(); // only close the gate after firing ALL the balls
+                intake.spin(0.0);
                 return true; // finished firing all balls, return true for "score"
             } else {
                 this.update(true, false, telemetry); // start the shooting update process, with "true" for shootingstate START

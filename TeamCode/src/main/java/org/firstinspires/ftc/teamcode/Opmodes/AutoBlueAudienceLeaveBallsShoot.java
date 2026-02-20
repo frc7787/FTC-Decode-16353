@@ -128,6 +128,8 @@ public class AutoBlueAudienceLeaveBallsShoot extends  OpMode{
         pickupBalls = follower.pathBuilder()
                 .addPath(new BezierLine(leavePoseAudience,pickupBallsPose))
                 .setLinearHeadingInterpolation(leavePoseAudience.getHeading(), pickupBallsPose.getHeading())
+                .addPath(new BezierLine(pickupBallsPose,pickupBallsPose2))
+                .setLinearHeadingInterpolation(pickupBallsPose.getHeading(),pickupBallsPose2.getHeading())
                 .build();
 
         leaveBalls = follower.pathBuilder()
@@ -136,8 +138,8 @@ public class AutoBlueAudienceLeaveBallsShoot extends  OpMode{
                 .build();
 
         scorePickupBalls = follower.pathBuilder()
-                .addPath(new BezierLine(pickupBallsPose,scorePoseAudience))
-                .setLinearHeadingInterpolation(pickupBallsPose.getHeading(), scorePoseAudience.getHeading())
+                .addPath(new BezierLine(pickupBallsPose2,scorePoseAudienceFake))
+                .setLinearHeadingInterpolation(pickupBallsPose2.getHeading(), scorePoseAudienceFake.getHeading())
                 .build();
 
 
@@ -171,7 +173,7 @@ public class AutoBlueAudienceLeaveBallsShoot extends  OpMode{
                 break;
             }
             case 2: { // JUST SCORING - preloaded
-                if (shooter.score(false, 3, telemetry)) {
+                if (shooter.score(true, 3, telemetry)) {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     follower.followPath(leaveAudience, 0.95, true);
                     // setPathState(2); OK, let's just test the first two paths.
@@ -193,7 +195,7 @@ public class AutoBlueAudienceLeaveBallsShoot extends  OpMode{
             }
             case 4: { // FOLLOW PATH TO SCORING - pickup 3
                 if (!follower.isBusy()) {
-                    intake.spin(1.0);
+                    intake.spin(0.0);
                     follower.followPath(scorePickupBalls,true);
                     setPathState(5);
                 }
@@ -201,13 +203,50 @@ public class AutoBlueAudienceLeaveBallsShoot extends  OpMode{
             }
             case 5: { // FOLLOW PATH TO SCORING - pickup 3
                 if (!follower.isBusy() && opmodeTimer.getElapsedTimeSeconds() > delayStart2) {
-                    setPathState(5);
+                    setPathState(6);
                 }
                 break;
             }
             case 6: { // JUST SCORING - pickup 3
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if (shooter.score(false, 3, telemetry)) {
+                if (shooter.score(true, 3, telemetry)) {
+                    /* Score Sample */
+
+                    follower.followPath(leaveAudience, 0.95, true);
+                    // setPathState(2); OK, let's just test the first two paths.
+                    intake.spin(1.0);
+                    setPathState(7);
+                }
+                break;
+            }
+            case 7: { // FOLLOW GRAB PATH - pickup 3
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
+                if (!follower.isBusy()) {
+                    /* Grab Sample */
+                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
+                    intake.spin(1.0);
+                    follower.followPath(pickupBalls, true);
+                    setPathState(8);
+                }
+                break;
+            }
+            case 8: { // FOLLOW PATH TO SCORING - pickup 3
+                if (!follower.isBusy()) {
+                    intake.spin(0.0);
+                    follower.followPath(scorePickupBalls,true);
+                    setPathState(9);
+                }
+                break;
+            }
+            case 9: { // FOLLOW PATH TO SCORING - pickup 3
+                if (!follower.isBusy() && opmodeTimer.getElapsedTimeSeconds() > delayStart2) {
+                    setPathState(10);
+                }
+                break;
+            }
+            case 10: { // JUST SCORING - pickup 3
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if (shooter.score(true, 3, telemetry)) {
                     /* Score Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
@@ -215,7 +254,15 @@ public class AutoBlueAudienceLeaveBallsShoot extends  OpMode{
                     follower.followPath(leaveAudience, true);
                     intake.spin(0.0);  // POWER DOWN FOR END OF AUTO
                     shooter.spin(0);
-                    setPathState(9);
+                    setPathState(11);
+                }
+                break;
+            }
+            case 11: { // FOLLOW PATH LEAVEAUDIENCE
+                if (!follower.isBusy()) {
+                    shooter.spin(0);
+                    intake.spin(0);
+                    setPathState(-1);
                 }
                 break;
             }
@@ -238,13 +285,13 @@ public class AutoBlueAudienceLeaveBallsShoot extends  OpMode{
                 }
                 break;
             }
-            case 7: { // FOLLOW PATH TO SCORING - pickup 2
+            case 71: { // FOLLOW PATH TO SCORING - pickup 2
                 if (!follower.isBusy()) {
                     setPathState(8);
                 }
                 break;
             }
-            case 8: { // JUST SCORING - pickup 2
+            case 81: { // JUST SCORING - pickup 2
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if (shooter.score(false, 3, telemetry)) {
                     /* Score Sample */
@@ -258,7 +305,7 @@ public class AutoBlueAudienceLeaveBallsShoot extends  OpMode{
                 }
                 break;
             }
-            case 9: { // FOLLOW PATH LEAVEAUDIENCE
+            case 91: { // FOLLOW PATH LEAVEAUDIENCE
                 if (!follower.isBusy()) {
                     shooter.spin(0);
                     intake.spin(0);
@@ -351,7 +398,7 @@ public class AutoBlueAudienceLeaveBallsShoot extends  OpMode{
 
         if (gamepad1.xWasPressed()) {
             delayStart2 = delayStart2 + 1;
-        } else if (gamepad1.aWasPressed()) {
+        } else if (gamepad1.bWasPressed()) {
             delayStart2 = delayStart2 - 1;
             if (delayStart2 < 0) {
                 delayStart2 = 0;

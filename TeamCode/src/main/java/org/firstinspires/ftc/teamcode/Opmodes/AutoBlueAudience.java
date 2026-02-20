@@ -130,8 +130,10 @@ public class AutoBlueAudience extends  OpMode{
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: {  // FOLLOW PATH TO SCORING - preloaded
-                follower.followPath(scorePreloadAudience);
-                setPathState(1);
+                if (opmodeTimer.getElapsedTimeSeconds() > 0.1) {
+                    follower.followPath(scorePreloadAudience);
+                    setPathState(1);
+                }
                 //shooter.spin(2000);
                 break;
             }
@@ -153,7 +155,7 @@ public class AutoBlueAudience extends  OpMode{
             case 2: { // JUST SCORING - preloaded
                 if (shooter.score(true, 3, telemetry)) {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup3Audience, 0.7, true);
+                    follower.followPath(grabPickup3Audience, 0.6, true);
                     // setPathState(2); OK, let's just test the first two paths.
                     intake.spin(1.0);
                     setPathState(3);
@@ -165,7 +167,7 @@ public class AutoBlueAudience extends  OpMode{
                 if (!follower.isBusy()) {
                     /* Grab Sample */
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
-                    intake.spin(1.0);
+                    intake.spin(0.0);
                     follower.followPath(scorePickup3Audience, true);
                     setPathState(4);
                 }
@@ -184,14 +186,14 @@ public class AutoBlueAudience extends  OpMode{
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     follower.followPath(grabPickup2PreAudience, true);
-                    intake.spin(0.8);
+                    intake.spin(1.0);
                     setPathState(6);
                 }
                 break;
             }
             case 6: {
                 if (!follower.isBusy()) {
-                    follower.followPath(grabPickup2Audience,0.7,true);
+                    follower.followPath(grabPickup2Audience,0.6,true);
                     setPathState(61);
                 }
                 break;
@@ -204,7 +206,7 @@ public class AutoBlueAudience extends  OpMode{
                     /* Grab Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
-                    intake.spin(0.8);
+                    intake.spin(0.0);
                     follower.followPath(scorePickup2Audience, true);
                     setPathState(7);
                 }
@@ -311,6 +313,13 @@ public class AutoBlueAudience extends  OpMode{
     public void start() {
         opmodeTimer.resetTimer();
         setPathState(0);
+        follower.startTeleopDrive(); // give this a try
+        follower.setTeleOpDrive(
+                0.5,
+                0.0,
+                0.0,
+                true // Robot Centric
+        );
     }
 
     /** We do not use this because everything should automatically disable **/

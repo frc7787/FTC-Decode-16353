@@ -84,7 +84,7 @@ public class ShooterTeleBoring {
     public static double RPM_50 = 1440;
     public static double RPM_46 = 1360;
     public static double RPM_42 = 1340;
-    public static double RPM_AUDIENCE = 1790; // was 1760 @12.9V; was 2290/2240 new wheel
+    public static double RPM_AUDIENCE = 1830; // was 1790 @12.9V; was 2290/2240 new wheel
     public static double RPM_GOAL = 1320; // was 1400 old wheel
 
     public static double AUTO_GOAL_INTAKE_SPEED = 0.7;

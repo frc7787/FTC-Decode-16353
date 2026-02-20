@@ -31,6 +31,7 @@ public class AutoConstants {
     public static Pose pickup3EndPose = new Pose(10,34, Math.toRadians(180));
 
     public static Pose pickupBallsPose = new Pose(11,10,180); // steal enemy balls!
+    public static Pose pickupBallsPose2 = new Pose(13,8,225); // steal enemy balls!
 
 
     // THIS scorePose is different from the mirror image of Red Goal in AutoConstants Red
@@ -59,8 +60,8 @@ public class AutoConstants {
     public static Pose scorePoseDump = new Pose(56, 105, Math.toRadians(151));
 
 
-    public static Pose scorePoseAudience = new Pose(56,21, Math.toRadians(110)); // was 112 Scoring Pose from the Audience launch zone.
-    public static Pose scorePoseAudienceFake = new Pose(55,21, Math.toRadians(114)); // was 115 Scoring Pose from the Audience launch zone.
+    public static Pose scorePoseAudience = new Pose(57,21, Math.toRadians(110)); // was 112 Scoring Pose from the Audience launch zone.
+    public static Pose scorePoseAudienceFake = new Pose(57,21, Math.toRadians(114)); // (55,21,110)was 115 Scoring Pose from the Audience launch zone.
 
     public static Pose dumpPose = new Pose(15,62, Math.toRadians(270));
     public static Pose dumpControl = new Pose(19, 59); // (37,63)

@@ -199,8 +199,8 @@ public class AutoBlueGoalDump extends  OpMode{
                 .build();
 
         scoreDump = follower.pathBuilder()
-                .addPath(new BezierCurve(dumpPose, dumpScoreControl, scorePoseFake))
-                .setLinearHeadingInterpolation(dumpPose.getHeading(), scorePoseFake.getHeading())
+                .addPath(new BezierCurve(dumpPose, dumpScoreControl, scorePoseDump))
+                .setLinearHeadingInterpolation(dumpPose.getHeading(), scorePoseDump.getHeading())
                 .build();
 
 
@@ -260,7 +260,7 @@ public class AutoBlueGoalDump extends  OpMode{
                 break;
             }
             case 5: {
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3) {
                     follower.followPath(scoreDump, 0.7,true);
                     setPathState(6);
                 }

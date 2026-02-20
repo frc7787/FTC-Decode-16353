@@ -151,9 +151,9 @@ public class AutoBlueAudience extends  OpMode{
                 break;
             }
             case 2: { // JUST SCORING - preloaded
-                if (shooter.score(false, 3, telemetry)) {
+                if (shooter.score(true, 3, telemetry)) {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup3Audience, 0.5, true);
+                    follower.followPath(grabPickup3Audience, 0.7, true);
                     // setPathState(2); OK, let's just test the first two paths.
                     intake.spin(1.0);
                     setPathState(3);
@@ -179,7 +179,7 @@ public class AutoBlueAudience extends  OpMode{
             }
             case 5: { // JUST SCORING - pickup 3
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if (shooter.score(false, 3, telemetry)) {
+                if (shooter.score(true, 3, telemetry)) {
                     /* Score Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
@@ -191,7 +191,7 @@ public class AutoBlueAudience extends  OpMode{
             }
             case 6: {
                 if (!follower.isBusy()) {
-                    follower.followPath(grabPickup2Audience,0.5,true);
+                    follower.followPath(grabPickup2Audience,0.7,true);
                     setPathState(61);
                 }
                 break;
@@ -218,7 +218,7 @@ public class AutoBlueAudience extends  OpMode{
             }
             case 8: { // JUST SCORING - pickup 2
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if (shooter.score(false, 3, telemetry)) {
+                if (shooter.score(true, 3, telemetry)) {
                     /* Score Sample */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */

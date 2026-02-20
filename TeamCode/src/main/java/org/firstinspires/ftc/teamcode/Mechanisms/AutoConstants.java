@@ -24,11 +24,11 @@ public class AutoConstants {
     public static Pose pickup2StartPose = new Pose(48,57, Math.toRadians(180));
 
     //public static Pose pickup2EndPose = new Pose(21,57,Math.toRadians(180));
-    public static Pose pickup2EndPose = new Pose(11,57,Math.toRadians(180));
+    public static Pose pickup2EndPose = new Pose(10,57,Math.toRadians(180));
 
     public static Pose pickup3StartPose = new Pose(48, 34, Math.toRadians(180));
     //public static Pose pickup3EndPose = new Pose(21,34, Math.toRadians(180));
-    public static Pose pickup3EndPose = new Pose(11,34, Math.toRadians(180));
+    public static Pose pickup3EndPose = new Pose(10,34, Math.toRadians(180));
 
     public static Pose pickupBallsPose = new Pose(11,10,180); // steal enemy balls!
 
@@ -52,10 +52,11 @@ public class AutoConstants {
     // changed feb 18 public static Pose scorePoseFake2 = new Pose(57, 97, Math.toRadians(147)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
 
     //public static Pose scorePoseFake2 = new Pose(56, 99, Math.toRadians(142)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    public static Pose scorePoseFake2 = new Pose(56, 105, Math.toRadians(145)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    public static Pose scorePoseFake2 = new Pose(56, 105, Math.toRadians(148)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
 
 
     public static Pose scorePoseFake2Control = new Pose(61,58);
+    public static Pose scorePoseDump = new Pose(56, 105, Math.toRadians(151));
 
 
     public static Pose scorePoseAudience = new Pose(56,21, Math.toRadians(110)); // was 112 Scoring Pose from the Audience launch zone.
@@ -64,7 +65,7 @@ public class AutoConstants {
     public static Pose dumpPose = new Pose(15,62, Math.toRadians(270));
     public static Pose dumpControl = new Pose(19, 59); // (37,63)
 
-    public static Pose dumpScoreControl = new Pose(61,61);
+    public static Pose dumpScoreControl = new Pose(72,60); // (61,61)
 
 
     public static Pose pickup1Pose = new Pose(37, 121, Math.toRadians(0)); // Highest (First Set) of Artifacts from the Spike Mark.

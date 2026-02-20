@@ -85,7 +85,13 @@ public class ShooterTeleBoring {
     public static double RPM_46 = 1360;
     public static double RPM_42 = 1340;
     public static double RPM_AUDIENCE = 1790; // was 1760 @12.9V; was 2290/2240 new wheel
-    public static double RPM_GOAL = 1300; // was 1400 old wheel
+    public static double RPM_GOAL = 1320; // was 1400 old wheel
+
+    public static double AUTO_GOAL_INTAKE_SPEED = 0.7;
+    public static double AUTO_AUDIENCE_INTAKE_SPEED = 0.5;
+    public static double AUTO_AUDIENCE_INTAKE_DELAY= 4;
+
+    private double autoIntakeSpeed;
 
 
     // THESE VARIABLES ARE FOR THE AUTOMATIC SHOOTER PROCESS.
@@ -398,7 +404,7 @@ public class ShooterTeleBoring {
         return motor.getVelocity();
     }
 
-    public boolean update(boolean startShootingProcess, boolean cancelShootingProcess, Telemetry telemetry) {
+    public boolean update(boolean startShootingProcess, boolean cancelShootingProcess, Telemetry telemetry, double audienceDelay) {
 
         if (cancelShootingProcess) {
             intake.spin(0);
@@ -437,7 +443,8 @@ public class ShooterTeleBoring {
                         shooterState = shootingState.MOTORSPINUP;
                         shooterTimer.resetTimer();
                         // NOT the first ball, startShootingProcess will be false, intake already moving, so give the intake LESS time
-                    } else if (!startShootingProcess && (shooterTimer.getElapsedTimeSeconds() > INTAKE_TIME_CONTINUE)) {
+                    } else if (!startShootingProcess && (shooterTimer.getElapsedTimeSeconds() > INTAKE_TIME_CONTINUE*audienceDelay)) {
+                    //} else if (!startShootingProcess && (shooterTimer.getElapsedTimeSeconds() > 1)) {
                         shooterState = shootingState.MOTORSPINUP;
                         shooterTimer.resetTimer();
                     }
@@ -450,7 +457,7 @@ public class ShooterTeleBoring {
                             || shooterTimer.getElapsedTimeSeconds() > JUST_SHOOT_IT) {
                         shooterTimer.resetTimer();
                         shooterState = shootingState.FLINGER;
-                        intake.spin(0.5);
+                        intake.spin(autoIntakeSpeed);
                         //gate.open(); // TODO I only changed the method name, the logic might still need to be updated
                     }
                     telemetry.addLine(String.format("SHOOTER UPDATE:MOTORSPINUP actual velocity %6.1f",
@@ -477,16 +484,34 @@ public class ShooterTeleBoring {
 
     } // end update
 
-    public boolean score(boolean placeHolder, double numberBalls, Telemetry telemetry) {
+    public boolean score(boolean autoAudience, double numberBalls, Telemetry telemetry) {
+        double delay;
+
+        if (autoAudience) {
+            autoIntakeSpeed = AUTO_AUDIENCE_INTAKE_SPEED;
+            delay = AUTO_AUDIENCE_INTAKE_DELAY;
+        } else {
+            autoIntakeSpeed = AUTO_GOAL_INTAKE_SPEED;
+            delay = 1;
+        }
 
         if (startScoring) {
             telemetry.addData("SHOOTER SCORE","startScoring");
+            if (autoAudience) {
+                autoIntakeSpeed = AUTO_AUDIENCE_INTAKE_SPEED;
+                delay = AUTO_AUDIENCE_INTAKE_DELAY;
+            } else {
+                autoIntakeSpeed = AUTO_GOAL_INTAKE_SPEED;
+                delay = 1;
+            }
+            telemetryM.addData("Current Velocity", delay);
+            telemetryM.update();
             totalBalls = numberBalls;
             startScoring = false;
-            intake.spin(-0.4);
+            intake.spin(-0.1);
             gate.open();
-            this.update(true,false, telemetry); // start the shooting update process, with "true" for shootingstate START
-        } else if (this.update(false,false, telemetry)) {
+            this.update(true,false, telemetry, delay); // start the shooting update process, with "true" for shootingstate START
+        } else if (this.update(false,false, telemetry, delay)) {
             telemetry.addData("SHOOTER SCORE", "update true, so minus one ball");
             totalBalls = totalBalls - 1;
             if (totalBalls == 0) {
@@ -496,7 +521,7 @@ public class ShooterTeleBoring {
                 intake.spin(0.0);
                 return true; // finished firing all balls, return true for "score"
             } else {
-                this.update(true, false, telemetry); // start the shooting update process, with "true" for shootingstate START
+                this.update(true, false, telemetry, delay); // start the shooting update process, with "true" for shootingstate START
                 return false; // if not finished firing all balls, return false for "score"
             }
         }

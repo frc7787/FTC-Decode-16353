@@ -30,8 +30,8 @@ public class AutoConstants {
     //public static Pose pickup3EndPose = new Pose(21,34, Math.toRadians(180));
     public static Pose pickup3EndPose = new Pose(10,34, Math.toRadians(180));
 
-    public static Pose pickupBallsPose = new Pose(11,10,180); // steal enemy balls!
-    public static Pose pickupBallsPose2 = new Pose(13,8,225); // steal enemy balls!
+    public static Pose pickupBallsPose = new Pose(11,11,270); // 180 steal enemy balls!
+    public static Pose pickupBallsPose2 = new Pose(11,8,270); // 195 steal enemy balls!
 
 
     // THIS scorePose is different from the mirror image of Red Goal in AutoConstants Red
@@ -56,7 +56,7 @@ public class AutoConstants {
     public static Pose scorePoseFake2 = new Pose(56, 105, Math.toRadians(148)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
 
 
-    public static Pose scorePoseFake2Control = new Pose(61,58);
+    public static Pose scorePoseFake2Control = new Pose(61,58); // (61,58)
     public static Pose scorePoseDump = new Pose(56, 105, Math.toRadians(151));
 
 
@@ -76,6 +76,6 @@ public class AutoConstants {
     // INITIALIZING PATHS
     public static Path scorePreload, scorePreloadAudience;
     public static PathChain grabPickup1, scorePickup1, grabPickup2Pre, grabPickup2, scorePickup2, grabPickup3, scorePickup3, dumpPath, scoreDump;
-    public static PathChain grabPickup3Audience, scorePickup3Audience, grabPickup2PreAudience, grabPickup2Audience, scorePickup2Audience, pickupBalls, leaveBalls, scorePickupBalls;
+    public static PathChain grabPickup3Audience, scorePickup3Audience, grabPickup2PreAudience, grabPickup2Audience, scorePickup2Audience, pickupBalls, pickupBalls2, leaveBalls, scorePickupBalls;
     public static PathChain leaveGoal, leaveAudience;
 }

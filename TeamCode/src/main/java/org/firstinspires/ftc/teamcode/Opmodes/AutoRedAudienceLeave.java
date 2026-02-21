@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.Mechanisms.AprilTagSubsystem;
 import org.firstinspires.ftc.teamcode.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
+import org.firstinspires.ftc.teamcode.Mechanisms.ShooterTeleBoring;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstantsRed.*;
 
@@ -20,7 +21,7 @@ import static org.firstinspires.ftc.teamcode.Mechanisms.AutoConstantsRed.*;
 public class AutoRedAudienceLeave extends  OpMode{
 
     private Intake intake;
-    private Shooter shooter;
+    private ShooterTeleBoring shooter;
 
     private AprilTagSubsystem aprilTagSubsystem;
 
@@ -361,7 +362,7 @@ public class AutoRedAudienceLeave extends  OpMode{
         follower.setStartingPose(startPoseAudience);
 
         intake = new Intake(hardwareMap);
-        shooter = new Shooter(hardwareMap);
+        shooter = new ShooterTeleBoring(hardwareMap);
         aprilTagSubsystem = new AprilTagSubsystem(hardwareMap);
 
         shooter.setShooterVelocity(shooter.RPM_AUDIENCE);

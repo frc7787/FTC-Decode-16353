@@ -30,21 +30,21 @@ public class AutoConstantsRed {
     public static Pose pickupBallsPose = new Pose(134,10,0); // steal enemy balls!
 
     //public static Pose scorePose = new Pose(88, 85, Math.toRadians(45)); // GOAL Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    public static double scorePoseHeading = 43; //45
-    public static Pose scorePose = new Pose(86, 94, Math.toRadians(scorePoseHeading)); // GOAL Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    public static double scorePoseHeading = 35; //45
+    public static Pose scorePose = new Pose(88, 105, Math.toRadians(scorePoseHeading)); // (86,94), 43 GOAL Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
 
     // if the stupid thing keeps going to the wrong scorePose, just make a new one ...
-    public static double scorePoseFakeHeading = 40; //41
-    public static Pose scorePoseFake = new Pose(88, 92, Math.toRadians(scorePoseFakeHeading)); // 88,92 GOAL Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    public static double scorePoseFakeHeading = 32; //41
+    public static Pose scorePoseFake = new Pose(88, 105, Math.toRadians(scorePoseFakeHeading)); // (88,92),40 GOAL Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
 
-    public static double scorePoseFakeHeading2 = 38; //41
-    public static Pose scorePoseFake2 = new Pose(84, 99, Math.toRadians(scorePoseFakeHeading2)); // 86,90 GOAL Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    public static Pose scorePoseFake2Control = new Pose(83,58);
+    public static double scorePoseFakeHeading2 = 32; //41
+    public static Pose scorePoseFake2 = new Pose(88, 105, Math.toRadians(scorePoseFakeHeading2)); // (86,100),38 GOAL Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    public static Pose scorePoseFake2Control = new Pose(83,58); // (83,58);
 
 
     //public static Pose scorePoseAudience = new Pose(89,21, Math.toRadians(67)); // Scoring Pose from the Audience launch zone.
-    public static double scorePoseAudienceHeading = 72;
-    public static Pose scorePoseAudience = new Pose(88,15, Math.toRadians(scorePoseAudienceHeading)); // Scoring Pose from the Audience launch zone.
+    public static double scorePoseAudienceHeading = 70;
+    public static Pose scorePoseAudience = new Pose(88,21, Math.toRadians(scorePoseAudienceHeading)); // (85,19,68) 88,15,72Scoring Pose from the Audience launch zone.
     public static Pose scorePoseAudienceBalls = new Pose(88,15, Math.toRadians(78)); // Scoring Pose from the Audience launch zone.
 
     public static double scorePoseAudienceFakeHeading = 69;

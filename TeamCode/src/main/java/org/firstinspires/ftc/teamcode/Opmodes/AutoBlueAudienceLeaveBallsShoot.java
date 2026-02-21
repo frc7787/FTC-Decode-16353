@@ -132,6 +132,13 @@ public class AutoBlueAudienceLeaveBallsShoot extends  OpMode{
                 .setLinearHeadingInterpolation(pickupBallsPose.getHeading(),pickupBallsPose2.getHeading())
                 .build();
 
+        pickupBalls2 = follower.pathBuilder()
+                .addPath(new BezierLine(leavePoseAudience,pickupBallsPose))
+                .setLinearHeadingInterpolation(leavePoseAudience.getHeading(), pickupBallsPose.getHeading())
+                .addPath(new BezierLine(pickupBallsPose,pickupBallsPose2))
+                .setLinearHeadingInterpolation(pickupBallsPose.getHeading(),pickupBallsPose2.getHeading())
+                .build();
+
         leaveBalls = follower.pathBuilder()
                 .addPath(new BezierLine(pickupBallsPose,leavePoseAudience))
                 .setLinearHeadingInterpolation(pickupBallsPose.getHeading(), leavePoseAudience.getHeading())
@@ -195,13 +202,16 @@ public class AutoBlueAudienceLeaveBallsShoot extends  OpMode{
             }
             case 4: { // FOLLOW PATH TO SCORING - pickup 3
                 if (!follower.isBusy()) {
-                    intake.spin(0.0);
+                    intake.spin(-0.3);
                     follower.followPath(scorePickupBalls,true);
                     setPathState(5);
                 }
                 break;
             }
             case 5: { // FOLLOW PATH TO SCORING - pickup 3
+                if (pathTimer.getElapsedTimeSeconds()>0.5) {
+                    intake.spin(0.0);
+                }
                 if (!follower.isBusy() && opmodeTimer.getElapsedTimeSeconds() > delayStart2) {
                     setPathState(6);
                 }
@@ -232,13 +242,16 @@ public class AutoBlueAudienceLeaveBallsShoot extends  OpMode{
             }
             case 8: { // FOLLOW PATH TO SCORING - pickup 3
                 if (!follower.isBusy()) {
-                    intake.spin(0.0);
+                    intake.spin(-0.4);
                     follower.followPath(scorePickupBalls,true);
                     setPathState(9);
                 }
                 break;
             }
             case 9: { // FOLLOW PATH TO SCORING - pickup 3
+                if (pathTimer.getElapsedTimeSeconds()>0.5) {
+                    intake.spin(0.0);
+                }
                 if (!follower.isBusy() && opmodeTimer.getElapsedTimeSeconds() > delayStart2) {
                     setPathState(10);
                 }

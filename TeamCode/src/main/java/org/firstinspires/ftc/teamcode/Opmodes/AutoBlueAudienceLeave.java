@@ -185,6 +185,15 @@ public class AutoBlueAudienceLeave extends  OpMode{
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: {  // FOLLOW PATH TO SCORING - preloaded
+                if (opmodeTimer.getElapsedTimeSeconds() > 0.1 &&
+                        opmodeTimer.getElapsedTimeSeconds() < (delayStart + 0.5)) {
+                    follower.setTeleOpDrive(
+                            0.0,
+                            0.0,
+                            0.0,
+                            true // Robot Centric
+                    );
+                }
                 if (opmodeTimer.getElapsedTimeSeconds() > delayStart) {
                     follower.followPath(scorePreloadAudience);
                     setPathState(1);
@@ -381,6 +390,13 @@ public class AutoBlueAudienceLeave extends  OpMode{
     public void start() {
         opmodeTimer.resetTimer();
         setPathState(0);
+        follower.startTeleopDrive(); // give this a try
+        follower.setTeleOpDrive(
+                0.5,
+                0.0,
+                0.0,
+                true // Robot Centric
+        );
     }
 
     /** We do not use this because everything should automatically disable **/

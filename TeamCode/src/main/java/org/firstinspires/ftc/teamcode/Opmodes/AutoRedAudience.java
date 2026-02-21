@@ -184,8 +184,10 @@ public class AutoRedAudience extends  OpMode{
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0: {  // FOLLOW PATH TO SCORING - preloaded
-                follower.followPath(scorePreloadAudience);
-                setPathState(1);
+                if (opmodeTimer.getElapsedTimeSeconds() > 0.1) {
+                    follower.followPath(scorePreloadAudience);
+                    setPathState(1);
+                }
                 //shooter.spin(2000);
                 break;
             }
@@ -367,6 +369,13 @@ public class AutoRedAudience extends  OpMode{
     public void start() {
         opmodeTimer.resetTimer();
         setPathState(0);
+        follower.startTeleopDrive(); // give this a try
+        follower.setTeleOpDrive(
+                0.5,
+                0.0,
+                0.0,
+                true // Robot Centric
+        );
     }
 
     /** We do not use this because everything should automatically disable **/
